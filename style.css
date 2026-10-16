@@ -1,0 +1,766 @@
+/* =========================================================
+   GENERAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    margin: 0;
+
+    font-family:
+        Corbel,
+        Arial,
+        sans-serif;
+
+    color: #151515;
+
+    background: #f3f5f4;
+}
+
+
+button {
+    font-family: inherit;
+}
+
+
+
+/* =========================================================
+   APP LAYOUT
+   ========================================================= */
+
+.app {
+    display: grid;
+
+    grid-template-columns:
+        300px
+        minmax(500px, 1fr)
+        360px;
+
+    grid-template-rows:
+        80px
+        1fr;
+
+    width: 100vw;
+    height: 100vh;
+}
+
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+    grid-column: 1 / 4;
+
+    display: flex;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            90deg,
+            #008565,
+            #00664f
+        );
+
+    color: white;
+}
+
+
+.brand {
+    width: 300px;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding-left: 22px;
+
+    border-right:
+        1px solid
+        rgba(255, 255, 255, 0.30);
+}
+
+
+.brand-main {
+    font-size: 21px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+.brand-sub {
+    margin-top: 3px;
+
+    font-size: 14px;
+
+    letter-spacing: 0.8px;
+
+    opacity: 0.92;
+}
+
+
+.header-description {
+    padding-left: 26px;
+
+    font-size: 18px;
+}
+
+
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.filter-panel,
+.details-panel {
+    background: #ffffff;
+
+    margin: 8px;
+
+    border:
+        1px solid
+        #009b71;
+
+    border-radius: 12px;
+
+    overflow-y: auto;
+}
+
+
+.filter-panel {
+    margin-right: 4px;
+}
+
+
+.details-panel {
+    margin-left: 4px;
+}
+
+
+.panel-heading {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    min-height: 56px;
+
+    padding:
+        12px
+        16px;
+
+    border-bottom:
+        1px solid
+        #e2e6e4;
+}
+
+
+.panel-heading h2 {
+    padding: 0;
+    margin: 0;
+
+    font-size: 20px;
+}
+
+
+
+/* =========================================================
+   FILTER HEADER
+   ========================================================= */
+
+.filter-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.filter-divider {
+    color: #9aa5a0;
+
+    font-size: 13px;
+}
+
+
+.text-button {
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #007b5e;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+
+.text-button:hover {
+    text-decoration: underline;
+}
+
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+.filter-section {
+    padding:
+        14px
+        16px;
+
+    border-bottom:
+        1px solid
+        #e6e9e7;
+}
+
+
+.filter-section h3 {
+    margin:
+        0
+        0
+        11px
+        0;
+
+    font-size: 16px;
+}
+
+
+.checkbox-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.checkbox-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 25px;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+.checkbox-item input {
+    width: 17px;
+    height: 17px;
+
+    flex-shrink: 0;
+
+    accent-color: #008c68;
+}
+
+
+.colour-square {
+    display: inline-block;
+
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+
+    border-radius: 4px;
+
+    border:
+        1px solid
+        rgba(0, 0, 0, 0.08);
+}
+
+
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
+
+.results-box {
+    margin: 15px;
+
+    padding:
+        11px
+        12px;
+
+    background: #008c68;
+
+    color: white;
+
+    border-radius: 22px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
+
+.map-container {
+    position: relative;
+
+    margin:
+        8px
+        4px;
+
+    border:
+        1px solid
+        #009b71;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    background: #f4f5f4;
+}
+
+
+#viewDiv {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+/* =========================================================
+   FULL IRELAND / HOME BUTTON
+   ========================================================= */
+
+.map-home-button {
+    position: absolute;
+
+    z-index: 20;
+
+    top: 105px;
+    left: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    height: 38px;
+
+    padding:
+        0
+        12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.96
+        );
+
+    color: #00664f;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0
+        2px
+        8px
+        rgba(0, 0, 0, 0.20);
+}
+
+
+.map-home-button:hover {
+    background: #e6f5ed;
+}
+
+
+.home-icon {
+    font-size: 21px;
+
+    line-height: 1;
+}
+
+
+.home-label {
+    line-height: 1;
+}
+
+
+
+/* =========================================================
+   LEGEND
+   ========================================================= */
+
+.custom-legend {
+    position: absolute;
+
+    z-index: 10;
+
+    left: 16px;
+    bottom: 18px;
+
+    width: 245px;
+
+    padding:
+        12px
+        14px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.95
+        );
+
+    border-radius: 10px;
+
+    box-shadow:
+        0
+        2px
+        12px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+.custom-legend h3 {
+    padding: 0;
+
+    margin:
+        0
+        0
+        10px
+        0;
+
+    font-size: 15px;
+}
+
+
+.legend-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 6px;
+
+    font-size: 13px;
+}
+
+
+.legend-colour {
+    width: 18px;
+    height: 14px;
+
+    display: inline-block;
+
+    flex-shrink: 0;
+
+    border-radius: 3px;
+}
+
+
+.legend-count {
+    margin-left: auto;
+
+    color: #65716c;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.legend-note {
+    margin-top: 8px;
+
+    padding-top: 8px;
+
+    border-top:
+        1px solid
+        #e1e5e3;
+
+    color: #65716c;
+
+    font-size: 11px;
+
+    line-height: 1.35;
+}
+
+
+
+/* =========================================================
+   DETAILS PANEL
+   ========================================================= */
+
+.close-button {
+    border: none;
+
+    background: transparent;
+
+    color: #00664e;
+
+    font-size: 28px;
+
+    cursor: pointer;
+}
+
+
+.empty-state {
+    padding:
+        70px
+        30px;
+
+    text-align: center;
+
+    color: #607069;
+}
+
+
+.empty-icon {
+    margin-bottom: 15px;
+
+    color: #008c68;
+
+    font-size: 48px;
+}
+
+
+.empty-state h3 {
+    margin-bottom: 7px;
+
+    color: #22342d;
+}
+
+
+.empty-state p {
+    margin: 0;
+
+    line-height: 1.5;
+}
+
+
+
+/* =========================================================
+   FACILITY DETAILS
+   ========================================================= */
+
+.facility-details {
+    padding: 15px;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+.facility-title-box {
+    padding: 16px;
+
+    margin-bottom: 16px;
+
+    background: #e6f5ed;
+
+    border-radius: 10px;
+}
+
+
+.facility-title-box h2 {
+    padding: 0;
+
+    margin:
+        0
+        0
+        10px
+        0;
+
+    font-size: 22px;
+}
+
+
+.facility-tags {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+
+.tag {
+    display: inline-block;
+
+    padding:
+        5px
+        12px;
+
+    border-radius: 20px;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.tag-secondary {
+    background: #b8ead0;
+
+    color: #173e2c;
+}
+
+
+
+/* =========================================================
+   DETAILS TABLE
+   ========================================================= */
+
+.details-table {
+    border-top:
+        1px solid
+        #d9dfdc;
+}
+
+
+.detail-row {
+    display: grid;
+
+    grid-template-columns:
+        44%
+        56%;
+
+    gap: 8px;
+
+    padding:
+        9px
+        4px;
+
+    border-bottom:
+        1px solid
+        #e1e5e3;
+
+    font-size: 14px;
+}
+
+
+.detail-row span {
+    color: #44534d;
+}
+
+
+.detail-row strong {
+    font-weight: 600;
+}
+
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.primary-button {
+    width: 100%;
+
+    margin-top: 18px;
+
+    padding:
+        12px
+        14px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #008c68;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.primary-button:hover {
+    background: #006f54;
+}
+
+
+
+/* =========================================================
+   SMALLER SCREENS
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .app {
+        grid-template-columns:
+            260px
+            minmax(400px, 1fr)
+            330px;
+    }
+
+
+    .brand {
+        width: 260px;
+    }
+
+
+    .text-button {
+        font-size: 12px;
+    }
+
+
+    .home-label {
+        display: none;
+    }
+
+
+    .map-home-button {
+        width: 38px;
+
+        padding: 0;
+
+        justify-content: center;
+    }
+
+}
