@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sport Ireland Facilities Explorer</title>
+
+
+    <link
+        rel="stylesheet"
+        href="https://js.arcgis.com/4.31/esri/themes/light/main.css"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <script src="https://js.arcgis.com/4.31/"></script>
+
+</head>
+
+
+<body>
+
+    <div class="app">
+
+
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
+
+        <header class="header">
+
+            <div class="brand">
+
+                <div class="brand-main">
+                    SPORT IRELAND
+                </div>
+
+                <div class="brand-sub">
+                    FACILITIES EXPLORER
+                </div>
+
+            </div>
+
+
+            <div class="header-description">
+                Explore sports facilities across Ireland
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             FILTER PANEL
+             ===================================================== -->
+
+        <aside class="filter-panel">
+
+
+            <div class="panel-heading">
+
+                <h2>
+                    Filters
+                </h2>
+
+
+                <div class="filter-actions">
+
+                    <button
+                        id="selectAllFilters"
+                        class="text-button"
+                    >
+                        Select all
+                    </button>
+
+
+                    <span class="filter-divider">
+                        |
+                    </span>
+
+
+                    <button
+                        id="deselectAllFilters"
+                        class="text-button"
+                    >
+                        Deselect all
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SPORT -->
+
+            <section class="filter-section">
+
+                <h3>
+                    Sport
+                </h3>
+
+                <div
+                    id="sportFilters"
+                    class="checkbox-list"
+                >
+                </div>
+
+            </section>
+
+
+
+            <!-- FACILITY TYPE -->
+
+            <section class="filter-section">
+
+                <h3>
+                    Facility type
+                </h3>
+
+                <div
+                    id="infrastructureFilters"
+                    class="checkbox-list"
+                >
+                </div>
+
+            </section>
+
+
+
+            <!-- OWNERSHIP -->
+
+            <section class="filter-section">
+
+                <h3>
+                    Ownership type
+                </h3>
+
+                <div
+                    id="ownerFilters"
+                    class="checkbox-list"
+                >
+                </div>
+
+            </section>
+
+
+
+            <!-- RESULT COUNT -->
+
+            <div class="results-box">
+
+                <span id="resultCount">
+                    Loading facilities...
+                </span>
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- =====================================================
+             MAP
+             ===================================================== -->
+
+        <main class="map-container">
+
+
+            <div id="viewDiv">
+            </div>
+
+
+            <!-- HOME / FULL IRELAND BUTTON -->
+
+            <button
+                id="homeButton"
+                class="map-home-button"
+                title="Return to full Ireland view"
+            >
+                <span class="home-icon">
+                    ⌂
+                </span>
+
+                <span class="home-label">
+                    Full Ireland
+                </span>
+            </button>
+
+
+
+            <!-- LEGEND -->
+
+            <div
+                id="legend"
+                class="custom-legend"
+            >
+
+                <h3>
+                    Most mapped sports
+                </h3>
+
+
+                <div id="legendItems">
+                </div>
+
+
+                <div class="legend-note">
+                    Other sports are available in Filters
+                </div>
+
+            </div>
+
+        </main>
+
+
+
+        <!-- =====================================================
+             DETAILS PANEL
+             ===================================================== -->
+
+        <aside class="details-panel">
+
+
+            <div class="panel-heading">
+
+                <h2>
+                    Facility details
+                </h2>
+
+
+                <button
+                    id="closeDetails"
+                    class="close-button"
+                    title="Close"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+
+            <!-- EMPTY STATE -->
+
+            <div
+                id="emptyState"
+                class="empty-state"
+            >
+
+                <div class="empty-icon">
+                    ⌖
+                </div>
+
+
+                <h3>
+                    Select a facility
+                </h3>
+
+
+                <p>
+                    Click a facility on the map to view its details.
+                </p>
+
+            </div>
+
+
+
+            <!-- FACILITY DETAILS -->
+
+            <div
+                id="facilityDetails"
+                class="facility-details hidden"
+            >
+
+
+                <div class="facility-title-box">
+
+                    <h2 id="detailTitle">
+                        Facility
+                    </h2>
+
+
+                    <div class="facility-tags">
+
+                        <span
+                            id="detailSportTag"
+                            class="tag"
+                        >
+                        </span>
+
+
+                        <span
+                            id="detailTypeTag"
+                            class="tag tag-secondary"
+                        >
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="details-table">
+
+
+                    <div class="detail-row">
+                        <span>Sport</span>
+                        <strong id="detailSport">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Facility type</span>
+                        <strong id="detailInfrastructure">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Surface</span>
+                        <strong id="detailSurface">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Floodlights</span>
+                        <strong id="detailFloodlights">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Ownership type</span>
+                        <strong id="detailOwner">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Owner</span>
+                        <strong id="detailOwnerName">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Size</span>
+                        <strong id="detailSize">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Quality</span>
+                        <strong id="detailQuality">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Usage</span>
+                        <strong id="detailMultiUse">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Local Authority</span>
+                        <strong id="detailLA">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>LEA</span>
+                        <strong id="detailLEA">—</strong>
+                    </div>
+
+
+                    <div class="detail-row">
+                        <span>Area</span>
+                        <strong id="detailArea">—</strong>
+                    </div>
+
+                </div>
+
+
+
+                <button
+                    id="zoomToFacility"
+                    class="primary-button"
+                >
+                    Zoom to facility
+                </button>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
