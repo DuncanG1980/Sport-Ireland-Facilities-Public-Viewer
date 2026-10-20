@@ -93,9 +93,7 @@ button {
 
 .brand-main {
     font-size: 21px;
-
     font-weight: 700;
-
     letter-spacing: 0.5px;
 }
 
@@ -104,7 +102,6 @@ button {
     margin-top: 3px;
 
     font-size: 14px;
-
     letter-spacing: 0.8px;
 
     opacity: 0.92;
@@ -412,7 +409,7 @@ button {
 
 
 /* =========================================================
-   FULL IRELAND BUTTON
+   FULL IRELAND
    ========================================================= */
 
 .map-home-button {
@@ -633,6 +630,102 @@ button {
     padding: 15px;
 }
 
+
+
+/* =========================================================
+   MULTI-FACILITY NAVIGATION
+   ========================================================= */
+
+.selection-navigator {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        1fr
+        42px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 14px;
+
+    padding:
+        8px
+        10px;
+
+    border:
+        1px solid
+        #b9d9cd;
+
+    border-radius: 10px;
+
+    background: #f3faf7;
+}
+
+
+.selection-navigator.hidden {
+    display: none;
+}
+
+
+.navigator-button {
+    width: 38px;
+    height: 38px;
+
+    padding: 0;
+
+    border:
+        1px solid
+        #9ecdbd;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #007b5e;
+
+    font-size: 27px;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+.navigator-button:hover {
+    background: #e6f5ed;
+}
+
+
+.navigator-centre {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: #42524b;
+
+    font-size: 12px;
+}
+
+
+.navigator-centre strong {
+    color: #006f54;
+
+    font-size: 15px;
+}
+
+
+
+/* =========================================================
+   FACILITY TITLE
+   ========================================================= */
 
 .facility-title-box {
     padding: 16px;
