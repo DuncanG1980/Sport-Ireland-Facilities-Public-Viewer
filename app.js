@@ -26,14 +26,9 @@ require([
     "https://services-eu1.arcgis.com/z1y55jruXrgzzpdi/arcgis/rest/services/Sport_Ireland_Facilities_Mapping/FeatureServer/0";
 
   const CLICK_TOLERANCE_PIXELS = 14;
-
   const OSM_OPACITY = 0.45;
 
-  const IRELAND_CENTER = [
-    -8,
-    53.4
-  ];
-
+  const IRELAND_CENTER = [-8, 53.4];
   const IRELAND_ZOOM = 7;
 
 
@@ -42,46 +37,16 @@ require([
   // =========================================================
 
   const mainSports = [
-    {
-      value: "Gaelic Games",
-      label: "Gaelic Games"
-    },
-    {
-      value: "Soccer",
-      label: "Soccer"
-    },
-    {
-      value: "Golf",
-      label: "Golf"
-    },
-    {
-      value: "Tennis",
-      label: "Tennis"
-    },
-    {
-      value: "Basketball",
-      label: "Basketball"
-    },
-    {
-      value: "Athletics",
-      label: "Athletics"
-    },
-    {
-      value: "Hockey",
-      label: "Hockey"
-    },
-    {
-      value: "Cricket",
-      label: "Cricket"
-    },
-    {
-      value: "Sports Hall",
-      label: "Sports Halls"
-    },
-    {
-      value: "Swimming Indoor",
-      label: "Swimming Indoor"
-    }
+    { value: "Gaelic Games", label: "Gaelic Games" },
+    { value: "Soccer", label: "Soccer" },
+    { value: "Golf", label: "Golf" },
+    { value: "Tennis", label: "Tennis" },
+    { value: "Basketball", label: "Basketball" },
+    { value: "Athletics", label: "Athletics" },
+    { value: "Hockey", label: "Hockey" },
+    { value: "Cricket", label: "Cricket" },
+    { value: "Sports Hall", label: "Sports Halls" },
+    { value: "Swimming Indoor", label: "Swimming Indoor" }
   ];
 
 
@@ -125,200 +90,160 @@ require([
   // RENDERER
   // =========================================================
 
-  const rendererInfos =
-    Object.entries(sportColours).map(
-      function ([sport, colour]) {
-
-        return {
-          value: sport,
-
-          symbol: {
-            type: "simple-fill",
-
+  const rendererInfos = Object.entries(sportColours).map(
+    function ([sport, colour]) {
+      return {
+        value: sport,
+        symbol: {
+          type: "simple-fill",
+          color: [
+            colour[0],
+            colour[1],
+            colour[2],
+            0.44
+          ],
+          outline: {
             color: [
               colour[0],
               colour[1],
               colour[2],
-              0.44
+              1
             ],
-
-            outline: {
-              color: [
-                colour[0],
-                colour[1],
-                colour[2],
-                1
-              ],
-
-              width: 2
-            }
+            width: 2
           }
-        };
-
-      }
-    );
+        }
+      };
+    }
+  );
 
 
   // =========================================================
   // FACILITY LAYER
   // =========================================================
 
-  const facilitiesLayer =
-    new FeatureLayer({
+  const facilitiesLayer = new FeatureLayer({
+    url: FACILITIES_URL,
 
-      url: FACILITIES_URL,
+    outFields: [
+      "OBJECTID",
+      "Sport",
+      "Infrastructure_Type",
+      "Surface",
+      "Floodlights",
+      "Owner",
+      "Facility_Size",
+      "Owner_Name",
+      "Quality",
+      "Local_Authority",
+      "LEA",
+      "Multi_Use",
+      "Area_msq"
+    ],
 
-      outFields: [
-        "OBJECTID",
-        "Sport",
-        "Infrastructure_Type",
-        "Surface",
-        "Floodlights",
-        "Owner",
-        "Facility_Size",
-        "Owner_Name",
-        "Quality",
-        "Local_Authority",
-        "LEA",
-        "Multi_Use",
-        "Area_msq"
-      ],
+    minScale: 0,
+    popupEnabled: false,
 
-      minScale: 0,
+    renderer: {
+      type: "unique-value",
+      field: "Sport",
 
-      popupEnabled: false,
-
-      renderer: {
-        type: "unique-value",
-
-        field: "Sport",
-
-        defaultSymbol: {
-          type: "simple-fill",
-
+      defaultSymbol: {
+        type: "simple-fill",
+        color: [
+          145,
+          145,
+          145,
+          0.27
+        ],
+        outline: {
           color: [
-            145,
-            145,
-            145,
-            0.27
+            100,
+            100,
+            100,
+            1
           ],
+          width: 1.5
+        }
+      },
 
-          outline: {
-            color: [
-              100,
-              100,
-              100,
-              1
-            ],
-
-            width: 1.5
-          }
-        },
-
-        uniqueValueInfos:
-          rendererInfos
-      }
-
-    });
+      uniqueValueInfos: rendererInfos
+    }
+  });
 
 
   // =========================================================
   // BASEMAP
   // =========================================================
 
-  const osmLayer =
-    new OpenStreetMapLayer({
-      opacity: OSM_OPACITY
-    });
+  const osmLayer = new OpenStreetMapLayer({
+    opacity: OSM_OPACITY
+  });
 
-
-  const customBasemap =
-    new Basemap({
-
-      baseLayers: [
-        osmLayer
-      ],
-
-      title: "Muted OpenStreetMap"
-
-    });
+  const customBasemap = new Basemap({
+    baseLayers: [
+      osmLayer
+    ],
+    title: "Muted OpenStreetMap"
+  });
 
 
   // =========================================================
   // MAP
   // =========================================================
 
-  const map =
-    new Map({
-
-      basemap: customBasemap,
-
-      layers: [
-        facilitiesLayer
-      ]
-
-    });
+  const map = new Map({
+    basemap: customBasemap,
+    layers: [
+      facilitiesLayer
+    ]
+  });
 
 
   // =========================================================
   // VIEW
   // =========================================================
 
-  const view =
-    new MapView({
+  const view = new MapView({
+    container: "viewDiv",
+    map: map,
+    center: IRELAND_CENTER,
+    zoom: IRELAND_ZOOM,
 
-      container: "viewDiv",
+    background: {
+      color: [
+        245,
+        246,
+        245,
+        1
+      ]
+    },
 
-      map: map,
+    constraints: {
+      minZoom: 6
+    },
 
-      center: IRELAND_CENTER,
-
-      zoom: IRELAND_ZOOM,
-
-      background: {
-        color: [
-          245,
-          246,
-          245,
-          1
-        ]
-      },
-
-      constraints: {
-        minZoom: 6
-      },
-
-      highlightOptions: {
-        color: [
-          0,
-          190,
-          175,
-          1
-        ],
-
-        haloOpacity: 0.9,
-
-        fillOpacity: 0.12
-      }
-
-    });
+    highlightOptions: {
+      color: [
+        0,
+        190,
+        175,
+        1
+      ],
+      haloOpacity: 0.9,
+      fillOpacity: 0.10
+    }
+  });
 
 
   // =========================================================
   // SEARCH
   // =========================================================
 
-  const search =
-    new Search({
-
-      view: view,
-
-      includeDefaultSources: true,
-
-      locationEnabled: false
-
-    });
-
+  const search = new Search({
+    view: view,
+    includeDefaultSources: true,
+    locationEnabled: false
+  });
 
   view.ui.add(
     search,
@@ -333,13 +258,10 @@ require([
   let facilitiesLayerView = null;
 
   let highlightHandle = null;
-
   let currentOverlayGraphic = null;
 
   let selectedGraphics = [];
-
   let selectedIndex = 0;
-
   let selectedGraphic = null;
 
 
@@ -348,99 +270,61 @@ require([
   // =========================================================
 
   const resultCount =
-    document.getElementById(
-      "resultCount"
-    );
+    document.getElementById("resultCount");
 
   const emptyState =
-    document.getElementById(
-      "emptyState"
-    );
+    document.getElementById("emptyState");
 
   const facilityDetails =
-    document.getElementById(
-      "facilityDetails"
-    );
+    document.getElementById("facilityDetails");
 
   const closeDetails =
-    document.getElementById(
-      "closeDetails"
-    );
+    document.getElementById("closeDetails");
 
   const zoomToFacility =
-    document.getElementById(
-      "zoomToFacility"
-    );
+    document.getElementById("zoomToFacility");
 
   const homeButton =
-    document.getElementById(
-      "homeButton"
-    );
+    document.getElementById("homeButton");
 
   const selectAllFilters =
-    document.getElementById(
-      "selectAllFilters"
-    );
+    document.getElementById("selectAllFilters");
 
   const deselectAllFilters =
-    document.getElementById(
-      "deselectAllFilters"
-    );
+    document.getElementById("deselectAllFilters");
 
   const mainSportFilters =
-    document.getElementById(
-      "mainSportFilters"
-    );
+    document.getElementById("mainSportFilters");
 
   const moreSportFilters =
-    document.getElementById(
-      "moreSportFilters"
-    );
+    document.getElementById("moreSportFilters");
 
   const moreSportsButton =
-    document.getElementById(
-      "moreSportsButton"
-    );
+    document.getElementById("moreSportsButton");
 
   const moreSportsArrow =
-    document.getElementById(
-      "moreSportsArrow"
-    );
+    document.getElementById("moreSportsArrow");
 
   const infrastructureFilters =
-    document.getElementById(
-      "infrastructureFilters"
-    );
+    document.getElementById("infrastructureFilters");
 
   const ownerFilters =
-    document.getElementById(
-      "ownerFilters"
-    );
+    document.getElementById("ownerFilters");
 
   const legendItems =
-    document.getElementById(
-      "legendItems"
-    );
+    document.getElementById("legendItems");
 
   const selectionNavigator =
-    document.getElementById(
-      "selectionNavigator"
-    );
+    document.getElementById("selectionNavigator");
 
   const selectionPosition =
-    document.getElementById(
-      "selectionPosition"
-    );
+    document.getElementById("selectionPosition");
 
   const previousFacility =
-    document.getElementById(
-      "previousFacility"
-    );
+    document.getElementById("previousFacility");
 
   const nextFacility =
-    document.getElementById(
-      "nextFacility"
-    );
+    document.getElementById("nextFacility");
 
 
   // =========================================================
@@ -458,7 +342,6 @@ require([
         );
 
       buildFilterLists();
-
       buildLegend();
 
       await updateResultCount();
@@ -474,10 +357,8 @@ require([
       );
 
       if (resultCount) {
-
         resultCount.textContent =
           "Unable to load facilities";
-
       }
 
     }
@@ -516,11 +397,9 @@ require([
     const sportField =
       facilitiesLayer.fields.find(
         function (field) {
-
           return (
             field.name === "Sport"
           );
-
         }
       );
 
@@ -541,7 +420,6 @@ require([
 
 
     mainSportFilters.innerHTML = "";
-
     moreSportFilters.innerHTML = "";
 
 
@@ -555,14 +433,12 @@ require([
         const match =
           domainValues.find(
             function (codedValue) {
-
               return (
                 codedValue.code ===
                   mainSport.value ||
                 codedValue.name ===
                   mainSport.value
               );
-
             }
           );
 
@@ -584,41 +460,31 @@ require([
     const mainValues =
       mainSports.map(
         function (sport) {
-
           return sport.value;
-
         }
       );
 
 
     domainValues
-
       .filter(
         function (codedValue) {
-
           return (
             !mainValues.includes(
               codedValue.code
-            )
-            &&
+            ) &&
             !mainValues.includes(
               codedValue.name
             )
           );
-
         }
       )
-
       .sort(
         function (a, b) {
-
           return a.name.localeCompare(
             b.name
           );
-
         }
       )
-
       .forEach(
         function (codedValue) {
 
@@ -649,7 +515,6 @@ require([
         "label"
       );
 
-
     label.className =
       "checkbox-item";
 
@@ -659,19 +524,15 @@ require([
         "input"
       );
 
-
     checkbox.type =
       "checkbox";
-
 
     checkbox.value =
       codedValue.code;
 
-
     checkbox.classList.add(
       "sport-filter"
     );
-
 
     checkbox.checked =
       true;
@@ -687,7 +548,6 @@ require([
         "span"
       );
 
-
     square.className =
       "colour-square";
 
@@ -695,12 +555,10 @@ require([
     const colour =
       sportColours[
         codedValue.code
-      ]
-      ||
+      ] ||
       sportColours[
         codedValue.name
-      ]
-      ||
+      ] ||
       [
         145,
         145,
@@ -727,7 +585,6 @@ require([
       document.createElement(
         "span"
       );
-
 
     text.textContent =
       displayLabel;
@@ -769,12 +626,10 @@ require([
     const field =
       facilitiesLayer.fields.find(
         function (fieldItem) {
-
           return (
             fieldItem.name ===
             fieldName
           );
-
         }
       );
 
@@ -784,9 +639,7 @@ require([
       !field.domain ||
       !field.domain.codedValues
     ) {
-
       return;
-
     }
 
 
@@ -801,7 +654,6 @@ require([
             "label"
           );
 
-
         label.className =
           "checkbox-item";
 
@@ -811,19 +663,15 @@ require([
             "input"
           );
 
-
         checkbox.type =
           "checkbox";
-
 
         checkbox.value =
           codedValue.code;
 
-
         checkbox.classList.add(
           className
         );
-
 
         checkbox.checked =
           true;
@@ -838,7 +686,6 @@ require([
           document.createElement(
             "span"
           );
-
 
         text.textContent =
           codedValue.name;
@@ -930,7 +777,6 @@ require([
             "div"
           );
 
-
         row.className =
           "legend-item";
 
@@ -940,7 +786,6 @@ require([
             "span"
           );
 
-
         square.className =
           "legend-colour";
 
@@ -948,8 +793,7 @@ require([
         const colour =
           sportColours[
             sport.value
-          ]
-          ||
+          ] ||
           [
             145,
             145,
@@ -972,7 +816,6 @@ require([
             "span"
           );
 
-
         text.textContent =
           sport.label;
 
@@ -981,11 +824,9 @@ require([
           square
         );
 
-
         row.appendChild(
           text
         );
-
 
         legendItems.appendChild(
           row
@@ -1013,12 +854,10 @@ require([
         ".sport-filter"
       );
 
-
     const selectedTypes =
       getCheckedValues(
         ".type-filter"
       );
-
 
     const selectedOwners =
       getCheckedValues(
@@ -1031,12 +870,10 @@ require([
         ".sport-filter"
       ).length;
 
-
     const totalTypeBoxes =
       document.querySelectorAll(
         ".type-filter"
       ).length;
-
 
     const totalOwnerBoxes =
       document.querySelectorAll(
@@ -1055,7 +892,6 @@ require([
       facilitiesLayerView.filter = {
         where: "1=0"
       };
-
 
       clearSelection();
 
@@ -1166,16 +1002,12 @@ require([
   ) {
 
     return Array.from(
-
       document.querySelectorAll(
         selector + ":checked"
       )
-
     ).map(
       function (checkbox) {
-
         return checkbox.value;
-
       }
     );
 
@@ -1215,7 +1047,7 @@ require([
 
 
   // =========================================================
-  // SELECT ALL
+  // SELECT / DESELECT ALL
   // =========================================================
 
   if (selectAllFilters) {
@@ -1230,20 +1062,14 @@ require([
           )
           .forEach(
             function (checkbox) {
-
               checkbox.checked =
                 true;
-
             }
           );
 
 
-        if (facilitiesLayerView) {
-
-          facilitiesLayerView.filter =
-            null;
-
-        }
+        facilitiesLayerView.filter =
+          null;
 
 
         clearSelection();
@@ -1255,10 +1081,6 @@ require([
 
   }
 
-
-  // =========================================================
-  // DESELECT ALL
-  // =========================================================
 
   if (deselectAllFilters) {
 
@@ -1272,21 +1094,15 @@ require([
           )
           .forEach(
             function (checkbox) {
-
               checkbox.checked =
                 false;
-
             }
           );
 
 
-        if (facilitiesLayerView) {
-
-          facilitiesLayerView.filter = {
-            where: "1=0"
-          };
-
-        }
+        facilitiesLayerView.filter = {
+          where: "1=0"
+        };
 
 
         clearSelection();
@@ -1326,20 +1142,16 @@ require([
         );
 
 
-      if (resultCount) {
-
-        resultCount.textContent =
-          count.toLocaleString(
-            "en-IE"
-          )
-          +
-          (
-            count === 1
-              ? " facility"
-              : " facilities"
-          );
-
-      }
+      resultCount.textContent =
+        count.toLocaleString(
+          "en-IE"
+        )
+        +
+        (
+          count === 1
+            ? " facility"
+            : " facilities"
+        );
 
     }
     catch (error) {
@@ -1356,6 +1168,10 @@ require([
 
   // =========================================================
   // CLICK FACILITY
+  //
+  // QUERY EVERYTHING AROUND THE CLICK FIRST.
+  // THEN TEST WHICH RETURNED POLYGONS ACTUALLY CONTAIN
+  // THE EXACT CLICK LOCATION.
   // =========================================================
 
   view.on(
@@ -1363,107 +1179,6 @@ require([
     async function (event) {
 
       try {
-
-        // -----------------------------------------------------
-        // FIRST: GET ALL RENDERED FACILITIES UNDER CURSOR
-        // -----------------------------------------------------
-
-        const hitResponse =
-          await view.hitTest(
-            event,
-            {
-              include: [
-                facilitiesLayer
-              ]
-            }
-          );
-
-
-        const hitGraphics = [];
-
-
-        if (
-          hitResponse.results &&
-          hitResponse.results.length > 0
-        ) {
-
-          hitResponse.results.forEach(
-            function (result) {
-
-              if (
-                result.type === "graphic" &&
-                result.graphic &&
-                result.graphic.layer ===
-                  facilitiesLayer
-              ) {
-
-                hitGraphics.push(
-                  result.graphic
-                );
-
-              }
-
-            }
-          );
-
-        }
-
-
-        // -----------------------------------------------------
-        // REMOVE DUPLICATES
-        // -----------------------------------------------------
-
-        const uniqueHitGraphics =
-          deduplicateGraphics(
-            hitGraphics
-          );
-
-
-        // -----------------------------------------------------
-        // RESPECT CURRENT FILTER
-        // -----------------------------------------------------
-
-        const filteredHitGraphics =
-          await filterGraphicsAgainstCurrentWhere(
-            uniqueHitGraphics
-          );
-
-
-        if (
-          filteredHitGraphics.length > 0
-        ) {
-
-          filteredHitGraphics.sort(
-            function (a, b) {
-
-              return (
-                getPolygonArea(
-                  a.geometry
-                )
-                -
-                getPolygonArea(
-                  b.geometry
-                )
-              );
-
-            }
-          );
-
-
-          selectFacilities(
-            filteredHitGraphics
-          );
-
-
-          return;
-
-        }
-
-
-        // -----------------------------------------------------
-        // FALLBACK:
-        // 14 PIXEL SEARCH FOR SMALL / MISSED FACILITIES
-        // -----------------------------------------------------
 
         const clickedPoint =
           event.mapPoint;
@@ -1477,6 +1192,10 @@ require([
 
         }
 
+
+        // -----------------------------------------------------
+        // CREATE 14 PIXEL QUERY AREA
+        // -----------------------------------------------------
 
         const topLeft =
           view.toMap({
@@ -1547,6 +1266,10 @@ require([
           });
 
 
+        // -----------------------------------------------------
+        // GET ALL NEARBY FEATURES
+        // -----------------------------------------------------
+
         const query =
           facilitiesLayer.createQuery();
 
@@ -1606,13 +1329,87 @@ require([
 
 
         // -----------------------------------------------------
-        // IF SEVERAL ARE WITHIN TOLERANCE,
-        // USE NEAREST ONE ONLY
+        // CHECK WHICH POLYGONS ACTUALLY CONTAIN THE CLICK
+        // -----------------------------------------------------
+
+        const overlappingFacilities =
+          nearbyFacilities.filter(
+            function (facility) {
+
+              if (!facility.geometry) {
+                return false;
+              }
+
+
+              try {
+
+                return (
+                  geometryEngine.intersects(
+                    facility.geometry,
+                    clickedPoint
+                  )
+                );
+
+              }
+              catch (error) {
+
+                return false;
+
+              }
+
+            }
+          );
+
+
+        // -----------------------------------------------------
+        // IF ONE OR MORE ACTUALLY CONTAIN CLICK:
+        // SELECT ALL OF THEM
+        // -----------------------------------------------------
+
+        if (
+          overlappingFacilities.length > 0
+        ) {
+
+          overlappingFacilities.sort(
+            function (a, b) {
+
+              return (
+                getPolygonArea(
+                  a.geometry
+                )
+                -
+                getPolygonArea(
+                  b.geometry
+                )
+              );
+
+            }
+          );
+
+
+          console.log(
+            "Overlapping facilities found:",
+            overlappingFacilities.length
+          );
+
+
+          selectFacilities(
+            overlappingFacilities
+          );
+
+
+          return;
+
+        }
+
+
+        // -----------------------------------------------------
+        // OTHERWISE USER MISSED SLIGHTLY:
+        // PICK NEAREST ONE
         // -----------------------------------------------------
 
         let nearestFacility =
           null;
-
 
         let nearestDistance =
           Infinity;
@@ -1704,181 +1501,7 @@ require([
 
 
   // =========================================================
-  // DEDUPLICATE HITTEST GRAPHICS
-  // =========================================================
-
-  function deduplicateGraphics(
-    graphics
-  ) {
-
-    const seen =
-      new Set();
-
-
-    const unique =
-      [];
-
-
-    graphics.forEach(
-      function (graphic) {
-
-        const objectId =
-          graphic.getObjectId();
-
-
-        const key =
-          objectId !== null &&
-          objectId !== undefined
-
-            ? String(objectId)
-
-            : JSON.stringify(
-                graphic.geometry
-              );
-
-
-        if (
-          !seen.has(key)
-        ) {
-
-          seen.add(key);
-
-          unique.push(
-            graphic
-          );
-
-        }
-
-      }
-    );
-
-
-    return unique;
-
-  }
-
-
-  // =========================================================
-  // MAKE SURE HITTEST RESULTS MATCH ACTIVE FILTER
-  // =========================================================
-
-  async function filterGraphicsAgainstCurrentWhere(
-    graphics
-  ) {
-
-    if (
-      !graphics ||
-      graphics.length === 0
-    ) {
-
-      return [];
-
-    }
-
-
-    const where =
-      getCurrentWhereClause();
-
-
-    if (
-      where === "1=1"
-    ) {
-
-      return graphics;
-
-    }
-
-
-    if (
-      where === "1=0"
-    ) {
-
-      return [];
-
-    }
-
-
-    const objectIds =
-      graphics
-
-        .map(
-          function (graphic) {
-
-            return graphic.getObjectId();
-
-          }
-        )
-
-        .filter(
-          function (objectId) {
-
-            return (
-              objectId !== null &&
-              objectId !== undefined
-            );
-
-          }
-        );
-
-
-    if (
-      objectIds.length === 0
-    ) {
-
-      return [];
-
-    }
-
-
-    const query =
-      facilitiesLayer.createQuery();
-
-
-    query.where =
-      "(" +
-      where +
-      ") AND OBJECTID IN (" +
-      objectIds.join(",") +
-      ")";
-
-
-    query.returnGeometry =
-      true;
-
-
-    query.outFields = [
-      "OBJECTID",
-      "Sport",
-      "Infrastructure_Type",
-      "Surface",
-      "Floodlights",
-      "Owner",
-      "Facility_Size",
-      "Owner_Name",
-      "Quality",
-      "Local_Authority",
-      "LEA",
-      "Multi_Use",
-      "Area_msq"
-    ];
-
-
-    const response =
-      await facilitiesLayer.queryFeatures(
-        query
-      );
-
-
-    return (
-      response.features ||
-      []
-    );
-
-  }
-
-
-  // =========================================================
-  // SELECT ONE OR MORE FACILITIES
+  // SELECT FACILITIES
   // =========================================================
 
   function selectFacilities(
@@ -1906,27 +1529,27 @@ require([
     selectedIndex = 0;
 
 
+    // -------------------------------------------------------
+    // HIGHLIGHT ALL SELECTED POLYGONS
+    // -------------------------------------------------------
+
     if (facilitiesLayerView) {
 
       const objectIds =
         selectedGraphics
-
           .map(
             function (graphic) {
-
-              return graphic.getObjectId();
-
+              return (
+                graphic.getObjectId()
+              );
             }
           )
-
           .filter(
             function (objectId) {
-
               return (
                 objectId !== null &&
                 objectId !== undefined
               );
-
             }
           );
 
@@ -1998,7 +1621,6 @@ require([
         currentOverlayGraphic
       );
 
-
       currentOverlayGraphic =
         null;
 
@@ -2026,14 +1648,14 @@ require([
         0,
         170,
         150,
-        0.08
+        0.06
       ],
 
       outline: {
         color: [
           0,
-          95,
-          80,
+          90,
+          75,
           1
         ],
 
@@ -2098,9 +1720,7 @@ require([
         if (
           selectedGraphics.length <= 1
         ) {
-
           return;
-
         }
 
 
@@ -2135,9 +1755,7 @@ require([
         if (
           selectedGraphics.length <= 1
         ) {
-
           return;
-
         }
 
 
@@ -2167,9 +1785,7 @@ require([
   ) {
 
     if (!geometry) {
-
       return Infinity;
-
     }
 
 
@@ -2215,7 +1831,7 @@ require([
 
 
   // =========================================================
-  // DETAILS
+  // FACILITY DETAILS
   // =========================================================
 
   function showFacilityDetails(
@@ -2387,28 +2003,20 @@ require([
     );
 
 
-    if (emptyState) {
-
-      emptyState.classList.add(
-        "hidden"
-      );
-
-    }
+    emptyState.classList.add(
+      "hidden"
+    );
 
 
-    if (facilityDetails) {
-
-      facilityDetails.classList.remove(
-        "hidden"
-      );
-
-    }
+    facilityDetails.classList.remove(
+      "hidden"
+    );
 
   }
 
 
   // =========================================================
-  // DISPLAY SPORT
+  // SPORT DISPLAY
   // =========================================================
 
   function displaySportName(
@@ -2416,8 +2024,7 @@ require([
   ) {
 
     if (
-      value ===
-      "Sports Hall"
+      value === "Sports Hall"
     ) {
 
       return "Sports Halls";
@@ -2433,7 +2040,7 @@ require([
 
 
   // =========================================================
-  // SPORT TAG
+  // SPORT TAG COLOUR
   // =========================================================
 
   function setSportTagColour(
@@ -2454,8 +2061,7 @@ require([
     const colour =
       sportColours[
         sport
-      ]
-      ||
+      ] ||
       [
         130,
         130,
@@ -2505,8 +2111,7 @@ require([
   ) {
 
     if (
-      value ===
-      "Floodlights"
+      value === "Floodlights"
     ) {
 
       return "Yes";
@@ -2515,8 +2120,7 @@ require([
 
 
     if (
-      value ===
-      "No Floodlights"
+      value === "No Floodlights"
     ) {
 
       return "No";
@@ -2556,9 +2160,7 @@ require([
       .replace(
         /\b\w/g,
         function (letter) {
-
           return letter.toUpperCase();
-
         }
       );
 
@@ -2566,7 +2168,7 @@ require([
 
 
   // =========================================================
-  // CLEAR MAP HIGHLIGHTS ONLY
+  // CLEAR MAP HIGHLIGHTS
   // =========================================================
 
   function clearMapHighlightsOnly() {
@@ -2575,7 +2177,8 @@ require([
 
       highlightHandle.remove();
 
-      highlightHandle = null;
+      highlightHandle =
+        null;
 
     }
 
@@ -2586,8 +2189,8 @@ require([
         currentOverlayGraphic
       );
 
-
-      currentOverlayGraphic = null;
+      currentOverlayGraphic =
+        null;
 
     }
 
@@ -2681,9 +2284,11 @@ require([
 
           const target =
             geometry.extent
+
               ? geometry.extent.expand(
                   2.2
                 )
+
               : geometry;
 
 
@@ -2779,7 +2384,7 @@ require([
 
 
   // =========================================================
-  // HELPERS
+  // GENERIC HELPERS
   // =========================================================
 
   function setText(
