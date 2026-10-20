@@ -46,6 +46,69 @@ require([
 
 
   // =========================================================
+  // MAIN SPORTS
+  //
+  // value = actual value expected in Sport field
+  // label = wording displayed to the user
+  // =========================================================
+
+  const mainSports = [
+
+    {
+      value: "Gaelic Games",
+      label: "Gaelic Games"
+    },
+
+    {
+      value: "Soccer",
+      label: "Soccer"
+    },
+
+    {
+      value: "Golf",
+      label: "Golf"
+    },
+
+    {
+      value: "Tennis",
+      label: "Tennis"
+    },
+
+    {
+      value: "Basketball",
+      label: "Basketball"
+    },
+
+    {
+      value: "Athletics",
+      label: "Athletics"
+    },
+
+    {
+      value: "Hockey",
+      label: "Hockey"
+    },
+
+    {
+      value: "Cricket",
+      label: "Cricket"
+    },
+
+    {
+      value: "Sports Hall",
+      label: "Sports Halls"
+    },
+
+    {
+      value: "Swimming Indoor",
+      label: "Swimming Indoor"
+    }
+
+  ];
+
+
+
+  // =========================================================
   // SPORT COLOURS
   // =========================================================
 
@@ -63,22 +126,22 @@ require([
       235
     ],
 
-    "Rugby": [
-      230,
-      65,
-      55
-    ],
-
-    "Basketball": [
-      255,
+    "Golf": [
+      120,
       145,
-      20
+      95
     ],
 
     "Tennis": [
       235,
       205,
       0
+    ],
+
+    "Basketball": [
+      255,
+      145,
+      20
     ],
 
     "Athletics": [
@@ -93,10 +156,28 @@ require([
       175
     ],
 
+    "Cricket": [
+      185,
+      90,
+      165
+    ],
+
+    "Sports Hall": [
+      105,
+      105,
+      140
+    ],
+
     "Swimming Indoor": [
       0,
       185,
       220
+    ],
+
+    "Rugby": [
+      230,
+      65,
+      55
     ],
 
     "Swimming Outdoor": [
@@ -105,22 +186,10 @@ require([
       195
     ],
 
-    "Golf": [
-      120,
-      145,
-      95
-    ],
-
     "Equestrian": [
       145,
       125,
       105
-    ],
-
-    "Cricket": [
-      185,
-      90,
-      165
     ],
 
     "Badminton": [
@@ -175,12 +244,6 @@ require([
       70,
       155,
       230
-    ],
-
-    "Sports Hall": [
-      105,
-      105,
-      140
     ],
 
     "Pitch and Putt": [
@@ -309,14 +372,6 @@ require([
       ],
 
 
-      /*
-       * No minScale restriction.
-       *
-       * This means facility polygons stay visible
-       * at the full Ireland view as well as when
-       * zoomed in.
-       */
-
       minScale:
         0,
 
@@ -373,7 +428,7 @@ require([
 
 
   // =========================================================
-  // OPENSTREETMAP BASEMAP
+  // OPENSTREETMAP
   // =========================================================
 
   const osmLayer =
@@ -418,7 +473,7 @@ require([
 
 
   // =========================================================
-  // MAP VIEW
+  // VIEW
   // =========================================================
 
   const view =
@@ -553,9 +608,27 @@ require([
     );
 
 
-  const sportFilters =
+  const mainSportFilters =
     document.getElementById(
-      "sportFilters"
+      "mainSportFilters"
+    );
+
+
+  const moreSportFilters =
+    document.getElementById(
+      "moreSportFilters"
+    );
+
+
+  const moreSportsButton =
+    document.getElementById(
+      "moreSportsButton"
+    );
+
+
+  const moreSportsArrow =
+    document.getElementById(
+      "moreSportsArrow"
     );
 
 
@@ -579,7 +652,7 @@ require([
 
 
   // =========================================================
-  // LOAD MAP
+  // LOAD
   // =========================================================
 
   view.when(
@@ -597,7 +670,7 @@ require([
       buildFilterLists();
 
 
-      await buildTopSportsLegend();
+      buildLegend();
 
 
       await updateResultCount();
@@ -626,24 +699,12 @@ require([
 
 
   // =========================================================
-  // BUILD FILTER LISTS
+  // BUILD FILTERS
   // =========================================================
 
   function buildFilterLists() {
 
-    buildDomainFilter(
-
-      "Sport",
-
-      sportFilters,
-
-      "sport-filter",
-
-      true,
-
-      true
-
-    );
+    buildSportFilters();
 
 
     buildDomainFilter(
@@ -652,11 +713,7 @@ require([
 
       infrastructureFilters,
 
-      "type-filter",
-
-      false,
-
-      false
+      "type-filter"
 
     );
 
@@ -667,11 +724,7 @@ require([
 
       ownerFilters,
 
-      "owner-filter",
-
-      false,
-
-      false
+      "owner-filter"
 
     );
 
@@ -680,15 +733,283 @@ require([
 
 
   // =========================================================
-  // BUILD DOMAIN FILTER
+  // BUILD SPORTS
+  // =========================================================
+
+  function buildSportFilters() {
+
+    const sportField =
+      facilitiesLayer.fields.find(
+        function (field) {
+
+          return (
+            field.name ===
+            "Sport"
+          );
+
+        }
+      );
+
+
+    if (
+      !sportField ||
+      !sportField.domain ||
+      !sportField.domain.codedValues
+    ) {
+
+      return;
+
+    }
+
+
+    mainSportFilters.innerHTML =
+      "";
+
+
+    moreSportFilters.innerHTML =
+      "";
+
+
+    const domainValues =
+      sportField.domain.codedValues.slice();
+
+
+
+    // -------------------------------------------------------
+    // MAIN TEN SPORTS
+    // -------------------------------------------------------
+
+    mainSports.forEach(
+      function (mainSport) {
+
+        const match =
+          domainValues.find(
+            function (codedValue) {
+
+              return (
+                codedValue.code ===
+                  mainSport.value ||
+                codedValue.name ===
+                  mainSport.value
+              );
+
+            }
+          );
+
+
+        if (match) {
+
+          addSportCheckbox(
+
+            match,
+
+            mainSportFilters,
+
+            mainSport.label
+
+          );
+
+        }
+
+      }
+    );
+
+
+
+    // -------------------------------------------------------
+    // EVERYTHING ELSE
+    // -------------------------------------------------------
+
+    const mainValues =
+      mainSports.map(
+        function (sport) {
+
+          return sport.value;
+
+        }
+      );
+
+
+    domainValues
+
+      .filter(
+        function (codedValue) {
+
+          return (
+
+            !mainValues.includes(
+              codedValue.code
+            )
+
+            &&
+
+            !mainValues.includes(
+              codedValue.name
+            )
+
+          );
+
+        }
+      )
+
+      .sort(
+        function (a, b) {
+
+          return a.name.localeCompare(
+            b.name
+          );
+
+        }
+      )
+
+      .forEach(
+        function (codedValue) {
+
+          addSportCheckbox(
+
+            codedValue,
+
+            moreSportFilters,
+
+            codedValue.name
+
+          );
+
+        }
+      );
+
+  }
+
+
+
+  // =========================================================
+  // ADD SPORT CHECKBOX
+  // =========================================================
+
+  function addSportCheckbox(
+    codedValue,
+    container,
+    displayLabel
+  ) {
+
+    const label =
+      document.createElement(
+        "label"
+      );
+
+
+    label.className =
+      "checkbox-item";
+
+
+    const checkbox =
+      document.createElement(
+        "input"
+      );
+
+
+    checkbox.type =
+      "checkbox";
+
+
+    checkbox.value =
+      codedValue.code;
+
+
+    checkbox.classList.add(
+      "sport-filter"
+    );
+
+
+    checkbox.checked =
+      true;
+
+
+    label.appendChild(
+      checkbox
+    );
+
+
+
+    const square =
+      document.createElement(
+        "span"
+      );
+
+
+    square.className =
+      "colour-square";
+
+
+    const colour =
+      sportColours[
+        codedValue.code
+      ]
+      ||
+      sportColours[
+        codedValue.name
+      ]
+      ||
+      [
+        145,
+        145,
+        145
+      ];
+
+
+    square.style.backgroundColor =
+      "rgb(" +
+      colour[0] +
+      "," +
+      colour[1] +
+      "," +
+      colour[2] +
+      ")";
+
+
+    label.appendChild(
+      square
+    );
+
+
+
+    const text =
+      document.createElement(
+        "span"
+      );
+
+
+    text.textContent =
+      displayLabel;
+
+
+    label.appendChild(
+      text
+    );
+
+
+    checkbox.addEventListener(
+      "change",
+      applyFilters
+    );
+
+
+    container.appendChild(
+      label
+    );
+
+  }
+
+
+
+  // =========================================================
+  // OTHER DOMAIN FILTERS
   // =========================================================
 
   function buildDomainFilter(
     fieldName,
     container,
-    className,
-    showColour,
-    alphabetical
+    className
   ) {
 
     if (!container) {
@@ -717,9 +1038,6 @@ require([
       !field.domain.codedValues
     ) {
 
-      container.innerHTML =
-        "<span>No categories available</span>";
-
       return;
 
     }
@@ -729,28 +1047,8 @@ require([
       "";
 
 
-    let values =
-      field.domain.codedValues.slice();
-
-
-    if (alphabetical) {
-
-      values.sort(
-        function (a, b) {
-
-          return a.name.localeCompare(
-            b.name
-          );
-
-        }
-      );
-
-    }
-
-
-    values.forEach(
+    field.domain.codedValues.forEach(
       function (codedValue) {
-
 
         const label =
           document.createElement(
@@ -790,51 +1088,6 @@ require([
         );
 
 
-        if (showColour) {
-
-          const square =
-            document.createElement(
-              "span"
-            );
-
-
-          square.className =
-            "colour-square";
-
-
-          const colour =
-            sportColours[
-              codedValue.code
-            ]
-            ||
-            sportColours[
-              codedValue.name
-            ]
-            ||
-            [
-              145,
-              145,
-              145
-            ];
-
-
-          square.style.backgroundColor =
-            "rgb(" +
-            colour[0] +
-            "," +
-            colour[1] +
-            "," +
-            colour[2] +
-            ")";
-
-
-          label.appendChild(
-            square
-          );
-
-        }
-
-
         const text =
           document.createElement(
             "span"
@@ -868,10 +1121,56 @@ require([
 
 
   // =========================================================
-  // TOP 8 MOST MAPPED SPORTS
+  // MORE SPORTS
   // =========================================================
 
-  async function buildTopSportsLegend() {
+  if (moreSportsButton) {
+
+    moreSportsButton.addEventListener(
+      "click",
+      function () {
+
+        const currentlyHidden =
+          moreSportFilters.classList.contains(
+            "hidden"
+          );
+
+
+        if (currentlyHidden) {
+
+          moreSportFilters.classList.remove(
+            "hidden"
+          );
+
+
+          moreSportsArrow.textContent =
+            "▴";
+
+        }
+        else {
+
+          moreSportFilters.classList.add(
+            "hidden"
+          );
+
+
+          moreSportsArrow.textContent =
+            "▾";
+
+        }
+
+      }
+    );
+
+  }
+
+
+
+  // =========================================================
+  // FIXED TEN-SPORT LEGEND
+  // =========================================================
+
+  function buildLegend() {
 
     if (!legendItems) {
 
@@ -880,205 +1179,81 @@ require([
     }
 
 
-    try {
-
-      const query =
-        facilitiesLayer.createQuery();
+    legendItems.innerHTML =
+      "";
 
 
-      query.where =
-        "Sport IS NOT NULL";
+    mainSports.forEach(
+      function (sport) {
+
+        const row =
+          document.createElement(
+            "div"
+          );
 
 
-      query.returnGeometry =
-        false;
+        row.className =
+          "legend-item";
 
 
-      query.groupByFieldsForStatistics = [
-        "Sport"
-      ];
+        const square =
+          document.createElement(
+            "span"
+          );
 
 
-      query.outStatistics = [
-
-        {
-
-          statisticType:
-            "count",
-
-          onStatisticField:
-            "OBJECTID",
-
-          outStatisticFieldName:
-            "facility_count"
-
-        }
-
-      ];
+        square.className =
+          "legend-colour";
 
 
-      const response =
-        await facilitiesLayer.queryFeatures(
-          query
+        const colour =
+          sportColours[
+            sport.value
+          ]
+          ||
+          [
+            145,
+            145,
+            145
+          ];
+
+
+        square.style.backgroundColor =
+          "rgb(" +
+          colour[0] +
+          "," +
+          colour[1] +
+          "," +
+          colour[2] +
+          ")";
+
+
+        const text =
+          document.createElement(
+            "span"
+          );
+
+
+        text.textContent =
+          sport.label;
+
+
+        row.appendChild(
+          square
         );
 
 
-      const rankedSports =
-        response.features
-
-          .map(
-            function (feature) {
-
-              return {
-
-                sport:
-                  feature.attributes.Sport,
-
-                count:
-                  feature.attributes.facility_count
-
-              };
-
-            }
-          )
-
-          .filter(
-            function (item) {
-
-              return (
-                item.sport !== null &&
-                item.sport !== undefined
-              );
-
-            }
-          )
-
-          .sort(
-            function (a, b) {
-
-              return (
-                b.count -
-                a.count
-              );
-
-            }
-          )
-
-          .slice(
-            0,
-            8
-          );
+        row.appendChild(
+          text
+        );
 
 
-      legendItems.innerHTML =
-        "";
+        legendItems.appendChild(
+          row
+        );
 
-
-      rankedSports.forEach(
-        function (item) {
-
-
-          const row =
-            document.createElement(
-              "div"
-            );
-
-
-          row.className =
-            "legend-item";
-
-
-          const square =
-            document.createElement(
-              "span"
-            );
-
-
-          square.className =
-            "legend-colour";
-
-
-          const colour =
-            sportColours[
-              item.sport
-            ]
-            ||
-            [
-              145,
-              145,
-              145
-            ];
-
-
-          square.style.backgroundColor =
-            "rgb(" +
-            colour[0] +
-            "," +
-            colour[1] +
-            "," +
-            colour[2] +
-            ")";
-
-
-          const name =
-            document.createElement(
-              "span"
-            );
-
-
-          name.textContent =
-            item.sport;
-
-
-          const count =
-            document.createElement(
-              "span"
-            );
-
-
-          count.className =
-            "legend-count";
-
-
-          count.textContent =
-            Number(
-              item.count
-            ).toLocaleString(
-              "en-IE"
-            );
-
-
-          row.appendChild(
-            square
-          );
-
-
-          row.appendChild(
-            name
-          );
-
-
-          row.appendChild(
-            count
-          );
-
-
-          legendItems.appendChild(
-            row
-          );
-
-        }
-      );
-
-    }
-    catch (error) {
-
-      console.error(
-        "LEGEND ERROR:",
-        error
-      );
-
-    }
+      }
+    );
 
   }
 
@@ -1131,7 +1306,6 @@ require([
       document.querySelectorAll(
         ".owner-filter"
       ).length;
-
 
 
     const nothingSelected =
@@ -1494,9 +1668,6 @@ require([
 
   // =========================================================
   // CLICK FACILITY
-  //
-  // 14 PIXEL TOLERANCE
-  // SELECTS NEAREST FACILITY ONLY
   // =========================================================
 
   view.on(
@@ -1591,7 +1762,6 @@ require([
           });
 
 
-
         const query =
           facilitiesLayer.createQuery();
 
@@ -1663,7 +1833,6 @@ require([
           return;
 
         }
-
 
 
         let nearestFacility =
@@ -1798,7 +1967,7 @@ require([
 
 
   // =========================================================
-  // FACILITY DETAILS
+  // DETAILS
   // =========================================================
 
   function showFacilityDetails(
@@ -1858,7 +2027,7 @@ require([
 
     setText(
       "detailSportTag",
-      cleanValue(
+      displaySportName(
         attributes.Sport
       )
     );
@@ -1879,7 +2048,7 @@ require([
 
     setText(
       "detailSport",
-      cleanValue(
+      displaySportName(
         attributes.Sport
       )
     );
@@ -1995,7 +2164,33 @@ require([
 
 
   // =========================================================
-  // SPORT TAG COLOUR
+  // DISPLAY SPORT NAME
+  // =========================================================
+
+  function displaySportName(
+    value
+  ) {
+
+    if (
+      value ===
+      "Sports Hall"
+    ) {
+
+      return "Sports Halls";
+
+    }
+
+
+    return cleanValue(
+      value
+    );
+
+  }
+
+
+
+  // =========================================================
+  // SPORT TAG
   // =========================================================
 
   function setSportTagColour(
@@ -2041,7 +2236,7 @@ require([
 
 
   // =========================================================
-  // FORMAT QUALITY
+  // FORMATTERS
   // =========================================================
 
   function formatQuality(
@@ -2078,10 +2273,6 @@ require([
 
 
 
-  // =========================================================
-  // FORMAT FLOODLIGHTS
-  // =========================================================
-
   function formatFloodlights(
     value
   ) {
@@ -2113,10 +2304,6 @@ require([
   }
 
 
-
-  // =========================================================
-  // TITLE CASE
-  // =========================================================
 
   function titleCase(
     value
@@ -2305,7 +2492,7 @@ require([
 
 
   // =========================================================
-  // FULL IRELAND BUTTON
+  // FULL IRELAND
   // =========================================================
 
   if (homeButton) {
@@ -2315,11 +2502,6 @@ require([
       async function () {
 
         try {
-
-          /*
-           * Remove the extra padding used by
-           * Zoom to facility.
-           */
 
           view.padding = {
 
@@ -2384,7 +2566,7 @@ require([
 
 
   // =========================================================
-  // SET TEXT
+  // GENERIC HELPERS
   // =========================================================
 
   function setText(
@@ -2408,10 +2590,6 @@ require([
   }
 
 
-
-  // =========================================================
-  // CLEAN VALUES
-  // =========================================================
 
   function cleanValue(
     value
@@ -2437,10 +2615,6 @@ require([
   }
 
 
-
-  // =========================================================
-  // FORMAT AREA
-  // =========================================================
 
   function formatArea(
     value
