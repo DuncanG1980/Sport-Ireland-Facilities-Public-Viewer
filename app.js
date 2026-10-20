@@ -239,8 +239,7 @@ require([
         osmLayer
       ],
 
-      title:
-        "Muted OpenStreetMap"
+      title: "Muted OpenStreetMap"
 
     });
 
@@ -252,8 +251,7 @@ require([
   const map =
     new Map({
 
-      basemap:
-        customBasemap,
+      basemap: customBasemap,
 
       layers: [
         facilitiesLayer
@@ -269,17 +267,13 @@ require([
   const view =
     new MapView({
 
-      container:
-        "viewDiv",
+      container: "viewDiv",
 
-      map:
-        map,
+      map: map,
 
-      center:
-        IRELAND_CENTER,
+      center: IRELAND_CENTER,
 
-      zoom:
-        IRELAND_ZOOM,
+      zoom: IRELAND_ZOOM,
 
       background: {
         color: [
@@ -297,12 +291,12 @@ require([
       highlightOptions: {
         color: [
           0,
-          180,
-          170,
+          190,
+          175,
           1
         ],
 
-        haloOpacity: 0.85,
+        haloOpacity: 0.9,
 
         fillOpacity: 0.12
       }
@@ -1370,6 +1364,107 @@ require([
 
       try {
 
+        // -----------------------------------------------------
+        // FIRST: GET ALL RENDERED FACILITIES UNDER CURSOR
+        // -----------------------------------------------------
+
+        const hitResponse =
+          await view.hitTest(
+            event,
+            {
+              include: [
+                facilitiesLayer
+              ]
+            }
+          );
+
+
+        const hitGraphics = [];
+
+
+        if (
+          hitResponse.results &&
+          hitResponse.results.length > 0
+        ) {
+
+          hitResponse.results.forEach(
+            function (result) {
+
+              if (
+                result.type === "graphic" &&
+                result.graphic &&
+                result.graphic.layer ===
+                  facilitiesLayer
+              ) {
+
+                hitGraphics.push(
+                  result.graphic
+                );
+
+              }
+
+            }
+          );
+
+        }
+
+
+        // -----------------------------------------------------
+        // REMOVE DUPLICATES
+        // -----------------------------------------------------
+
+        const uniqueHitGraphics =
+          deduplicateGraphics(
+            hitGraphics
+          );
+
+
+        // -----------------------------------------------------
+        // RESPECT CURRENT FILTER
+        // -----------------------------------------------------
+
+        const filteredHitGraphics =
+          await filterGraphicsAgainstCurrentWhere(
+            uniqueHitGraphics
+          );
+
+
+        if (
+          filteredHitGraphics.length > 0
+        ) {
+
+          filteredHitGraphics.sort(
+            function (a, b) {
+
+              return (
+                getPolygonArea(
+                  a.geometry
+                )
+                -
+                getPolygonArea(
+                  b.geometry
+                )
+              );
+
+            }
+          );
+
+
+          selectFacilities(
+            filteredHitGraphics
+          );
+
+
+          return;
+
+        }
+
+
+        // -----------------------------------------------------
+        // FALLBACK:
+        // 14 PIXEL SEARCH FOR SMALL / MISSED FACILITIES
+        // -----------------------------------------------------
+
         const clickedPoint =
           event.mapPoint;
 
@@ -1382,89 +1477,6 @@ require([
 
         }
 
-
-        // -----------------------------------------------------
-        // FIRST: FIND POLYGONS ACTUALLY UNDER THE CLICK
-        // -----------------------------------------------------
-
-        const exactQuery =
-          facilitiesLayer.createQuery();
-
-
-        exactQuery.geometry =
-          clickedPoint;
-
-
-        exactQuery.spatialRelationship =
-          "intersects";
-
-
-        exactQuery.where =
-          getCurrentWhereClause();
-
-
-        exactQuery.returnGeometry =
-          true;
-
-
-        exactQuery.outFields = [
-          "OBJECTID",
-          "Sport",
-          "Infrastructure_Type",
-          "Surface",
-          "Floodlights",
-          "Owner",
-          "Facility_Size",
-          "Owner_Name",
-          "Quality",
-          "Local_Authority",
-          "LEA",
-          "Multi_Use",
-          "Area_msq"
-        ];
-
-
-        const exactResponse =
-          await facilitiesLayer.queryFeatures(
-            exactQuery
-          );
-
-
-        if (
-          exactResponse.features &&
-          exactResponse.features.length > 0
-        ) {
-
-          const exactFeatures =
-            exactResponse.features.slice();
-
-
-          // Smallest polygons first.
-          exactFeatures.sort(
-            function (a, b) {
-
-              return (
-                getPolygonArea(a.geometry) -
-                getPolygonArea(b.geometry)
-              );
-
-            }
-          );
-
-
-          selectFacilities(
-            exactFeatures
-          );
-
-
-          return;
-
-        }
-
-
-        // -----------------------------------------------------
-        // FALLBACK: 14 PIXEL TOLERANCE
-        // -----------------------------------------------------
 
         const topLeft =
           view.toMap({
@@ -1535,42 +1547,54 @@ require([
           });
 
 
-        const toleranceQuery =
+        const query =
           facilitiesLayer.createQuery();
 
 
-        toleranceQuery.geometry =
+        query.geometry =
           searchExtent;
 
 
-        toleranceQuery.spatialRelationship =
+        query.spatialRelationship =
           "intersects";
 
 
-        toleranceQuery.where =
+        query.where =
           getCurrentWhereClause();
 
 
-        toleranceQuery.returnGeometry =
+        query.returnGeometry =
           true;
 
 
-        toleranceQuery.outFields =
-          exactQuery.outFields;
+        query.outFields = [
+          "OBJECTID",
+          "Sport",
+          "Infrastructure_Type",
+          "Surface",
+          "Floodlights",
+          "Owner",
+          "Facility_Size",
+          "Owner_Name",
+          "Quality",
+          "Local_Authority",
+          "LEA",
+          "Multi_Use",
+          "Area_msq"
+        ];
 
 
-        const toleranceResponse =
+        const response =
           await facilitiesLayer.queryFeatures(
-            toleranceQuery
+            query
           );
 
 
         const nearbyFacilities =
-          toleranceResponse.features;
+          response.features || [];
 
 
         if (
-          !nearbyFacilities ||
           nearbyFacilities.length === 0
         ) {
 
@@ -1582,7 +1606,8 @@ require([
 
 
         // -----------------------------------------------------
-        // IF CLICK MISSED, CHOOSE NEAREST ONLY
+        // IF SEVERAL ARE WITHIN TOLERANCE,
+        // USE NEAREST ONE ONLY
         // -----------------------------------------------------
 
         let nearestFacility =
@@ -1679,6 +1704,180 @@ require([
 
 
   // =========================================================
+  // DEDUPLICATE HITTEST GRAPHICS
+  // =========================================================
+
+  function deduplicateGraphics(
+    graphics
+  ) {
+
+    const seen =
+      new Set();
+
+
+    const unique =
+      [];
+
+
+    graphics.forEach(
+      function (graphic) {
+
+        const objectId =
+          graphic.getObjectId();
+
+
+        const key =
+          objectId !== null &&
+          objectId !== undefined
+
+            ? String(objectId)
+
+            : JSON.stringify(
+                graphic.geometry
+              );
+
+
+        if (
+          !seen.has(key)
+        ) {
+
+          seen.add(key);
+
+          unique.push(
+            graphic
+          );
+
+        }
+
+      }
+    );
+
+
+    return unique;
+
+  }
+
+
+  // =========================================================
+  // MAKE SURE HITTEST RESULTS MATCH ACTIVE FILTER
+  // =========================================================
+
+  async function filterGraphicsAgainstCurrentWhere(
+    graphics
+  ) {
+
+    if (
+      !graphics ||
+      graphics.length === 0
+    ) {
+
+      return [];
+
+    }
+
+
+    const where =
+      getCurrentWhereClause();
+
+
+    if (
+      where === "1=1"
+    ) {
+
+      return graphics;
+
+    }
+
+
+    if (
+      where === "1=0"
+    ) {
+
+      return [];
+
+    }
+
+
+    const objectIds =
+      graphics
+
+        .map(
+          function (graphic) {
+
+            return graphic.getObjectId();
+
+          }
+        )
+
+        .filter(
+          function (objectId) {
+
+            return (
+              objectId !== null &&
+              objectId !== undefined
+            );
+
+          }
+        );
+
+
+    if (
+      objectIds.length === 0
+    ) {
+
+      return [];
+
+    }
+
+
+    const query =
+      facilitiesLayer.createQuery();
+
+
+    query.where =
+      "(" +
+      where +
+      ") AND OBJECTID IN (" +
+      objectIds.join(",") +
+      ")";
+
+
+    query.returnGeometry =
+      true;
+
+
+    query.outFields = [
+      "OBJECTID",
+      "Sport",
+      "Infrastructure_Type",
+      "Surface",
+      "Floodlights",
+      "Owner",
+      "Facility_Size",
+      "Owner_Name",
+      "Quality",
+      "Local_Authority",
+      "LEA",
+      "Multi_Use",
+      "Area_msq"
+    ];
+
+
+    const response =
+      await facilitiesLayer.queryFeatures(
+        query
+      );
+
+
+    return (
+      response.features ||
+      []
+    );
+
+  }
+
+
+  // =========================================================
   // SELECT ONE OR MORE FACILITIES
   // =========================================================
 
@@ -1704,13 +1903,8 @@ require([
     }
 
 
-    selectedIndex =
-      0;
+    selectedIndex = 0;
 
-
-    // -------------------------------------------------------
-    // HIGHLIGHT ALL OVERLAPPING FACILITIES
-    // -------------------------------------------------------
 
     if (facilitiesLayerView) {
 
@@ -1757,7 +1951,7 @@ require([
 
 
   // =========================================================
-  // SHOW CURRENT FACILITY IN MULTI-SELECTION
+  // SHOW CURRENT FACILITY
   // =========================================================
 
   function showCurrentFacility() {
@@ -1793,7 +1987,7 @@ require([
 
 
   // =========================================================
-  // STRONG OUTLINE FOR CURRENT FACILITY
+  // CURRENT FACILITY STRONG OUTLINE
   // =========================================================
 
   function updateCurrentOverlay() {
@@ -1803,6 +1997,7 @@ require([
       view.graphics.remove(
         currentOverlayGraphic
       );
+
 
       currentOverlayGraphic =
         null;
@@ -1825,26 +2020,24 @@ require([
 
 
     currentOverlayGraphic.symbol = {
-      type:
-        "simple-fill",
+      type: "simple-fill",
 
       color: [
         0,
-        180,
         170,
-        0.05
+        150,
+        0.08
       ],
 
       outline: {
         color: [
           0,
-          125,
-          105,
+          95,
+          80,
           1
         ],
 
-        width:
-          4
+        width: 4
       }
     };
 
@@ -1893,7 +2086,7 @@ require([
 
 
   // =========================================================
-  // PREVIOUS FACILITY
+  // PREVIOUS
   // =========================================================
 
   if (previousFacility) {
@@ -1930,7 +2123,7 @@ require([
 
 
   // =========================================================
-  // NEXT FACILITY
+  // NEXT
   // =========================================================
 
   if (nextFacility) {
@@ -2002,7 +2195,7 @@ require([
 
     }
     catch (error) {
-      // Use fallback below.
+      // fallback below
     }
 
 
@@ -2291,14 +2484,9 @@ require([
   ) {
 
     const labels = {
-      1:
-        "Poor",
-
-      2:
-        "Good / Satisfactory",
-
-      3:
-        "Excellent"
+      1: "Poor",
+      2: "Good / Satisfactory",
+      3: "Excellent"
     };
 
 
@@ -2378,7 +2566,7 @@ require([
 
 
   // =========================================================
-  // CLEAR HIGHLIGHTS ONLY
+  // CLEAR MAP HIGHLIGHTS ONLY
   // =========================================================
 
   function clearMapHighlightsOnly() {
@@ -2387,8 +2575,7 @@ require([
 
       highlightHandle.remove();
 
-      highlightHandle =
-        null;
+      highlightHandle = null;
 
     }
 
@@ -2399,8 +2586,8 @@ require([
         currentOverlayGraphic
       );
 
-      currentOverlayGraphic =
-        null;
+
+      currentOverlayGraphic = null;
 
     }
 
@@ -2416,16 +2603,11 @@ require([
     clearMapHighlightsOnly();
 
 
-    selectedGraphics =
-      [];
+    selectedGraphics = [];
 
+    selectedIndex = 0;
 
-    selectedIndex =
-      0;
-
-
-    selectedGraphic =
-      null;
+    selectedGraphic = null;
 
 
     if (selectionNavigator) {
@@ -2499,34 +2681,24 @@ require([
 
           const target =
             geometry.extent
-
               ? geometry.extent.expand(
                   2.2
                 )
-
               : geometry;
 
 
           view.padding = {
-            top:
-              20,
-
-            right:
-              140,
-
-            bottom:
-              20,
-
-            left:
-              20
+            top: 20,
+            right: 140,
+            bottom: 20,
+            left: 20
           };
 
 
           await view.goTo(
             target,
             {
-              duration:
-                800
+              duration: 800
             }
           );
 
@@ -2566,31 +2738,20 @@ require([
         try {
 
           view.padding = {
-            top:
-              0,
-
-            right:
-              0,
-
-            bottom:
-              0,
-
-            left:
-              0
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
           };
 
 
           await view.goTo(
             {
-              center:
-                IRELAND_CENTER,
-
-              zoom:
-                IRELAND_ZOOM
+              center: IRELAND_CENTER,
+              zoom: IRELAND_ZOOM
             },
             {
-              duration:
-                900
+              duration: 900
             }
           );
 
@@ -2689,8 +2850,7 @@ require([
 
 
     if (
-      area >=
-      10000
+      area >= 10000
     ) {
 
       return (
@@ -2700,8 +2860,7 @@ require([
         ).toLocaleString(
           "en-IE",
           {
-            maximumFractionDigits:
-              2
+            maximumFractionDigits: 2
           }
         )
         +
@@ -2715,8 +2874,7 @@ require([
       area.toLocaleString(
         "en-IE",
         {
-          maximumFractionDigits:
-            0
+          maximumFractionDigits: 0
         }
       )
       +
