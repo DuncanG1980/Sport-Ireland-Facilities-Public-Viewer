@@ -122,7 +122,7 @@ require([
 
 
   // =========================================================
-  // SPORT RENDERER
+  // RENDERER
   // =========================================================
 
   const rendererInfos =
@@ -160,7 +160,7 @@ require([
 
 
   // =========================================================
-  // FACILITIES LAYER
+  // FACILITY LAYER
   // =========================================================
 
   const facilitiesLayer =
@@ -215,14 +215,15 @@ require([
           }
         },
 
-        uniqueValueInfos: rendererInfos
+        uniqueValueInfos:
+          rendererInfos
       }
 
     });
 
 
   // =========================================================
-  // OPENSTREETMAP
+  // BASEMAP
   // =========================================================
 
   const osmLayer =
@@ -238,7 +239,8 @@ require([
         osmLayer
       ],
 
-      title: "Muted OpenStreetMap"
+      title:
+        "Muted OpenStreetMap"
 
     });
 
@@ -250,7 +252,8 @@ require([
   const map =
     new Map({
 
-      basemap: customBasemap,
+      basemap:
+        customBasemap,
 
       layers: [
         facilitiesLayer
@@ -266,13 +269,17 @@ require([
   const view =
     new MapView({
 
-      container: "viewDiv",
+      container:
+        "viewDiv",
 
-      map: map,
+      map:
+        map,
 
-      center: IRELAND_CENTER,
+      center:
+        IRELAND_CENTER,
 
-      zoom: IRELAND_ZOOM,
+      zoom:
+        IRELAND_ZOOM,
 
       background: {
         color: [
@@ -285,6 +292,19 @@ require([
 
       constraints: {
         minZoom: 6
+      },
+
+      highlightOptions: {
+        color: [
+          0,
+          180,
+          170,
+          1
+        ],
+
+        haloOpacity: 0.85,
+
+        fillOpacity: 0.12
       }
 
     });
@@ -319,6 +339,12 @@ require([
   let facilitiesLayerView = null;
 
   let highlightHandle = null;
+
+  let currentOverlayGraphic = null;
+
+  let selectedGraphics = [];
+
+  let selectedIndex = 0;
 
   let selectedGraphic = null;
 
@@ -402,6 +428,26 @@ require([
       "legendItems"
     );
 
+  const selectionNavigator =
+    document.getElementById(
+      "selectionNavigator"
+    );
+
+  const selectionPosition =
+    document.getElementById(
+      "selectionPosition"
+    );
+
+  const previousFacility =
+    document.getElementById(
+      "previousFacility"
+    );
+
+  const nextFacility =
+    document.getElementById(
+      "nextFacility"
+    );
+
 
   // =========================================================
   // LOAD
@@ -468,7 +514,7 @@ require([
 
 
   // =========================================================
-  // BUILD SPORTS
+  // SPORT FILTERS
   // =========================================================
 
   function buildSportFilters() {
@@ -509,10 +555,6 @@ require([
       sportField.domain.codedValues.slice();
 
 
-    // -------------------------------------------------------
-    // MAIN TEN SPORTS
-    // -------------------------------------------------------
-
     mainSports.forEach(
       function (mainSport) {
 
@@ -521,8 +563,10 @@ require([
             function (codedValue) {
 
               return (
-                codedValue.code === mainSport.value ||
-                codedValue.name === mainSport.value
+                codedValue.code ===
+                  mainSport.value ||
+                codedValue.name ===
+                  mainSport.value
               );
 
             }
@@ -538,22 +582,10 @@ require([
           );
 
         }
-        else {
-
-          console.warn(
-            "Main sport not found in domain:",
-            mainSport.value
-          );
-
-        }
 
       }
     );
 
-
-    // -------------------------------------------------------
-    // ALL OTHER SPORTS
-    // -------------------------------------------------------
 
     const mainValues =
       mainSports.map(
@@ -634,16 +666,21 @@ require([
       );
 
 
-    checkbox.type = "checkbox";
+    checkbox.type =
+      "checkbox";
+
 
     checkbox.value =
       codedValue.code;
+
 
     checkbox.classList.add(
       "sport-filter"
     );
 
-    checkbox.checked = true;
+
+    checkbox.checked =
+      true;
 
 
     label.appendChild(
@@ -721,7 +758,7 @@ require([
 
 
   // =========================================================
-  // BUILD OTHER DOMAIN FILTERS
+  // OTHER FILTERS
   // =========================================================
 
   function buildDomainFilter(
@@ -731,9 +768,7 @@ require([
   ) {
 
     if (!container) {
-
       return;
-
     }
 
 
@@ -742,7 +777,8 @@ require([
         function (fieldItem) {
 
           return (
-            fieldItem.name === fieldName
+            fieldItem.name ===
+            fieldName
           );
 
         }
@@ -782,16 +818,21 @@ require([
           );
 
 
-        checkbox.type = "checkbox";
+        checkbox.type =
+          "checkbox";
+
 
         checkbox.value =
           codedValue.code;
+
 
         checkbox.classList.add(
           className
         );
 
-        checkbox.checked = true;
+
+        checkbox.checked =
+          true;
 
 
         label.appendChild(
@@ -831,7 +872,7 @@ require([
 
 
   // =========================================================
-  // MORE SPORTS DROPDOWN
+  // MORE SPORTS
   // =========================================================
 
   if (moreSportsButton) {
@@ -874,15 +915,13 @@ require([
 
 
   // =========================================================
-  // FIXED TEN SPORT LEGEND
+  // LEGEND
   // =========================================================
 
   function buildLegend() {
 
     if (!legendItems) {
-
       return;
-
     }
 
 
@@ -971,9 +1010,7 @@ require([
   async function applyFilters() {
 
     if (!facilitiesLayerView) {
-
       return;
-
     }
 
 
@@ -1162,12 +1199,11 @@ require([
 
           return (
             "'" +
-            String(value)
-              .replace(
-                /'/g,
-                "''"
-              )
-            + "'"
+            String(value).replace(
+              /'/g,
+              "''"
+            ) +
+            "'"
           );
 
         }
@@ -1201,7 +1237,8 @@ require([
           .forEach(
             function (checkbox) {
 
-              checkbox.checked = true;
+              checkbox.checked =
+                true;
 
             }
           );
@@ -1242,7 +1279,8 @@ require([
           .forEach(
             function (checkbox) {
 
-              checkbox.checked = false;
+              checkbox.checked =
+                false;
 
             }
           );
@@ -1274,9 +1312,7 @@ require([
   async function updateResultCount() {
 
     if (!facilitiesLayerView) {
-
       return;
-
     }
 
 
@@ -1347,6 +1383,89 @@ require([
         }
 
 
+        // -----------------------------------------------------
+        // FIRST: FIND POLYGONS ACTUALLY UNDER THE CLICK
+        // -----------------------------------------------------
+
+        const exactQuery =
+          facilitiesLayer.createQuery();
+
+
+        exactQuery.geometry =
+          clickedPoint;
+
+
+        exactQuery.spatialRelationship =
+          "intersects";
+
+
+        exactQuery.where =
+          getCurrentWhereClause();
+
+
+        exactQuery.returnGeometry =
+          true;
+
+
+        exactQuery.outFields = [
+          "OBJECTID",
+          "Sport",
+          "Infrastructure_Type",
+          "Surface",
+          "Floodlights",
+          "Owner",
+          "Facility_Size",
+          "Owner_Name",
+          "Quality",
+          "Local_Authority",
+          "LEA",
+          "Multi_Use",
+          "Area_msq"
+        ];
+
+
+        const exactResponse =
+          await facilitiesLayer.queryFeatures(
+            exactQuery
+          );
+
+
+        if (
+          exactResponse.features &&
+          exactResponse.features.length > 0
+        ) {
+
+          const exactFeatures =
+            exactResponse.features.slice();
+
+
+          // Smallest polygons first.
+          exactFeatures.sort(
+            function (a, b) {
+
+              return (
+                getPolygonArea(a.geometry) -
+                getPolygonArea(b.geometry)
+              );
+
+            }
+          );
+
+
+          selectFacilities(
+            exactFeatures
+          );
+
+
+          return;
+
+        }
+
+
+        // -----------------------------------------------------
+        // FALLBACK: 14 PIXEL TOLERANCE
+        // -----------------------------------------------------
+
         const topLeft =
           view.toMap({
             x:
@@ -1416,51 +1535,38 @@ require([
           });
 
 
-        const query =
+        const toleranceQuery =
           facilitiesLayer.createQuery();
 
 
-        query.geometry =
+        toleranceQuery.geometry =
           searchExtent;
 
 
-        query.spatialRelationship =
+        toleranceQuery.spatialRelationship =
           "intersects";
 
 
-        query.where =
+        toleranceQuery.where =
           getCurrentWhereClause();
 
 
-        query.returnGeometry =
+        toleranceQuery.returnGeometry =
           true;
 
 
-        query.outFields = [
-          "OBJECTID",
-          "Sport",
-          "Infrastructure_Type",
-          "Surface",
-          "Floodlights",
-          "Owner",
-          "Facility_Size",
-          "Owner_Name",
-          "Quality",
-          "Local_Authority",
-          "LEA",
-          "Multi_Use",
-          "Area_msq"
-        ];
+        toleranceQuery.outFields =
+          exactQuery.outFields;
 
 
-        const response =
+        const toleranceResponse =
           await facilitiesLayer.queryFeatures(
-            query
+            toleranceQuery
           );
 
 
         const nearbyFacilities =
-          response.features;
+          toleranceResponse.features;
 
 
         if (
@@ -1475,18 +1581,23 @@ require([
         }
 
 
-        let nearestFacility = null;
+        // -----------------------------------------------------
+        // IF CLICK MISSED, CHOOSE NEAREST ONLY
+        // -----------------------------------------------------
 
-        let nearestDistance = Infinity;
+        let nearestFacility =
+          null;
+
+
+        let nearestDistance =
+          Infinity;
 
 
         nearbyFacilities.forEach(
           function (facility) {
 
             if (!facility.geometry) {
-
               return;
-
             }
 
 
@@ -1516,7 +1627,8 @@ require([
               isNaN(distance)
             ) {
 
-              distance = Infinity;
+              distance =
+                Infinity;
 
             }
 
@@ -1546,42 +1658,10 @@ require([
         }
 
 
-        selectedGraphic =
-          nearestFacility;
-
-
-        if (highlightHandle) {
-
-          highlightHandle.remove();
-
-          highlightHandle = null;
-
-        }
-
-
-        if (facilitiesLayerView) {
-
-          const objectId =
-            selectedGraphic.getObjectId();
-
-
-          if (
-            objectId !== null &&
-            objectId !== undefined
-          ) {
-
-            highlightHandle =
-              facilitiesLayerView.highlight(
-                objectId
-              );
-
-          }
-
-        }
-
-
-        showFacilityDetails(
-          selectedGraphic.attributes
+        selectFacilities(
+          [
+            nearestFacility
+          ]
         );
 
       }
@@ -1599,6 +1679,349 @@ require([
 
 
   // =========================================================
+  // SELECT ONE OR MORE FACILITIES
+  // =========================================================
+
+  function selectFacilities(
+    graphics
+  ) {
+
+    clearMapHighlightsOnly();
+
+
+    selectedGraphics =
+      graphics || [];
+
+
+    if (
+      selectedGraphics.length === 0
+    ) {
+
+      clearSelection();
+
+      return;
+
+    }
+
+
+    selectedIndex =
+      0;
+
+
+    // -------------------------------------------------------
+    // HIGHLIGHT ALL OVERLAPPING FACILITIES
+    // -------------------------------------------------------
+
+    if (facilitiesLayerView) {
+
+      const objectIds =
+        selectedGraphics
+
+          .map(
+            function (graphic) {
+
+              return graphic.getObjectId();
+
+            }
+          )
+
+          .filter(
+            function (objectId) {
+
+              return (
+                objectId !== null &&
+                objectId !== undefined
+              );
+
+            }
+          );
+
+
+      if (
+        objectIds.length > 0
+      ) {
+
+        highlightHandle =
+          facilitiesLayerView.highlight(
+            objectIds
+          );
+
+      }
+
+    }
+
+
+    showCurrentFacility();
+
+  }
+
+
+  // =========================================================
+  // SHOW CURRENT FACILITY IN MULTI-SELECTION
+  // =========================================================
+
+  function showCurrentFacility() {
+
+    if (
+      selectedGraphics.length === 0
+    ) {
+
+      clearSelection();
+
+      return;
+
+    }
+
+
+    selectedGraphic =
+      selectedGraphics[
+        selectedIndex
+      ];
+
+
+    updateCurrentOverlay();
+
+
+    showFacilityDetails(
+      selectedGraphic.attributes
+    );
+
+
+    updateSelectionNavigator();
+
+  }
+
+
+  // =========================================================
+  // STRONG OUTLINE FOR CURRENT FACILITY
+  // =========================================================
+
+  function updateCurrentOverlay() {
+
+    if (currentOverlayGraphic) {
+
+      view.graphics.remove(
+        currentOverlayGraphic
+      );
+
+      currentOverlayGraphic =
+        null;
+
+    }
+
+
+    if (
+      !selectedGraphic ||
+      !selectedGraphic.geometry
+    ) {
+
+      return;
+
+    }
+
+
+    currentOverlayGraphic =
+      selectedGraphic.clone();
+
+
+    currentOverlayGraphic.symbol = {
+      type:
+        "simple-fill",
+
+      color: [
+        0,
+        180,
+        170,
+        0.05
+      ],
+
+      outline: {
+        color: [
+          0,
+          125,
+          105,
+          1
+        ],
+
+        width:
+          4
+      }
+    };
+
+
+    view.graphics.add(
+      currentOverlayGraphic
+    );
+
+  }
+
+
+  // =========================================================
+  // NAVIGATOR
+  // =========================================================
+
+  function updateSelectionNavigator() {
+
+    if (
+      selectedGraphics.length > 1
+    ) {
+
+      selectionNavigator.classList.remove(
+        "hidden"
+      );
+
+
+      selectionPosition.textContent =
+        (
+          selectedIndex + 1
+        )
+        +
+        " of "
+        +
+        selectedGraphics.length;
+
+    }
+    else {
+
+      selectionNavigator.classList.add(
+        "hidden"
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // PREVIOUS FACILITY
+  // =========================================================
+
+  if (previousFacility) {
+
+    previousFacility.addEventListener(
+      "click",
+      function () {
+
+        if (
+          selectedGraphics.length <= 1
+        ) {
+
+          return;
+
+        }
+
+
+        selectedIndex =
+          (
+            selectedIndex -
+            1 +
+            selectedGraphics.length
+          )
+          %
+          selectedGraphics.length;
+
+
+        showCurrentFacility();
+
+      }
+    );
+
+  }
+
+
+  // =========================================================
+  // NEXT FACILITY
+  // =========================================================
+
+  if (nextFacility) {
+
+    nextFacility.addEventListener(
+      "click",
+      function () {
+
+        if (
+          selectedGraphics.length <= 1
+        ) {
+
+          return;
+
+        }
+
+
+        selectedIndex =
+          (
+            selectedIndex +
+            1
+          )
+          %
+          selectedGraphics.length;
+
+
+        showCurrentFacility();
+
+      }
+    );
+
+  }
+
+
+  // =========================================================
+  // POLYGON AREA
+  // =========================================================
+
+  function getPolygonArea(
+    geometry
+  ) {
+
+    if (!geometry) {
+
+      return Infinity;
+
+    }
+
+
+    try {
+
+      const area =
+        Math.abs(
+          geometryEngine.geodesicArea(
+            geometry,
+            "square-meters"
+          )
+        );
+
+
+      if (
+        isFinite(area) &&
+        area > 0
+      ) {
+
+        return area;
+
+      }
+
+    }
+    catch (error) {
+      // Use fallback below.
+    }
+
+
+    if (geometry.extent) {
+
+      return (
+        geometry.extent.width *
+        geometry.extent.height
+      );
+
+    }
+
+
+    return Infinity;
+
+  }
+
+
+  // =========================================================
   // DETAILS
   // =========================================================
 
@@ -1607,9 +2030,7 @@ require([
   ) {
 
     if (!attributes) {
-
       return;
-
     }
 
 
@@ -1794,7 +2215,7 @@ require([
 
 
   // =========================================================
-  // DISPLAY SPORT NAME
+  // DISPLAY SPORT
   // =========================================================
 
   function displaySportName(
@@ -1802,7 +2223,8 @@ require([
   ) {
 
     if (
-      value === "Sports Hall"
+      value ===
+      "Sports Hall"
     ) {
 
       return "Sports Halls";
@@ -1818,7 +2240,7 @@ require([
 
 
   // =========================================================
-  // SPORT TAG COLOUR
+  // SPORT TAG
   // =========================================================
 
   function setSportTagColour(
@@ -1832,9 +2254,7 @@ require([
 
 
     if (!tag) {
-
       return;
-
     }
 
 
@@ -1863,7 +2283,7 @@ require([
 
 
   // =========================================================
-  // FORMAT QUALITY
+  // FORMATTERS
   // =========================================================
 
   function formatQuality(
@@ -1871,9 +2291,14 @@ require([
   ) {
 
     const labels = {
-      1: "Poor",
-      2: "Good / Satisfactory",
-      3: "Excellent"
+      1:
+        "Poor",
+
+      2:
+        "Good / Satisfactory",
+
+      3:
+        "Excellent"
     };
 
 
@@ -1886,10 +2311,6 @@ require([
 
   }
 
-
-  // =========================================================
-  // FORMAT FLOODLIGHTS
-  // =========================================================
 
   function formatFloodlights(
     value
@@ -1921,10 +2342,6 @@ require([
 
   }
 
-
-  // =========================================================
-  // TITLE CASE
-  // =========================================================
 
   function titleCase(
     value
@@ -1961,19 +2378,61 @@ require([
 
 
   // =========================================================
-  // CLEAR SELECTION
+  // CLEAR HIGHLIGHTS ONLY
   // =========================================================
 
-  function clearSelection() {
-
-    selectedGraphic = null;
-
+  function clearMapHighlightsOnly() {
 
     if (highlightHandle) {
 
       highlightHandle.remove();
 
-      highlightHandle = null;
+      highlightHandle =
+        null;
+
+    }
+
+
+    if (currentOverlayGraphic) {
+
+      view.graphics.remove(
+        currentOverlayGraphic
+      );
+
+      currentOverlayGraphic =
+        null;
+
+    }
+
+  }
+
+
+  // =========================================================
+  // CLEAR SELECTION
+  // =========================================================
+
+  function clearSelection() {
+
+    clearMapHighlightsOnly();
+
+
+    selectedGraphics =
+      [];
+
+
+    selectedIndex =
+      0;
+
+
+    selectedGraphic =
+      null;
+
+
+    if (selectionNavigator) {
+
+      selectionNavigator.classList.add(
+        "hidden"
+      );
 
     }
 
@@ -1999,7 +2458,7 @@ require([
 
 
   // =========================================================
-  // CLOSE DETAILS
+  // CLOSE
   // =========================================================
 
   if (closeDetails) {
@@ -2013,7 +2472,7 @@ require([
 
 
   // =========================================================
-  // ZOOM TO FACILITY
+  // ZOOM TO CURRENT FACILITY
   // =========================================================
 
   if (zoomToFacility) {
@@ -2040,24 +2499,34 @@ require([
 
           const target =
             geometry.extent
+
               ? geometry.extent.expand(
                   2.2
                 )
+
               : geometry;
 
 
           view.padding = {
-            top: 20,
-            right: 140,
-            bottom: 20,
-            left: 20
+            top:
+              20,
+
+            right:
+              140,
+
+            bottom:
+              20,
+
+            left:
+              20
           };
 
 
           await view.goTo(
             target,
             {
-              duration: 800
+              duration:
+                800
             }
           );
 
@@ -2097,20 +2566,31 @@ require([
         try {
 
           view.padding = {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
+            top:
+              0,
+
+            right:
+              0,
+
+            bottom:
+              0,
+
+            left:
+              0
           };
 
 
           await view.goTo(
             {
-              center: IRELAND_CENTER,
-              zoom: IRELAND_ZOOM
+              center:
+                IRELAND_CENTER,
+
+              zoom:
+                IRELAND_ZOOM
             },
             {
-              duration: 900
+              duration:
+                900
             }
           );
 
@@ -2138,7 +2618,7 @@ require([
 
 
   // =========================================================
-  // GENERIC HELPERS
+  // HELPERS
   // =========================================================
 
   function setText(
@@ -2209,7 +2689,8 @@ require([
 
 
     if (
-      area >= 10000
+      area >=
+      10000
     ) {
 
       return (
@@ -2219,7 +2700,8 @@ require([
         ).toLocaleString(
           "en-IE",
           {
-            maximumFractionDigits: 2
+            maximumFractionDigits:
+              2
           }
         )
         +
@@ -2233,9 +2715,10 @@ require([
       area.toLocaleString(
         "en-IE",
         {
-          maximumFractionDigits: 0
+          maximumFractionDigits:
+            0
         }
-      )    
+      )
       +
       " m²"
     );
