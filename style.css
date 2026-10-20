@@ -296,6 +296,66 @@ button {
 
 
 /* =========================================================
+   MORE SPORTS
+   ========================================================= */
+
+.more-sports-button {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-top: 12px;
+
+    padding:
+        9px
+        10px;
+
+    border:
+        1px solid
+        #b9d9cd;
+
+    border-radius: 8px;
+
+    background: #f3faf7;
+
+    color: #006f54;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.more-sports-button:hover {
+    background: #e7f4ef;
+}
+
+
+.more-sports-arrow {
+    font-size: 15px;
+}
+
+
+.more-sports-list {
+    margin-top: 10px;
+
+    padding-top: 4px;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+
+/* =========================================================
    RESULTS
    ========================================================= */
 
@@ -352,7 +412,7 @@ button {
 
 
 /* =========================================================
-   FULL IRELAND / HOME BUTTON
+   FULL IRELAND BUTTON
    ========================================================= */
 
 .map-home-button {
@@ -360,7 +420,7 @@ button {
 
     z-index: 20;
 
-    top: 105px;
+    top: 110px;
     left: 15px;
 
     display: flex;
@@ -495,17 +555,6 @@ button {
 }
 
 
-.legend-count {
-    margin-left: auto;
-
-    color: #65716c;
-
-    font-size: 12px;
-
-    font-weight: 600;
-}
-
-
 .legend-note {
     margin-top: 8px;
 
@@ -525,7 +574,7 @@ button {
 
 
 /* =========================================================
-   DETAILS PANEL
+   DETAILS
    ========================================================= */
 
 .close-button {
@@ -582,11 +631,6 @@ button {
 
 .facility-details {
     padding: 15px;
-}
-
-
-.hidden {
-    display: none;
 }
 
 
