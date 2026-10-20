@@ -12,18 +12,15 @@
 
     <title>Sport Ireland Facilities Explorer</title>
 
-
     <link
         rel="stylesheet"
         href="https://js.arcgis.com/4.31/esri/themes/light/main.css"
     >
 
-
     <link
         rel="stylesheet"
         href="style.css"
     >
-
 
     <script src="https://js.arcgis.com/4.31/"></script>
 
@@ -112,9 +109,43 @@
                     Sport
                 </h3>
 
+
+                <!-- ALWAYS VISIBLE SPORTS -->
+
                 <div
-                    id="sportFilters"
+                    id="mainSportFilters"
                     class="checkbox-list"
+                >
+                </div>
+
+
+                <!-- MORE SPORTS BUTTON -->
+
+                <button
+                    id="moreSportsButton"
+                    class="more-sports-button"
+                    type="button"
+                >
+
+                    <span>
+                        More sports
+                    </span>
+
+                    <span
+                        id="moreSportsArrow"
+                        class="more-sports-arrow"
+                    >
+                        ▾
+                    </span>
+
+                </button>
+
+
+                <!-- HIDDEN SPORTS -->
+
+                <div
+                    id="moreSportFilters"
+                    class="checkbox-list more-sports-list hidden"
                 >
                 </div>
 
@@ -183,13 +214,14 @@
             </div>
 
 
-            <!-- HOME / FULL IRELAND BUTTON -->
+            <!-- FULL IRELAND -->
 
             <button
                 id="homeButton"
                 class="map-home-button"
                 title="Return to full Ireland view"
             >
+
                 <span class="home-icon">
                     ⌂
                 </span>
@@ -197,6 +229,7 @@
                 <span class="home-label">
                     Full Ireland
                 </span>
+
             </button>
 
 
@@ -209,7 +242,7 @@
             >
 
                 <h3>
-                    Most mapped sports
+                    Sports
                 </h3>
 
 
@@ -218,7 +251,7 @@
 
 
                 <div class="legend-note">
-                    Other sports are available in Filters
+                    Additional sports are available in Filters
                 </div>
 
             </div>
