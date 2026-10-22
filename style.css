@@ -15,6 +15,7 @@ body {
         sans-serif;
 
     color: #151515;
+
     background: #f3f5f4;
 }
 
@@ -130,9 +131,7 @@ button {
 
 .panel-heading {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     min-height: 56px;
@@ -166,6 +165,7 @@ button {
 
 .filter-divider {
     color: #9aa5a0;
+
     font-size: 13px;
 }
 
@@ -359,7 +359,7 @@ button {
 
 
 /* =========================================================
-   FULL IRELAND BUTTON
+   FULL IRELAND
    ========================================================= */
 
 .map-home-button {
@@ -561,7 +561,7 @@ button {
 
 
 /* =========================================================
-   MULTI FACILITY NAVIGATION
+   MULTI FACILITY NAV
    ========================================================= */
 
 .selection-navigator {
@@ -624,11 +624,8 @@ button {
 
 .navigator-centre {
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
 
     text-align: center;
