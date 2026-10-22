@@ -24,11 +24,9 @@
     <script src="https://js.arcgis.com/4.31/"></script>
 </head>
 
-
 <body>
 
     <div class="app">
-
 
         <!-- HEADER -->
 
@@ -51,7 +49,6 @@
             </div>
 
         </header>
-
 
 
         <!-- FILTER PANEL -->
@@ -89,7 +86,6 @@
             </div>
 
 
-
             <!-- SPORT -->
 
             <section class="filter-section">
@@ -103,7 +99,6 @@
                     class="checkbox-list"
                 >
                 </div>
-
 
                 <button
                     id="moreSportsButton"
@@ -124,7 +119,6 @@
 
                 </button>
 
-
                 <div
                     id="moreSportFilters"
                     class="checkbox-list more-sports-list hidden"
@@ -132,25 +126,6 @@
                 </div>
 
             </section>
-
-
-
-            <!-- FACILITY TYPE -->
-
-            <section class="filter-section">
-
-                <h3>
-                    Facility type
-                </h3>
-
-                <div
-                    id="infrastructureFilters"
-                    class="checkbox-list"
-                >
-                </div>
-
-            </section>
-
 
 
             <!-- OWNERSHIP -->
@@ -170,7 +145,6 @@
             </section>
 
 
-
             <div class="results-box">
 
                 <span id="resultCount">
@@ -182,13 +156,11 @@
         </aside>
 
 
-
         <!-- MAP -->
 
         <main class="map-container">
 
             <div id="viewDiv"></div>
-
 
             <button
                 id="homeButton"
@@ -205,7 +177,6 @@
                 </span>
 
             </button>
-
 
 
             <!-- LEGEND -->
@@ -231,7 +202,6 @@
         </main>
 
 
-
         <!-- DETAILS PANEL -->
 
         <aside class="details-panel">
@@ -251,7 +221,6 @@
                 </button>
 
             </div>
-
 
 
             <!-- EMPTY STATE -->
@@ -276,7 +245,6 @@
             </div>
 
 
-
             <!-- FACILITY DETAILS -->
 
             <div
@@ -284,8 +252,7 @@
                 class="facility-details hidden"
             >
 
-
-                <!-- MULTIPLE FACILITY NAVIGATION -->
+                <!-- MULTI-FACILITY NAVIGATION -->
 
                 <div
                     id="selectionNavigator"
@@ -301,7 +268,6 @@
                         ‹
                     </button>
 
-
                     <div class="navigator-centre">
 
                         <strong id="selectionPosition">
@@ -313,7 +279,6 @@
                         </span>
 
                     </div>
-
 
                     <button
                         id="nextFacility"
@@ -327,13 +292,11 @@
                 </div>
 
 
-
                 <div class="facility-title-box">
 
                     <h2 id="detailTitle">
                         Facility
                     </h2>
-
 
                     <div class="facility-tags">
 
@@ -352,7 +315,6 @@
                     </div>
 
                 </div>
-
 
 
                 <div class="details-table">
@@ -419,7 +381,6 @@
 
                 </div>
 
-
                 <button
                     id="zoomToFacility"
                     class="primary-button"
@@ -432,7 +393,6 @@
         </aside>
 
     </div>
-
 
     <script src="app.js"></script>
 
