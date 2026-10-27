@@ -15,7 +15,6 @@ body {
         sans-serif;
 
     color: #151515;
-
     background: #f3f5f4;
 }
 
@@ -173,7 +172,6 @@ button {
     padding: 0;
 
     border: none;
-
     background: transparent;
 
     color: #007b5e;
@@ -202,6 +200,12 @@ button {
         #e6e9e7;
 }
 
+.compact-filter-section {
+    padding:
+        10px
+        16px;
+}
+
 .filter-section h3 {
     margin:
         0
@@ -215,12 +219,14 @@ button {
 .checkbox-list {
     display: flex;
     flex-direction: column;
+
     gap: 7px;
 }
 
 .checkbox-item {
     display: flex;
     align-items: center;
+
     gap: 8px;
 
     min-height: 25px;
@@ -256,21 +262,19 @@ button {
 
 
 /* =========================================================
-   MORE SPORTS
+   DROPDOWN FILTER BUTTONS
    ========================================================= */
 
-.more-sports-button {
+.filter-dropdown-button {
     width: 100%;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    margin-top: 12px;
-
     padding:
-        9px
-        10px;
+        10px
+        11px;
 
     border:
         1px solid
@@ -288,21 +292,25 @@ button {
     cursor: pointer;
 }
 
-.more-sports-button:hover {
+.filter-dropdown-button:hover {
     background: #e7f4ef;
 }
 
-.more-sports-arrow {
+.dropdown-arrow {
     font-size: 15px;
 }
 
-.more-sports-list {
+.dropdown-list {
     margin-top: 10px;
-    padding-top: 4px;
+
+    padding:
+        4px
+        3px
+        5px;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 
@@ -372,6 +380,7 @@ button {
 
     display: flex;
     align-items: center;
+
     gap: 7px;
 
     height: 38px;
@@ -412,10 +421,6 @@ button {
 
 .home-icon {
     font-size: 21px;
-    line-height: 1;
-}
-
-.home-label {
     line-height: 1;
 }
 
@@ -470,6 +475,7 @@ button {
 .legend-item {
     display: flex;
     align-items: center;
+
     gap: 8px;
 
     margin-bottom: 6px;
@@ -490,6 +496,7 @@ button {
 
 .legend-note {
     margin-top: 8px;
+
     padding-top: 8px;
 
     border-top:
@@ -499,8 +506,6 @@ button {
     color: #65716c;
 
     font-size: 11px;
-
-    line-height: 1.35;
 }
 
 
@@ -561,7 +566,7 @@ button {
 
 
 /* =========================================================
-   MULTI FACILITY NAV
+   MULTI FACILITY NAVIGATION
    ========================================================= */
 
 .selection-navigator {
@@ -613,8 +618,6 @@ button {
 
     font-size: 27px;
 
-    line-height: 1;
-
     cursor: pointer;
 }
 
@@ -626,7 +629,6 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
 
     text-align: center;
 
@@ -671,6 +673,7 @@ button {
 .facility-tags {
     display: flex;
     flex-wrap: wrap;
+
     gap: 7px;
 }
 
