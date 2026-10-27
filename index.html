@@ -102,26 +102,24 @@
 
                 <button
                     id="moreSportsButton"
-                    class="more-sports-button"
+                    class="filter-dropdown-button"
                     type="button"
                 >
-
                     <span>
                         More sports
                     </span>
 
                     <span
                         id="moreSportsArrow"
-                        class="more-sports-arrow"
+                        class="dropdown-arrow"
                     >
                         ▾
                     </span>
-
                 </button>
 
                 <div
                     id="moreSportFilters"
-                    class="checkbox-list more-sports-list hidden"
+                    class="checkbox-list dropdown-list hidden"
                 >
                 </div>
 
@@ -130,20 +128,95 @@
 
             <!-- OWNERSHIP -->
 
-            <section class="filter-section">
+            <section class="filter-section compact-filter-section">
 
-                <h3>
-                    Ownership type
-                </h3>
+                <button
+                    id="ownerFilterButton"
+                    class="filter-dropdown-button"
+                    type="button"
+                >
+                    <span>
+                        Ownership type
+                    </span>
+
+                    <span
+                        id="ownerFilterArrow"
+                        class="dropdown-arrow"
+                    >
+                        ▾
+                    </span>
+                </button>
 
                 <div
                     id="ownerFilters"
-                    class="checkbox-list"
+                    class="checkbox-list dropdown-list hidden"
                 >
                 </div>
 
             </section>
 
+
+            <!-- SURFACE -->
+
+            <section class="filter-section compact-filter-section">
+
+                <button
+                    id="surfaceFilterButton"
+                    class="filter-dropdown-button"
+                    type="button"
+                >
+                    <span>
+                        Surface type
+                    </span>
+
+                    <span
+                        id="surfaceFilterArrow"
+                        class="dropdown-arrow"
+                    >
+                        ▾
+                    </span>
+                </button>
+
+                <div
+                    id="surfaceFilters"
+                    class="checkbox-list dropdown-list hidden"
+                >
+                </div>
+
+            </section>
+
+
+            <!-- FLOODLIGHTS -->
+
+            <section class="filter-section compact-filter-section">
+
+                <button
+                    id="floodlightFilterButton"
+                    class="filter-dropdown-button"
+                    type="button"
+                >
+                    <span>
+                        Floodlights
+                    </span>
+
+                    <span
+                        id="floodlightFilterArrow"
+                        class="dropdown-arrow"
+                    >
+                        ▾
+                    </span>
+                </button>
+
+                <div
+                    id="floodlightFilters"
+                    class="checkbox-list dropdown-list hidden"
+                >
+                </div>
+
+            </section>
+
+
+            <!-- RESULT COUNT -->
 
             <div class="results-box">
 
@@ -380,6 +453,7 @@
                     </div>
 
                 </div>
+
 
                 <button
                     id="zoomToFacility"
