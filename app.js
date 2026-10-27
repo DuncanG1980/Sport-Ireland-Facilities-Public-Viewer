@@ -65,6 +65,7 @@ require([
     "Cricket": [185, 90, 165],
     "Sports Hall": [105, 105, 140],
     "Swimming Indoor": [0, 185, 220],
+
     "Rugby": [230, 65, 55],
     "Swimming Outdoor": [70, 165, 195],
     "Equestrian": [145, 125, 105],
@@ -131,6 +132,12 @@ require([
     new FeatureLayer({
 
       url: FACILITIES_URL,
+
+      // Public-viewer-only exclusion.
+      // Private Residence features remain in the source dataset,
+      // but this app never draws or queries them.
+      definitionExpression:
+        "Owner <> 'Private Residence' OR Owner IS NULL",
 
       outFields: [
         "OBJECTID",
@@ -626,7 +633,7 @@ require([
     ) {
 
       container.innerHTML =
-        "<span class='search-message'>No values available</span>";
+        "<span>No values available</span>";
 
       return;
 
@@ -638,6 +645,18 @@ require([
 
     field.domain.codedValues.forEach(
       function (codedValue) {
+
+        // Hide Private Residence from the ownership dropdown.
+        if (
+          fieldName === "Owner" &&
+          (
+            codedValue.code === "Private Residence" ||
+            codedValue.name === "Private Residence"
+          )
+        ) {
+          return;
+        }
+
 
         const label =
           document.createElement("label");
