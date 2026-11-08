@@ -18,10 +18,6 @@ require([
   geometryEngine
 ) {
 
-  // =========================================================
-  // SETTINGS
-  // =========================================================
-
   const FACILITIES_URL =
     "https://services-eu1.arcgis.com/z1y55jruXrgzzpdi/arcgis/rest/services/Sport_Ireland_Facilities_Mapping/FeatureServer/0";
 
@@ -31,10 +27,6 @@ require([
   const IRELAND_CENTER = [-8, 53.4];
   const IRELAND_ZOOM = 7;
 
-
-  // =========================================================
-  // MAIN SPORTS
-  // =========================================================
 
   const mainSports = [
     { value: "Gaelic Games", label: "Gaelic Games" },
@@ -50,10 +42,6 @@ require([
   ];
 
 
-  // =========================================================
-  // COLOURS
-  // =========================================================
-
   const sportColours = {
     "Gaelic Games": [0, 176, 80],
     "Soccer": [25, 110, 235],
@@ -65,7 +53,6 @@ require([
     "Cricket": [185, 90, 165],
     "Sports Hall": [105, 105, 140],
     "Swimming Indoor": [0, 185, 220],
-
     "Rugby": [230, 65, 55],
     "Swimming Outdoor": [70, 165, 195],
     "Equestrian": [145, 125, 105],
@@ -85,10 +72,6 @@ require([
     "Other": [145, 145, 145]
   };
 
-
-  // =========================================================
-  // RENDERER
-  // =========================================================
 
   const rendererInfos =
     Object.entries(sportColours).map(
@@ -124,10 +107,6 @@ require([
     );
 
 
-  // =========================================================
-  // FACILITY LAYER
-  // =========================================================
-
   const facilitiesLayer =
     new FeatureLayer({
 
@@ -158,27 +137,14 @@ require([
 
       renderer: {
         type: "unique-value",
-
         field: "Sport",
 
         defaultSymbol: {
           type: "simple-fill",
-
-          color: [
-            145,
-            145,
-            145,
-            0.27
-          ],
+          color: [145, 145, 145, 0.27],
 
           outline: {
-            color: [
-              100,
-              100,
-              100,
-              1
-            ],
-
+            color: [100, 100, 100, 1],
             width: 1.5
           }
         },
@@ -189,14 +155,11 @@ require([
     });
 
 
-  // =========================================================
-  // BASEMAP
-  // =========================================================
-
   const osmLayer =
     new OpenStreetMapLayer({
       opacity: OSM_OPACITY
     });
+
 
   const customBasemap =
     new Basemap({
@@ -204,10 +167,6 @@ require([
       title: "Muted OpenStreetMap"
     });
 
-
-  // =========================================================
-  // MAP / VIEW
-  // =========================================================
 
   const map =
     new Map({
@@ -244,10 +203,6 @@ require([
     });
 
 
-  // =========================================================
-  // SEARCH
-  // =========================================================
-
   const search =
     new Search({
       view: view,
@@ -255,15 +210,12 @@ require([
       locationEnabled: false
     });
 
+
   view.ui.add(
     search,
     "top-right"
   );
 
-
-  // =========================================================
-  // STATE
-  // =========================================================
 
   let facilitiesLayerView = null;
 
@@ -274,10 +226,6 @@ require([
   let selectedIndex = 0;
   let selectedGraphic = null;
 
-
-  // =========================================================
-  // HTML
-  // =========================================================
 
   const resultCount =
     document.getElementById("resultCount");
@@ -334,10 +282,6 @@ require([
     document.getElementById("nextFacility");
 
 
-  // =========================================================
-  // LOAD
-  // =========================================================
-
   view.when(
     async function () {
 
@@ -355,27 +299,8 @@ require([
       await updateResultCount();
 
     }
-  )
-  .catch(
-    function (error) {
-
-      console.error(
-        "LOAD ERROR:",
-        error
-      );
-
-      if (resultCount) {
-        resultCount.textContent =
-          "Unable to load facilities";
-      }
-
-    }
   );
 
-
-  // =========================================================
-  // BUILD FILTERS
-  // =========================================================
 
   function buildFilters() {
 
@@ -401,10 +326,6 @@ require([
 
   }
 
-
-  // =========================================================
-  // SPORT FILTERS
-  // =========================================================
 
   function buildSportFilters() {
 
@@ -584,10 +505,6 @@ require([
   }
 
 
-  // =========================================================
-  // DOMAIN FILTERS
-  // =========================================================
-
   function buildDomainFilter(
     fieldName,
     container,
@@ -612,12 +529,7 @@ require([
       !field.domain ||
       !field.domain.codedValues
     ) {
-
-      container.innerHTML =
-        "<span>No values available</span>";
-
       return;
-
     }
 
 
@@ -695,10 +607,6 @@ require([
   }
 
 
-  // =========================================================
-  // DROPDOWNS
-  // =========================================================
-
   function setupDropdowns() {
 
     setupDropdown(
@@ -774,16 +682,7 @@ require([
   }
 
 
-  // =========================================================
-  // LEGEND
-  // =========================================================
-
   function buildLegend() {
-
-    if (!legendItems) {
-      return;
-    }
-
 
     legendItems.innerHTML = "";
 
@@ -832,16 +731,7 @@ require([
   }
 
 
-  // =========================================================
-  // FILTERS
-  // =========================================================
-
   async function applyFilters() {
-
-    if (!facilitiesLayerView) {
-      return;
-    }
-
 
     const selectedSports =
       getCheckedValues(".sport-filter");
@@ -1023,10 +913,6 @@ require([
   }
 
 
-  // =========================================================
-  // SELECT / DESELECT ALL
-  // =========================================================
-
   selectAllFilters.addEventListener(
     "click",
     async function () {
@@ -1080,303 +966,190 @@ require([
   );
 
 
-  // =========================================================
-  // RESULT COUNT
-  // =========================================================
-
   async function updateResultCount() {
 
-    if (!facilitiesLayerView) {
-      return;
-    }
+    const query =
+      facilitiesLayer.createQuery();
 
 
-    try {
-
-      const query =
-        facilitiesLayer.createQuery();
+    query.where =
+      getCurrentWhereClause();
 
 
-      query.where =
-        getCurrentWhereClause();
-
-
-      const count =
-        await facilitiesLayer.queryFeatureCount(
-          query
-        );
-
-
-      resultCount.textContent =
-        count.toLocaleString("en-IE") +
-        (
-          count === 1
-            ? " facility"
-            : " facilities"
-        );
-
-    }
-    catch (error) {
-
-      console.error(
-        "COUNT ERROR:",
-        error
+    const count =
+      await facilitiesLayer.queryFeatureCount(
+        query
       );
 
-    }
+
+    resultCount.textContent =
+      count.toLocaleString("en-IE") +
+      (
+        count === 1
+          ? " facility"
+          : " facilities"
+      );
 
   }
 
-
-  // =========================================================
-  // MAP CLICK
-  // =========================================================
 
   view.on(
     "click",
     async function (event) {
 
-      try {
-
-        const clickedPoint =
-          event.mapPoint;
+      const clickedPoint =
+        event.mapPoint;
 
 
-        if (!clickedPoint) {
-          clearSelection();
-          return;
-        }
+      if (!clickedPoint) {
+        clearSelection();
+        return;
+      }
 
 
-        const topLeft =
-          view.toMap({
-            x:
-              event.x -
-              CLICK_TOLERANCE_PIXELS,
+      const topLeft =
+        view.toMap({
+          x:
+            event.x -
+            CLICK_TOLERANCE_PIXELS,
 
-            y:
-              event.y -
-              CLICK_TOLERANCE_PIXELS
-          });
-
-
-        const bottomRight =
-          view.toMap({
-            x:
-              event.x +
-              CLICK_TOLERANCE_PIXELS,
-
-            y:
-              event.y +
-              CLICK_TOLERANCE_PIXELS
-          });
+          y:
+            event.y -
+            CLICK_TOLERANCE_PIXELS
+        });
 
 
-        if (!topLeft || !bottomRight) {
-          clearSelection();
-          return;
-        }
+      const bottomRight =
+        view.toMap({
+          x:
+            event.x +
+            CLICK_TOLERANCE_PIXELS,
+
+          y:
+            event.y +
+            CLICK_TOLERANCE_PIXELS
+        });
 
 
-        const searchExtent =
-          new Extent({
+      const searchExtent =
+        new Extent({
 
-            xmin:
-              Math.min(
-                topLeft.x,
-                bottomRight.x
-              ),
+          xmin:
+            Math.min(
+              topLeft.x,
+              bottomRight.x
+            ),
 
-            ymin:
-              Math.min(
-                topLeft.y,
-                bottomRight.y
-              ),
+          ymin:
+            Math.min(
+              topLeft.y,
+              bottomRight.y
+            ),
 
-            xmax:
-              Math.max(
-                topLeft.x,
-                bottomRight.x
-              ),
+          xmax:
+            Math.max(
+              topLeft.x,
+              bottomRight.x
+            ),
 
-            ymax:
-              Math.max(
-                topLeft.y,
-                bottomRight.y
-              ),
+          ymax:
+            Math.max(
+              topLeft.y,
+              bottomRight.y
+            ),
 
-            spatialReference:
-              view.spatialReference
+          spatialReference:
+            view.spatialReference
 
-          });
-
-
-        const query =
-          facilitiesLayer.createQuery();
+        });
 
 
-        query.geometry =
-          searchExtent;
-
-        query.spatialRelationship =
-          "intersects";
-
-        query.where =
-          getCurrentWhereClause();
-
-        query.returnGeometry =
-          true;
-
-        query.outFields = [
-          "OBJECTID",
-          "Sport",
-          "Infrastructure_Type",
-          "Surface",
-          "Floodlights",
-          "Owner",
-          "Facility_Size",
-          "Owner_Name",
-          "Quality",
-          "Local_Authority",
-          "LEA",
-          "Multi_Use",
-          "Area_msq"
-        ];
+      const query =
+        facilitiesLayer.createQuery();
 
 
-        const response =
-          await facilitiesLayer.queryFeatures(
-            query
-          );
+      query.geometry =
+        searchExtent;
+
+      query.spatialRelationship =
+        "intersects";
+
+      query.where =
+        getCurrentWhereClause();
+
+      query.returnGeometry =
+        true;
 
 
-        const nearby =
-          response.features || [];
+      const response =
+        await facilitiesLayer.queryFeatures(
+          query
+        );
 
 
-        if (nearby.length === 0) {
-          clearSelection();
-          return;
-        }
+      const nearby =
+        response.features || [];
 
 
-        const overlapping =
-          nearby.filter(
-            function (facility) {
-
-              if (!facility.geometry) {
-                return false;
-              }
-
-              try {
-
-                return geometryEngine.intersects(
-                  facility.geometry,
-                  clickedPoint
-                );
-
-              }
-              catch (error) {
-
-                return false;
-
-              }
-
-            }
-          );
+      if (nearby.length === 0) {
+        clearSelection();
+        return;
+      }
 
 
-        if (overlapping.length > 0) {
-
-          overlapping.sort(
-            function (a, b) {
-
-              return (
-                getPolygonArea(a.geometry) -
-                getPolygonArea(b.geometry)
-              );
-
-            }
-          );
-
-
-          selectFacilities(
-            overlapping
-          );
-
-          return;
-        }
-
-
-        let nearestFacility = null;
-        let nearestDistance = Infinity;
-
-
-        nearby.forEach(
+      const overlapping =
+        nearby.filter(
           function (facility) {
-
-            if (!facility.geometry) {
-              return;
-            }
-
-
-            let distance;
-
 
             try {
 
-              distance =
-                geometryEngine.distance(
-                  clickedPoint,
-                  facility.geometry
-                );
+              return geometryEngine.intersects(
+                facility.geometry,
+                clickedPoint
+              );
 
             }
-            catch (error) {
-
-              distance = Infinity;
-
-            }
-
-
-            if (
-              Number.isFinite(distance) &&
-              distance < nearestDistance
-            ) {
-
-              nearestDistance =
-                distance;
-
-              nearestFacility =
-                facility;
-
+            catch {
+              return false;
             }
 
           }
         );
 
 
-        selectFacilities([
-          nearestFacility || nearby[0]
-        ]);
+      if (overlapping.length > 0) {
 
-      }
-      catch (error) {
+        overlapping.sort(
+          function (a, b) {
 
-        console.error(
-          "FACILITY SELECTION ERROR:",
-          error
+            return (
+              getPolygonArea(a.geometry) -
+              getPolygonArea(b.geometry)
+            );
+
+          }
         );
 
+
+        selectFacilities(
+          overlapping
+        );
+
+        return;
       }
+
+
+      let nearestFacility =
+        nearby[0];
+
+
+      selectFacilities(
+        [nearestFacility]
+      );
 
     }
   );
 
-
-  // =========================================================
-  // SELECTION
-  // =========================================================
 
   function selectFacilities(graphics) {
 
@@ -1410,17 +1183,10 @@ require([
         );
 
 
-    if (
-      facilitiesLayerView &&
-      objectIds.length > 0
-    ) {
-
-      highlightHandle =
-        facilitiesLayerView.highlight(
-          objectIds
-        );
-
-    }
+    highlightHandle =
+      facilitiesLayerView.highlight(
+        objectIds
+      );
 
 
     showCurrentFacility();
@@ -1453,16 +1219,6 @@ require([
         currentOverlayGraphic
       );
 
-      currentOverlayGraphic = null;
-
-    }
-
-
-    if (
-      !selectedGraphic ||
-      !selectedGraphic.geometry
-    ) {
-      return;
     }
 
 
@@ -1500,10 +1256,6 @@ require([
   }
 
 
-  // =========================================================
-  // MULTIPLE FACILITIES
-  // =========================================================
-
   function updateSelectionNavigator() {
 
     if (selectedGraphics.length > 1) {
@@ -1532,11 +1284,6 @@ require([
     "click",
     function () {
 
-      if (selectedGraphics.length <= 1) {
-        return;
-      }
-
-
       selectedIndex =
         (
           selectedIndex -
@@ -1557,11 +1304,6 @@ require([
     "click",
     function () {
 
-      if (selectedGraphics.length <= 1) {
-        return;
-      }
-
-
       selectedIndex =
         (
           selectedIndex +
@@ -1577,66 +1319,28 @@ require([
   );
 
 
-  // =========================================================
-  // AREA
-  // =========================================================
-
   function getPolygonArea(geometry) {
-
-    if (!geometry) {
-      return Infinity;
-    }
-
 
     try {
 
-      const area =
-        Math.abs(
-          geometryEngine.geodesicArea(
-            geometry,
-            "square-meters"
-          )
-        );
-
-
-      if (
-        Number.isFinite(area) &&
-        area > 0
-      ) {
-        return area;
-      }
-
-    }
-    catch (error) {
-      // fallback
-    }
-
-
-    if (geometry.extent) {
-
-      return (
-        geometry.extent.width *
-        geometry.extent.height
+      return Math.abs(
+        geometryEngine.geodesicArea(
+          geometry,
+          "square-meters"
+        )
       );
 
     }
+    catch {
 
+      return Infinity;
 
-    return Infinity;
+    }
 
   }
 
 
-  // =========================================================
-  // DETAILS
-  // =========================================================
-
   function showFacilityDetails(attributes) {
-
-    if (!attributes) {
-      return;
-    }
-
 
     let title =
       cleanValue(
@@ -1646,24 +1350,8 @@ require([
 
     if (title === "Not recorded") {
 
-      const sport =
-        cleanValue(
-          attributes.Sport
-        );
-
-      const type =
-        cleanValue(
-          attributes.Infrastructure_Type
-        );
-
-
       title =
-        sport !== "Not recorded" &&
-        type !== "Not recorded"
-
-          ? `${sport} - ${type}`
-
-          : `${sport} facility`;
+        `${cleanValue(attributes.Sport)} - ${cleanValue(attributes.Infrastructure_Type)}`;
 
     }
 
@@ -1787,40 +1475,6 @@ require([
   }
 
 
-  function displaySportName(value) {
-
-    if (value === "Sports Hall") {
-      return "Sports Halls";
-    }
-
-    return cleanValue(value);
-
-  }
-
-
-  function setSportTagColour(sport) {
-
-    const tag =
-      document.getElementById(
-        "detailSportTag"
-      );
-
-
-    const colour =
-      sportColours[sport] ||
-      [130, 130, 130];
-
-
-    tag.style.backgroundColor =
-      `rgb(${colour[0]},${colour[1]},${colour[2]})`;
-
-  }
-
-
-  // =========================================================
-  // CLEAR
-  // =========================================================
-
   function clearMapHighlightsOnly() {
 
     if (highlightHandle) {
@@ -1876,116 +1530,89 @@ require([
   );
 
 
-  // =========================================================
-  // ZOOM
-  // =========================================================
-
   zoomToFacility.addEventListener(
     "click",
     async function () {
 
-      if (
-        !selectedGraphic ||
-        !selectedGraphic.geometry
-      ) {
+      if (!selectedGraphic) {
         return;
       }
 
 
-      try {
-
-        const geometry =
-          selectedGraphic.geometry;
-
-
-        const target =
-          geometry.extent
-            ? geometry.extent.expand(2.2)
-            : geometry;
+      const target =
+        selectedGraphic.geometry.extent
+          ? selectedGraphic.geometry.extent.expand(2.2)
+          : selectedGraphic.geometry;
 
 
-        view.padding = {
-          top: 20,
-          right: 140,
-          bottom: 20,
-          left: 20
-        };
+      view.padding = {
+        top: 20,
+        right: 140,
+        bottom: 20,
+        left: 20
+      };
 
 
-        await view.goTo(
-          target,
-          {
-            duration: 800
-          }
-        );
-
-      }
-      catch (error) {
-
-        if (error.name !== "AbortError") {
-
-          console.error(
-            "ZOOM ERROR:",
-            error
-          );
-
-        }
-
-      }
+      await view.goTo(
+        target
+      );
 
     }
   );
 
-
-  // =========================================================
-  // FULL IRELAND
-  // =========================================================
 
   homeButton.addEventListener(
     "click",
     async function () {
 
-      try {
-
-        view.padding = {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0
-        };
+      view.padding = {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      };
 
 
-        await view.goTo(
-          {
-            center: IRELAND_CENTER,
-            zoom: IRELAND_ZOOM
-          },
-          {
-            duration: 900
-          }
-        );
-
-      }
-      catch (error) {
-
-        if (error.name !== "AbortError") {
-
-          console.error(
-            "HOME VIEW ERROR:",
-            error
-          );
-
+      await view.goTo(
+        {
+          center: IRELAND_CENTER,
+          zoom: IRELAND_ZOOM
         }
-
-      }
+      );
 
     }
   );
 
 
-  // =========================================================
-  // FORMATTERS
-  // =========================================================
+  function displaySportName(value) {
+
+    if (value === "Sports Hall") {
+      return "Sports Halls";
+    }
+
+    return cleanValue(value);
+
+  }
+
+
+  function setSportTagColour(sport) {
+
+    const tag =
+      document.getElementById(
+        "detailSportTag"
+      );
+
+
+    const colour =
+      sportColours[sport] ||
+      [130, 130, 130];
+
+
+    tag.style.backgroundColor =
+      `rgb(${colour[0]},${colour[1]},${colour[2]})`;
+
+  }
+
 
   function formatQuality(value) {
 
@@ -2010,11 +1637,9 @@ require([
       return "Yes";
     }
 
-
     if (value === "No Floodlights") {
       return "No";
     }
-
 
     return cleanValue(value);
 
@@ -2079,20 +1704,13 @@ require([
 
   function formatArea(value) {
 
-    if (
-      value === null ||
-      value === undefined ||
-      value === "" ||
-      isNaN(Number(value))
-    ) {
-
-      return "Not recorded";
-
-    }
-
-
     const area =
       Number(value);
+
+
+    if (!Number.isFinite(area)) {
+      return "Not recorded";
+    }
 
 
     if (area >= 10000) {
