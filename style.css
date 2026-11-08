@@ -64,40 +64,42 @@ button {
     color: white;
 }
 
+
 .brand {
     width: 300px;
     height: 100%;
 
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
 
-    padding-left: 22px;
+    padding:
+        7px
+        18px;
 
     border-right:
         1px solid
         rgba(255, 255, 255, 0.30);
 }
 
-.brand-main {
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+
+.sport-ireland-logo {
+    display: block;
+
+    width: auto;
+    height: 62px;
+
+    max-width: 255px;
+
+    object-fit: contain;
+    object-position: left center;
 }
 
-.brand-sub {
-    margin-top: 3px;
-
-    font-size: 14px;
-    letter-spacing: 0.8px;
-
-    opacity: 0.92;
-}
 
 .header-description {
     padding-left: 26px;
 
-    font-size: 18px;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 
@@ -164,7 +166,6 @@ button {
 
 .filter-divider {
     color: #9aa5a0;
-
     font-size: 13px;
 }
 
@@ -262,7 +263,7 @@ button {
 
 
 /* =========================================================
-   DROPDOWN FILTER BUTTONS
+   DROPDOWNS
    ========================================================= */
 
 .filter-dropdown-button {
@@ -435,7 +436,11 @@ button {
     z-index: 10;
 
     left: 16px;
-    bottom: 18px;
+
+    /*
+       Raised to make room for the data.gov.ie button.
+    */
+    bottom: 72px;
 
     width: 245px;
 
@@ -506,6 +511,61 @@ button {
     color: #65716c;
 
     font-size: 11px;
+}
+
+
+/* =========================================================
+   DATA.GOV.IE BUTTON
+   ========================================================= */
+
+.dataset-button {
+    position: absolute;
+
+    z-index: 20;
+
+    left: 16px;
+    bottom: 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 40px;
+
+    padding:
+        0
+        14px;
+
+    border:
+        1px solid
+        #008c68;
+
+    border-radius: 8px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.96
+        );
+
+    color: #00664f;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    box-shadow:
+        0
+        2px
+        8px
+        rgba(0, 0, 0, 0.18);
+}
+
+.dataset-button:hover {
+    background: #e6f5ed;
 }
 
 
@@ -785,6 +845,10 @@ button {
 
     .brand {
         width: 260px;
+    }
+
+    .sport-ireland-logo {
+        max-width: 220px;
     }
 
     .text-button {
