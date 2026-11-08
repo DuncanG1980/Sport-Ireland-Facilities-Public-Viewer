@@ -22,6 +22,15 @@ button {
     font-family: inherit;
 }
 
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   APP
+   ========================================================= */
+
 .app {
     display: grid;
 
@@ -38,11 +47,17 @@ button {
     height: 100vh;
 }
 
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .header {
     grid-column: 1 / 4;
 
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
     background:
         linear-gradient(
@@ -54,21 +69,29 @@ button {
     color: white;
 }
 
+
+.header-description {
+    padding-left: 28px;
+
+    font-size: 22px;
+    font-weight: 600;
+}
+
+
 .brand {
-    width: 300px;
     height: 100%;
 
     display: flex;
     align-items: center;
+    justify-content: flex-end;
 
     padding:
-        7px
-        18px;
-
-    border-right:
-        1px solid
-        rgba(255, 255, 255, 0.30);
+        6px
+        28px
+        6px
+        20px;
 }
+
 
 .sport-ireland-logo {
     display: block;
@@ -76,18 +99,15 @@ button {
     width: auto;
     height: 62px;
 
-    max-width: 255px;
+    max-width: 260px;
 
     object-fit: contain;
-    object-position: left center;
 }
 
-.header-description {
-    padding-left: 26px;
 
-    font-size: 22px;
-    font-weight: 600;
-}
+/* =========================================================
+   PANELS
+   ========================================================= */
 
 .filter-panel,
 .details-panel {
@@ -129,11 +149,15 @@ button {
 }
 
 .panel-heading h2 {
-    padding: 0;
     margin: 0;
 
     font-size: 20px;
 }
+
+
+/* =========================================================
+   FILTER ACTIONS
+   ========================================================= */
 
 .filter-actions {
     display: flex;
@@ -162,6 +186,11 @@ button {
 .text-button:hover {
     text-decoration: underline;
 }
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
 
 .filter-section {
     padding:
@@ -233,6 +262,11 @@ button {
         rgba(0, 0, 0, 0.08);
 }
 
+
+/* =========================================================
+   DROPDOWNS
+   ========================================================= */
+
 .filter-dropdown-button {
     width: 100%;
 
@@ -277,9 +311,10 @@ button {
         5px;
 }
 
-.hidden {
-    display: none !important;
-}
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
 
 .results-box {
     margin: 15px;
@@ -299,6 +334,11 @@ button {
     font-size: 14px;
     font-weight: 700;
 }
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
 
 .map-container {
     position: relative;
@@ -322,6 +362,11 @@ button {
     width: 100%;
     height: 100%;
 }
+
+
+/* =========================================================
+   FULL IRELAND
+   ========================================================= */
 
 .map-home-button {
     position: absolute;
@@ -374,8 +419,12 @@ button {
 
 .home-icon {
     font-size: 21px;
-    line-height: 1;
 }
+
+
+/* =========================================================
+   LEGEND
+   ========================================================= */
 
 .custom-legend {
     position: absolute;
@@ -383,7 +432,7 @@ button {
     z-index: 10;
 
     left: 16px;
-    bottom: 72px;
+    bottom: 18px;
 
     width: 245px;
 
@@ -409,8 +458,6 @@ button {
 }
 
 .custom-legend h3 {
-    padding: 0;
-
     margin:
         0
         0
@@ -435,8 +482,6 @@ button {
     width: 18px;
     height: 14px;
 
-    display: inline-block;
-
     flex-shrink: 0;
 
     border-radius: 3px;
@@ -456,12 +501,17 @@ button {
     font-size: 11px;
 }
 
+
+/* =========================================================
+   DATASET BUTTON - BOTTOM RIGHT
+   ========================================================= */
+
 .dataset-button {
     position: absolute;
 
     z-index: 20;
 
-    left: 16px;
+    right: 16px;
     bottom: 18px;
 
     display: inline-flex;
@@ -472,7 +522,7 @@ button {
 
     padding:
         0
-        14px;
+        15px;
 
     border:
         1px solid
@@ -505,6 +555,11 @@ button {
 .dataset-button:hover {
     background: #e6f5ed;
 }
+
+
+/* =========================================================
+   DETAILS
+   ========================================================= */
 
 .close-button {
     border: none;
@@ -548,6 +603,11 @@ button {
     line-height: 1.5;
 }
 
+
+/* =========================================================
+   FACILITY DETAILS
+   ========================================================= */
+
 .facility-details {
     padding: 15px;
 }
@@ -579,15 +639,9 @@ button {
     background: #f3faf7;
 }
 
-.selection-navigator.hidden {
-    display: none;
-}
-
 .navigator-button {
     width: 38px;
     height: 38px;
-
-    padding: 0;
 
     border:
         1px solid
@@ -595,17 +649,13 @@ button {
 
     border-radius: 50%;
 
-    background: #ffffff;
+    background: white;
 
     color: #007b5e;
 
     font-size: 27px;
 
     cursor: pointer;
-}
-
-.navigator-button:hover {
-    background: #e6f5ed;
 }
 
 .navigator-centre {
@@ -626,6 +676,11 @@ button {
     font-size: 15px;
 }
 
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
 .facility-title-box {
     padding: 16px;
 
@@ -637,8 +692,6 @@ button {
 }
 
 .facility-title-box h2 {
-    padding: 0;
-
     margin:
         0
         0
@@ -676,6 +729,11 @@ button {
     color: #173e2c;
 }
 
+
+/* =========================================================
+   DETAILS TABLE
+   ========================================================= */
+
 .details-table {
     border-top:
         1px solid
@@ -710,6 +768,11 @@ button {
     font-weight: 600;
 }
 
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
 .primary-button {
     width: 100%;
 
@@ -737,6 +800,11 @@ button {
     background: #006f54;
 }
 
+
+/* =========================================================
+   SMALLER SCREENS
+   ========================================================= */
+
 @media (max-width: 1200px) {
 
     .app {
@@ -746,28 +814,12 @@ button {
             330px;
     }
 
-    .brand {
-        width: 260px;
-    }
-
     .sport-ireland-logo {
         max-width: 220px;
     }
 
-    .text-button {
-        font-size: 12px;
-    }
-
     .home-label {
         display: none;
-    }
-
-    .map-home-button {
-        width: 38px;
-
-        padding: 0;
-
-        justify-content: center;
     }
 
 }
