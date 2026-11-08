@@ -28,7 +28,13 @@
 
     <div class="app">
 
+        <!-- HEADER -->
+
         <header class="header">
+
+            <div class="header-description">
+                Facilities Explorer
+            </div>
 
             <div class="brand">
 
@@ -40,20 +46,16 @@
 
             </div>
 
-            <div class="header-description">
-                Facilities Explorer
-            </div>
-
         </header>
 
+
+        <!-- FILTER PANEL -->
 
         <aside class="filter-panel">
 
             <div class="panel-heading">
 
-                <h2>
-                    Filters
-                </h2>
+                <h2>Filters</h2>
 
                 <div class="filter-actions">
 
@@ -64,9 +66,7 @@
                         Select all
                     </button>
 
-                    <span class="filter-divider">
-                        |
-                    </span>
+                    <span class="filter-divider">|</span>
 
                     <button
                         id="deselectAllFilters"
@@ -80,11 +80,11 @@
             </div>
 
 
+            <!-- SPORT -->
+
             <section class="filter-section">
 
-                <h3>
-                    Sport
-                </h3>
+                <h3>Sport</h3>
 
                 <div
                     id="mainSportFilters"
@@ -97,9 +97,7 @@
                     class="filter-dropdown-button"
                     type="button"
                 >
-                    <span>
-                        More sports
-                    </span>
+                    <span>More sports</span>
 
                     <span
                         id="moreSportsArrow"
@@ -118,6 +116,8 @@
             </section>
 
 
+            <!-- OWNERSHIP -->
+
             <section class="filter-section compact-filter-section">
 
                 <button
@@ -125,9 +125,7 @@
                     class="filter-dropdown-button"
                     type="button"
                 >
-                    <span>
-                        Ownership type
-                    </span>
+                    <span>Ownership type</span>
 
                     <span
                         id="ownerFilterArrow"
@@ -146,6 +144,8 @@
             </section>
 
 
+            <!-- SURFACE -->
+
             <section class="filter-section compact-filter-section">
 
                 <button
@@ -153,9 +153,7 @@
                     class="filter-dropdown-button"
                     type="button"
                 >
-                    <span>
-                        Surface type
-                    </span>
+                    <span>Surface type</span>
 
                     <span
                         id="surfaceFilterArrow"
@@ -174,6 +172,8 @@
             </section>
 
 
+            <!-- FLOODLIGHTS -->
+
             <section class="filter-section compact-filter-section">
 
                 <button
@@ -181,9 +181,7 @@
                     class="filter-dropdown-button"
                     type="button"
                 >
-                    <span>
-                        Floodlights
-                    </span>
+                    <span>Floodlights</span>
 
                     <span
                         id="floodlightFilterArrow"
@@ -202,6 +200,8 @@
             </section>
 
 
+            <!-- RESULT COUNT -->
+
             <div class="results-box">
 
                 <span id="resultCount">
@@ -213,10 +213,14 @@
         </aside>
 
 
+        <!-- MAP -->
+
         <main class="map-container">
 
             <div id="viewDiv"></div>
 
+
+            <!-- FULL IRELAND -->
 
             <button
                 id="homeButton"
@@ -224,9 +228,7 @@
                 title="Return to full Ireland view"
             >
 
-                <span class="home-icon">
-                    ⌂
-                </span>
+                <span class="home-icon">⌂</span>
 
                 <span class="home-label">
                     Full Ireland
@@ -235,17 +237,16 @@
             </button>
 
 
+            <!-- LEGEND -->
+
             <div
                 id="legend"
                 class="custom-legend"
             >
 
-                <h3>
-                    Sports
-                </h3>
+                <h3>Sports</h3>
 
-                <div id="legendItems">
-                </div>
+                <div id="legendItems"></div>
 
                 <div class="legend-note">
                     Additional sports are available in Filters
@@ -253,6 +254,8 @@
 
             </div>
 
+
+            <!-- DATASET BUTTON -->
 
             <a
                 href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
@@ -267,13 +270,13 @@
         </main>
 
 
+        <!-- DETAILS -->
+
         <aside class="details-panel">
 
             <div class="panel-heading">
 
-                <h2>
-                    Facility details
-                </h2>
+                <h2>Facility details</h2>
 
                 <button
                     id="closeDetails"
@@ -295,9 +298,7 @@
                     ⌖
                 </div>
 
-                <h3>
-                    Select a facility
-                </h3>
+                <h3>Select a facility</h3>
 
                 <p>
                     Click a facility on the map to view its details.
@@ -320,7 +321,6 @@
                         id="previousFacility"
                         class="navigator-button"
                         type="button"
-                        title="Previous facility"
                     >
                         ‹
                     </button>
@@ -341,7 +341,6 @@
                         id="nextFacility"
                         class="navigator-button"
                         type="button"
-                        title="Next facility"
                     >
                         ›
                     </button>
@@ -360,14 +359,12 @@
                         <span
                             id="detailSportTag"
                             class="tag"
-                        >
-                        </span>
+                        ></span>
 
                         <span
                             id="detailTypeTag"
                             class="tag tag-secondary"
-                        >
-                        </span>
+                        ></span>
 
                     </div>
 
