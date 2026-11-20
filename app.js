@@ -56,16 +56,16 @@ require([
     [1, 2, 4, 8];
 
 
+  const LIVE_FOCUS_DELAY =
+    150;
+
+
   const COVERAGE_MIN_ZOOM =
     9;
 
 
   const COVERAGE_LIMIT =
     700;
-
-
-  const LIVE_FOCUS_DELAY =
-    150;
 
 
   // =========================================================
@@ -213,27 +213,18 @@ require([
   };
 
 
-  const typeColours = [
+  const breakdownColours = [
 
-    [0, 132, 150],
-
-    [235, 132, 30],
-
-    [85, 115, 185],
-
-    [170, 85, 165],
-
-    [55, 155, 125],
-
-    [200, 90, 80],
-
-    [120, 135, 80],
-
-    [95, 115, 135],
-
-    [170, 120, 70],
-
-    [110, 80, 160]
+    [0,132,150],
+    [235,132,30],
+    [85,115,185],
+    [170,85,165],
+    [55,155,125],
+    [210,85,70],
+    [125,145,75],
+    [105,105,145],
+    [225,165,45],
+    [75,145,175]
 
   ];
 
@@ -276,7 +267,7 @@ require([
               colour[2],
 
               pool
-                ? 0.62
+                ? 0.72
                 : 0.44
 
             ],
@@ -299,7 +290,7 @@ require([
 
               width:
                 pool
-                  ? 3
+                  ? 5
                   : 2
 
             }
@@ -313,7 +304,7 @@ require([
 
 
   // =========================================================
-  // GRAPHICS LAYERS
+  // GRAPHICS
   // =========================================================
 
   const coverageLayer =
@@ -325,16 +316,11 @@ require([
 
 
   const selectionGraphicsLayer =
-    new GraphicsLayer({
-
-      title:
-        "Selected facilities"
-
-    });
+    new GraphicsLayer();
 
 
   // =========================================================
-  // FEATURE LAYER
+  // FACILITY LAYER
   // =========================================================
 
   const facilitiesLayer =
@@ -349,37 +335,21 @@ require([
 
 
       outFields: [
-
         "OBJECTID",
-
         "Sport",
-
         "Infrastructure_Type",
-
         "Surface",
-
         "Floodlights",
-
         "Owner",
-
         "Facility_Size",
-
         "Owner_Name",
-
         "Quality",
-
         "Local_Authority",
-
         "LEA",
-
         "Multi_Use",
-
         "Area_msq",
-
         "Pool_Length",
-
         "Pool_Breadth"
-
       ],
 
 
@@ -463,15 +433,10 @@ require([
 
 
       layers: [
-
         coverageLayer,
-
         facilitiesLayer,
-
         analysisLayer,
-
         selectionGraphicsLayer
-
       ]
 
     });
@@ -500,26 +465,6 @@ require([
 
         minZoom:
           6
-
-      },
-
-
-      highlightOptions: {
-
-        color: [
-          0,
-          190,
-          175,
-          1
-        ],
-
-
-        haloOpacity:
-          0.9,
-
-
-        fillOpacity:
-          0.1
 
       }
 
@@ -553,10 +498,6 @@ require([
     null;
 
 
-  let highlightHandle =
-    null;
-
-
   let selectedGraphics =
     [];
 
@@ -569,8 +510,20 @@ require([
     null;
 
 
+  let highlightHandle =
+    null;
+
+
   let analysisMode =
     "normal";
+
+
+  let lastCatchmentPoint =
+    null;
+
+
+  let catchmentRequestId =
+    0;
 
 
   let lensRadiusKm =
@@ -585,12 +538,8 @@ require([
     null;
 
 
-  let catchmentRequestId =
-    0;
-
-
-  let lastCatchmentPoint =
-    null;
+  let lastFocusFeatures =
+    [];
 
 
   let coverageSport =
@@ -598,15 +547,15 @@ require([
 
 
   let coverageRadiusKm =
-    0;
+    1;
 
 
   let coverageRequestId =
     0;
 
 
-  let lastFocusSummary =
-    null;
+  let allSportValues =
+    [];
 
 
   // =========================================================
@@ -649,24 +598,6 @@ require([
     );
 
 
-  const selectAllFilters =
-    document.getElementById(
-      "selectAllFilters"
-    );
-
-
-  const deselectAllFilters =
-    document.getElementById(
-      "deselectAllFilters"
-    );
-
-
-  const legendItems =
-    document.getElementById(
-      "legendItems"
-    );
-
-
   const normalModeButton =
     document.getElementById(
       "normalModeButton"
@@ -685,15 +616,45 @@ require([
     );
 
 
+  const coverageModeButton =
+    document.getElementById(
+      "coverageModeButton"
+    );
+
+
   const lensControls =
     document.getElementById(
       "lensControls"
     );
 
 
+  const coverageControls =
+    document.getElementById(
+      "coverageControls"
+    );
+
+
   const lensRadiusSelect =
     document.getElementById(
       "lensRadiusSelect"
+    );
+
+
+  const coverageSportSelect =
+    document.getElementById(
+      "coverageSportSelect"
+    );
+
+
+  const coverageRadiusSelect =
+    document.getElementById(
+      "coverageRadiusSelect"
+    );
+
+
+  const coverageStatus =
+    document.getElementById(
+      "coverageStatus"
     );
 
 
@@ -727,33 +688,15 @@ require([
     );
 
 
-  const coverageSportSelect =
+  const mapAnalysisBadge =
     document.getElementById(
-      "coverageSportSelect"
-    );
-
-
-  const coverageRadiusSelect =
-    document.getElementById(
-      "coverageRadiusSelect"
-    );
-
-
-  const coverageStatus =
-    document.getElementById(
-      "coverageStatus"
+      "mapAnalysisBadge"
     );
 
 
   const analysisModeStatus =
     document.getElementById(
       "analysisModeStatus"
-    );
-
-
-  const mapAnalysisBadge =
-    document.getElementById(
-      "mapAnalysisBadge"
     );
 
 
@@ -799,51 +742,45 @@ require([
     );
 
 
-  const sportSummaryBlock =
+  const focusBreakdownControls =
     document.getElementById(
-      "sportSummaryBlock"
+      "focusBreakdownControls"
     );
 
 
-  const typeSummaryBlock =
+  const focusBreakdownField =
     document.getElementById(
-      "typeSummaryBlock"
-    );
-
-
-  const analysisSportSummary =
-    document.getElementById(
-      "analysisSportSummary"
-    );
-
-
-  const analysisTypeSummary =
-    document.getElementById(
-      "analysisTypeSummary"
-    );
-
-
-  const analysisTableContainer =
-    document.getElementById(
-      "analysisTableContainer"
-    );
-
-
-  const clearAnalysisButton =
-    document.getElementById(
-      "clearAnalysisButton"
-    );
-
-
-  const focusResultsControls =
-    document.getElementById(
-      "focusResultsControls"
+      "focusBreakdownField"
     );
 
 
   const focusResultsLimit =
     document.getElementById(
       "focusResultsLimit"
+    );
+
+
+  const summaryBlock =
+    document.getElementById(
+      "summaryBlock"
+    );
+
+
+  const summaryHeading =
+    document.getElementById(
+      "summaryHeading"
+    );
+
+
+  const analysisSummary =
+    document.getElementById(
+      "analysisSummary"
+    );
+
+
+  const analysisTableContainer =
+    document.getElementById(
+      "analysisTableContainer"
     );
 
 
@@ -868,24 +805,6 @@ require([
   const nextFacility =
     document.getElementById(
       "nextFacility"
-    );
-
-
-  const closeDetails =
-    document.getElementById(
-      "closeDetails"
-    );
-
-
-  const zoomToFacility =
-    document.getElementById(
-      "zoomToFacility"
-    );
-
-
-  const homeButton =
-    document.getElementById(
-      "homeButton"
     );
 
 
@@ -950,7 +869,7 @@ require([
       setupDropdowns();
 
 
-      setupAnalysisControls();
+      setupControls();
 
 
       await updateResultCount();
@@ -966,17 +885,8 @@ require([
   function buildSportFilters() {
 
     const field =
-      facilitiesLayer.fields.find(
-        function (
-          item
-        ) {
-
-          return (
-            item.name ===
-            "Sport"
-          );
-
-        }
+      getField(
+        "Sport"
       );
 
 
@@ -990,17 +900,33 @@ require([
     }
 
 
-    const values =
-      field.domain.codedValues;
+    allSportValues =
+      field.domain.codedValues.map(
+        function (
+          item
+        ) {
+
+          return {
+
+            code:
+              item.code,
+
+            name:
+              item.name
+
+          };
+
+        }
+      );
 
 
     const mainValues =
       mainSports.map(
         function (
-          sport
+          item
         ) {
 
-          return sport.value;
+          return item.value;
 
         }
       );
@@ -1012,14 +938,14 @@ require([
       ) {
 
         const match =
-          values.find(
+          field.domain.codedValues.find(
             function (
-              value
+              item
             ) {
 
               return (
-                value.code === sport.value ||
-                value.name === sport.value
+                item.code === sport.value ||
+                item.name === sport.value
               );
 
             }
@@ -1040,18 +966,18 @@ require([
     );
 
 
-    values
+    field.domain.codedValues
       .filter(
         function (
-          value
+          item
         ) {
 
           return (
             !mainValues.includes(
-              value.code
+              item.code
             ) &&
             !mainValues.includes(
-              value.name
+              item.name
             )
           );
 
@@ -1073,13 +999,13 @@ require([
       )
       .forEach(
         function (
-          value
+          item
         ) {
 
           addSportCheckbox(
-            value,
+            item,
             moreSportFilters,
-            value.name
+            item.name
           );
 
         }
@@ -1193,7 +1119,7 @@ require([
 
 
   // =========================================================
-  // DOMAIN FILTERS
+  // OTHER FILTERS
   // =========================================================
 
   function buildDomainFilter(
@@ -1203,17 +1129,8 @@ require([
   ) {
 
     const field =
-      facilitiesLayer.fields.find(
-        function (
-          item
-        ) {
-
-          return (
-            item.name ===
-            fieldName
-          );
-
-        }
+      getField(
+        fieldName
       );
 
 
@@ -1229,14 +1146,14 @@ require([
 
     field.domain.codedValues.forEach(
       function (
-        value
+        item
       ) {
 
         if (
           fieldName === "Owner" &&
           (
-            value.code === "Private Residence" ||
-            value.name === "Private Residence"
+            item.code === "Private Residence" ||
+            item.name === "Private Residence"
           )
         ) {
 
@@ -1266,7 +1183,7 @@ require([
 
 
         checkbox.value =
-          value.code;
+          item.code;
 
 
         checkbox.checked =
@@ -1284,7 +1201,7 @@ require([
 
 
         text.textContent =
-          value.name;
+          item.name;
 
 
         label.appendChild(
@@ -1372,7 +1289,7 @@ require([
           "click",
           function () {
 
-            const hidden =
+            const open =
               list.classList.contains(
                 "hidden"
               );
@@ -1380,12 +1297,12 @@ require([
 
             list.classList.toggle(
               "hidden",
-              !hidden
+              !open
             );
 
 
             arrow.textContent =
-              hidden
+              open
                 ? "▴"
                 : "▾";
 
@@ -1404,6 +1321,12 @@ require([
 
   function buildLegend() {
 
+    const legend =
+      document.getElementById(
+        "legendItems"
+      );
+
+
     mainSports.forEach(
       function (
         sport
@@ -1419,13 +1342,13 @@ require([
           "legend-item";
 
 
-        const square =
+        const box =
           document.createElement(
             "span"
           );
 
 
-        square.className =
+        box.className =
           "legend-colour";
 
 
@@ -1435,31 +1358,31 @@ require([
           ];
 
 
-        square.style.background =
+        box.style.background =
           `rgb(${colour.join(",")})`;
 
 
-        const label =
+        const text =
           document.createElement(
             "span"
           );
 
 
-        label.textContent =
+        text.textContent =
           sport.label;
 
 
         row.appendChild(
-          square
+          box
         );
 
 
         row.appendChild(
-          label
+          text
         );
 
 
-        legendItems.appendChild(
+        legend.appendChild(
           row
         );
 
@@ -1475,32 +1398,7 @@ require([
 
   function buildCoverageSportList() {
 
-    const field =
-      facilitiesLayer.fields.find(
-        function (
-          item
-        ) {
-
-          return (
-            item.name ===
-            "Sport"
-          );
-
-        }
-      );
-
-
-    if (
-      !field ||
-      !field.domain
-    ) {
-
-      return;
-
-    }
-
-
-    field.domain.codedValues
+    allSportValues
       .slice()
       .sort(
         function (
@@ -1629,13 +1527,12 @@ require([
 
   function buildAnalysisWhere() {
 
-    const filterWhere =
+    const filters =
       buildCurrentFilterWhere();
 
 
     if (
-      filterWhere ===
-      "1=0"
+      filters === "1=0"
     ) {
 
       return "1=0";
@@ -1644,9 +1541,7 @@ require([
 
 
     if (
-      !filterWhere ||
-      filterWhere ===
-      "1=1"
+      filters === "1=1"
     ) {
 
       return PRIVATE_RESIDENCE_WHERE;
@@ -1657,7 +1552,7 @@ require([
     return (
       PRIVATE_RESIDENCE_WHERE +
       " AND (" +
-      filterWhere +
+      filters +
       ")"
     );
 
@@ -1683,16 +1578,6 @@ require([
       );
 
 
-    /*
-      An empty individual group is treated as
-      unrestricted.
-
-      This means after Deselect All you can tick
-      just Tennis and it will work without also
-      having to tick every Ownership / Surface /
-      Floodlight value.
-    */
-
     if (
       checked.length === 0 ||
       checked.length === all.length
@@ -1713,11 +1598,8 @@ require([
 
           return (
             "'" +
-            String(
+            escapeSql(
               item.value
-            ).replace(
-              /'/g,
-              "''"
             ) +
             "'"
           );
@@ -1742,15 +1624,6 @@ require([
 
   async function applyFilters() {
 
-    if (
-      !facilitiesLayerView
-    ) {
-
-      return;
-
-    }
-
-
     facilitiesLayerView.filter = {
 
       where:
@@ -1767,29 +1640,13 @@ require([
 
     if (
       analysisMode ===
-      "catchment"
+      "catchment" &&
+      lastCatchmentPoint
     ) {
 
-      if (
+      runCatchment(
         lastCatchmentPoint
-      ) {
-
-        runCatchment(
-          lastCatchmentPoint
-        );
-
-      }
-      else {
-
-        analysisLayer.removeAll();
-
-
-        showAnalysisMessage(
-          "Catchment Area",
-          "Click a point on the map."
-        );
-
-      }
+      );
 
     }
 
@@ -1799,74 +1656,85 @@ require([
       "lens"
     ) {
 
-      runLensAnalysis();
+      runFocusSearch();
 
     }
 
 
-    refreshCoverage();
+    if (
+      analysisMode ===
+      "coverage"
+    ) {
+
+      refreshCoverage();
+
+    }
 
   }
 
 
+  document
+    .getElementById(
+      "selectAllFilters"
+    )
+    .addEventListener(
+      "click",
+      function () {
+
+        document
+          .querySelectorAll(
+            ".sport-filter, .owner-filter, .surface-filter, .floodlight-filter"
+          )
+          .forEach(
+            function (
+              item
+            ) {
+
+              item.checked =
+                true;
+
+            }
+          );
+
+
+        applyFilters();
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "deselectAllFilters"
+    )
+    .addEventListener(
+      "click",
+      function () {
+
+        document
+          .querySelectorAll(
+            ".sport-filter, .owner-filter, .surface-filter, .floodlight-filter"
+          )
+          .forEach(
+            function (
+              item
+            ) {
+
+              item.checked =
+                false;
+
+            }
+          );
+
+
+        applyFilters();
+
+      }
+    );
+
+
   // =========================================================
-  // SELECT / DESELECT ALL
-  // =========================================================
-
-  selectAllFilters.addEventListener(
-    "click",
-    async function () {
-
-      document
-        .querySelectorAll(
-          ".sport-filter, .owner-filter, .surface-filter, .floodlight-filter"
-        )
-        .forEach(
-          function (
-            item
-          ) {
-
-            item.checked =
-              true;
-
-          }
-        );
-
-
-      await applyFilters();
-
-    }
-  );
-
-
-  deselectAllFilters.addEventListener(
-    "click",
-    async function () {
-
-      document
-        .querySelectorAll(
-          ".sport-filter, .owner-filter, .surface-filter, .floodlight-filter"
-        )
-        .forEach(
-          function (
-            item
-          ) {
-
-            item.checked =
-              false;
-
-          }
-        );
-
-
-      await applyFilters();
-
-    }
-  );
-
-
-  // =========================================================
-  // TOTAL COUNT
+  // COUNT
   // =========================================================
 
   async function updateResultCount() {
@@ -1889,16 +1757,16 @@ require([
       count.toLocaleString(
         "en-IE"
       ) +
-      " facilities";
+      " public facilities";
 
   }
 
 
   // =========================================================
-  // ANALYSIS CONTROLS
+  // CONTROLS
   // =========================================================
 
-  function setupAnalysisControls() {
+  function setupControls() {
 
     normalModeButton.addEventListener(
       "click",
@@ -1936,6 +1804,18 @@ require([
     );
 
 
+    coverageModeButton.addEventListener(
+      "click",
+      function () {
+
+        setMode(
+          "coverage"
+        );
+
+      }
+    );
+
+
     lensRadiusSelect.addEventListener(
       "change",
       function () {
@@ -1954,27 +1834,7 @@ require([
         updateLensSize();
 
 
-        runLensAnalysis();
-
-      }
-    );
-
-
-    focusResultsLimit.addEventListener(
-      "change",
-      function () {
-
-        if (
-          lastFocusSummary
-        ) {
-
-          renderLensPanel(
-            lastFocusSummary.total,
-            lastFocusSummary.sportCounts,
-            lastFocusSummary.typeCounts
-          );
-
-        }
+        runFocusSearch();
 
       }
     );
@@ -2010,59 +1870,85 @@ require([
     );
 
 
-    clearAnalysisButton.addEventListener(
-      "click",
-      function () {
-
-        if (
-          analysisMode ===
-          "catchment"
-        ) {
-
-          analysisLayer.removeAll();
+    focusBreakdownField.addEventListener(
+      "change",
+      renderFocusBreakdown
+    );
 
 
-          lastCatchmentPoint =
-            null;
+    focusResultsLimit.addEventListener(
+      "change",
+      renderFocusBreakdown
+    );
 
 
-          showAnalysisMessage(
-            "Catchment Area",
-            "Click a point on the map."
+    document
+      .getElementById(
+        "clearAnalysisButton"
+      )
+      .addEventListener(
+        "click",
+        clearAnalysis
+      );
+
+
+    document
+      .getElementById(
+        "homeButton"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          view.goTo({
+
+            center:
+              IRELAND_CENTER,
+
+            zoom:
+              IRELAND_ZOOM
+
+          });
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        "zoomToFacility"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          if (
+            !selectedGraphic
+          ) {
+
+            return;
+
+          }
+
+
+          view.goTo(
+
+            selectedGraphic.geometry.extent
+              ? selectedGraphic.geometry.extent.expand(
+                  2.2
+                )
+              : selectedGraphic.geometry
+
           );
 
         }
-
-
-        if (
-          analysisMode ===
-          "lens"
-        ) {
-
-          lastFocusSummary =
-            null;
-
-
-          lensSvg.innerHTML =
-            "";
-
-
-          lensTotal.textContent =
-            "—";
-
-
-          runLensAnalysis();
-
-        }
-
-      }
-    );
+      );
 
   }
 
 
   // =========================================================
-  // MODE SWITCH
+  // MODES
   // =========================================================
 
   function setMode(
@@ -2073,37 +1959,35 @@ require([
       mode;
 
 
-    clearTimeout(
-      lensRefreshTimer
+    [
+      normalModeButton,
+      catchmentModeButton,
+      lensModeButton,
+      coverageModeButton
+    ].forEach(
+      function (
+        button
+      ) {
+
+        button.classList.remove(
+          "active"
+        );
+
+      }
     );
 
 
-    normalModeButton.classList.toggle(
-      "active",
-      mode ===
-      "normal"
+    lensControls.classList.add(
+      "hidden"
     );
 
 
-    catchmentModeButton.classList.toggle(
-      "active",
-      mode ===
-      "catchment"
+    coverageControls.classList.add(
+      "hidden"
     );
 
 
-    lensModeButton.classList.toggle(
-      "active",
-      mode ===
-      "lens"
-    );
-
-
-    lensControls.classList.toggle(
-      "hidden",
-      mode !==
-      "lens"
-    );
+    hideFixedLens();
 
 
     analysisLayer.removeAll();
@@ -2112,12 +1996,9 @@ require([
     coverageLayer.removeAll();
 
 
-    coverageRadiusSelect.value =
-      "0";
-
-
-    coverageRadiusKm =
-      0;
+    focusBreakdownControls.classList.add(
+      "hidden"
+    );
 
 
     if (
@@ -2125,11 +2006,8 @@ require([
       "normal"
     ) {
 
-      hideFixedLens();
-
-
-      focusResultsControls.classList.add(
-        "hidden"
+      normalModeButton.classList.add(
+        "active"
       );
 
 
@@ -2144,9 +2022,6 @@ require([
 
       showNormalPanel();
 
-
-      return;
-
     }
 
 
@@ -2155,11 +2030,8 @@ require([
       "catchment"
     ) {
 
-      hideFixedLens();
-
-
-      focusResultsControls.classList.add(
-        "hidden"
+      catchmentModeButton.classList.add(
+        "active"
       );
 
 
@@ -2173,7 +2045,7 @@ require([
 
 
       analysisModeStatus.textContent =
-        "Click a location for 1, 2, 4 and 8 km facility counts.";
+        "Click a location to calculate 1, 2, 4 and 8 km catchments.";
 
 
       if (
@@ -2194,9 +2066,6 @@ require([
 
       }
 
-
-      return;
-
     }
 
 
@@ -2205,15 +2074,17 @@ require([
       "lens"
     ) {
 
-      showFixedLens();
+      lensModeButton.classList.add(
+        "active"
+      );
 
 
-      updateLensSize();
-
-
-      focusResultsControls.classList.remove(
+      lensControls.classList.remove(
         "hidden"
       );
+
+
+      showFixedLens();
 
 
       mapAnalysisBadge.textContent =
@@ -2226,285 +2097,56 @@ require([
 
 
       analysisModeStatus.textContent =
-        "Pan or zoom the map underneath the focus area.";
+        "Move the map beneath the fixed focus area.";
 
 
-      lensRadiusLabel.textContent =
-        lensRadiusKm +
-        " km";
+      updateLensSize();
 
 
-      runLensAnalysis();
+      runFocusSearch();
+
+    }
 
 
-      return;
+    if (
+      mode ===
+      "coverage"
+    ) {
+
+      coverageModeButton.classList.add(
+        "active"
+      );
+
+
+      coverageControls.classList.remove(
+        "hidden"
+      );
+
+
+      mapAnalysisBadge.textContent =
+        "Coverage Gaps";
+
+
+      mapAnalysisBadge.classList.remove(
+        "hidden"
+      );
+
+
+      analysisModeStatus.textContent =
+        "Choose a sport and radius to identify areas outside facility coverage.";
+
+
+      showAnalysisMessage(
+        "Coverage Gaps",
+        "Choose a sport and coverage radius."
+      );
+
+
+      refreshCoverage();
 
     }
 
   }
-
-
-  // =========================================================
-  // FOCUS LENS
-  // =========================================================
-
-  function showFixedLens() {
-
-    fixedLens.classList.remove(
-      "hidden"
-    );
-
-
-    fixedLens.style.display =
-      "block";
-
-  }
-
-
-  function hideFixedLens() {
-
-    fixedLens.classList.add(
-      "hidden"
-    );
-
-
-    fixedLens.style.display =
-      "none";
-
-  }
-
-
-  // =========================================================
-  // GEOGRAPHICALLY CORRECT LENS SIZE
-  // =========================================================
-
-  function updateLensSize() {
-
-    if (
-      analysisMode !==
-        "lens" ||
-      !view.center
-    ) {
-
-      return;
-
-    }
-
-
-    const buffer =
-      geometryEngine.geodesicBuffer(
-        view.center,
-        lensRadiusKm,
-        "kilometers"
-      );
-
-
-    if (
-      !buffer ||
-      !buffer.extent
-    ) {
-
-      return;
-
-    }
-
-
-    const extent =
-      buffer.extent;
-
-
-    const leftPoint =
-      new Point({
-
-        x:
-          extent.xmin,
-
-        y:
-          extent.center.y,
-
-        spatialReference:
-          extent.spatialReference
-
-      });
-
-
-    const rightPoint =
-      new Point({
-
-        x:
-          extent.xmax,
-
-        y:
-          extent.center.y,
-
-        spatialReference:
-          extent.spatialReference
-
-      });
-
-
-    const leftScreen =
-      view.toScreen(
-        leftPoint
-      );
-
-
-    const rightScreen =
-      view.toScreen(
-        rightPoint
-      );
-
-
-    if (
-      !leftScreen ||
-      !rightScreen
-    ) {
-
-      return;
-
-    }
-
-
-    const diameterPixels =
-      Math.abs(
-        rightScreen.x -
-        leftScreen.x
-      );
-
-
-    if (
-      !Number.isFinite(
-        diameterPixels
-      ) ||
-      diameterPixels <= 0
-    ) {
-
-      return;
-
-    }
-
-
-    fixedLens.style.width =
-      diameterPixels +
-      "px";
-
-
-    fixedLens.style.height =
-      diameterPixels +
-      "px";
-
-
-    lensSvg.style.width =
-      diameterPixels +
-      150 +
-      "px";
-
-
-    lensSvg.style.height =
-      diameterPixels +
-      150 +
-      "px";
-
-  }
-
-
-  // =========================================================
-  // LIVE FOCUS SEARCH
-  // =========================================================
-
-  function scheduleLiveFocusRefresh() {
-
-    if (
-      analysisMode !==
-      "lens"
-    ) {
-
-      return;
-
-    }
-
-
-    updateLensSize();
-
-
-    lensLoading.classList.remove(
-      "hidden"
-    );
-
-
-    clearTimeout(
-      lensRefreshTimer
-    );
-
-
-    lensRefreshTimer =
-      setTimeout(
-        function () {
-
-          runLensAnalysis();
-
-        },
-        LIVE_FOCUS_DELAY
-      );
-
-  }
-
-
-  view.watch(
-    "center",
-    function () {
-
-      scheduleLiveFocusRefresh();
-
-    }
-  );
-
-
-  view.watch(
-    "resolution",
-    function () {
-
-      scheduleLiveFocusRefresh();
-
-    }
-  );
-
-
-  view.watch(
-    "stationary",
-    function (
-      stationary
-    ) {
-
-      if (
-        analysisMode ===
-          "lens" &&
-        stationary
-      ) {
-
-        clearTimeout(
-          lensRefreshTimer
-        );
-
-
-        runLensAnalysis();
-
-      }
-
-
-      if (
-        stationary &&
-        coverageSport &&
-        coverageRadiusKm >
-        0
-      ) {
-
-        refreshCoverage();
-
-      }
-
-    }
-  );
 
 
   // =========================================================
@@ -2533,8 +2175,8 @@ require([
 
 
       if (
-        analysisMode ===
-        "lens"
+        analysisMode !==
+        "normal"
       ) {
 
         return;
@@ -2560,15 +2202,6 @@ require([
 
     const clickedPoint =
       event.mapPoint;
-
-
-    if (!clickedPoint) {
-
-      clearSelection();
-
-      return;
-
-    }
 
 
     const topLeft =
@@ -2603,8 +2236,6 @@ require([
       !topLeft ||
       !bottomRight
     ) {
-
-      clearSelection();
 
       return;
 
@@ -2750,10 +2381,10 @@ require([
 
 
     let nearest =
-      null;
+      nearby[0];
 
 
-    let nearestDistance =
+    let shortest =
       Infinity;
 
 
@@ -2773,14 +2404,11 @@ require([
 
 
           if (
-            Number.isFinite(
-              distance
-            ) &&
             distance <
-            nearestDistance
+            shortest
           ) {
 
-            nearestDistance =
+            shortest =
               distance;
 
 
@@ -2799,10 +2427,7 @@ require([
 
 
     selectFacilities(
-      [
-        nearest ||
-        nearby[0]
-      ]
+      [nearest]
     );
 
   }
@@ -2928,8 +2553,7 @@ require([
           color: [
             0,
             105,
-            78,
-            1
+            78
           ],
 
 
@@ -2954,38 +2578,34 @@ require([
     showCatchmentLoading();
 
 
+    const query =
+      facilitiesLayer.createQuery();
+
+
+    query.geometry =
+      buffers[3];
+
+
+    query.spatialRelationship =
+      "intersects";
+
+
+    query.where =
+      buildAnalysisWhere();
+
+
+    query.returnGeometry =
+      true;
+
+
+    query.outFields = [
+      "OBJECTID",
+      "Sport",
+      "Infrastructure_Type"
+    ];
+
+
     try {
-
-      const query =
-        facilitiesLayer.createQuery();
-
-
-      query.geometry =
-        buffers[3];
-
-
-      query.spatialRelationship =
-        "intersects";
-
-
-      query.where =
-        buildAnalysisWhere();
-
-
-      query.returnGeometry =
-        true;
-
-
-      query.outFields = [
-
-        "OBJECTID",
-
-        "Sport",
-
-        "Infrastructure_Type"
-
-      ];
-
 
       const response =
         await facilitiesLayer.queryFeatures(
@@ -3022,33 +2642,18 @@ require([
                 ) {
 
                   const centre =
-                    getFacilityCentreForAnalysis(
+                    getGeometryCentre(
                       feature.geometry
                     );
 
 
-                  if (!centre) {
-
-                    return false;
-
-                  }
-
-
-                  try {
-
-                    return (
-                      geometryEngine.intersects(
-                        buffer,
-                        centre
-                      )
-                    );
-
-                  }
-                  catch {
-
-                    return false;
-
-                  }
+                  return (
+                    centre &&
+                    geometryEngine.intersects(
+                      buffer,
+                      centre
+                    )
+                  );
 
                 }
               )
@@ -3068,13 +2673,8 @@ require([
     ) {
 
       console.error(
-        "CATCHMENT ERROR:",
         error
       );
-
-
-      analysisSubtitle.textContent =
-        "Unable to calculate catchment.";
 
     }
 
@@ -3083,36 +2683,19 @@ require([
 
   function showCatchmentLoading() {
 
-    focusResultsControls.classList.add(
-      "hidden"
-    );
-
-
     rightPanelHeading.textContent =
       "Catchment Area";
 
 
-    emptyState.classList.add(
+    showAnalysisPanel();
+
+
+    focusBreakdownControls.classList.add(
       "hidden"
     );
 
 
-    facilityDetails.classList.add(
-      "hidden"
-    );
-
-
-    analysisDetails.classList.remove(
-      "hidden"
-    );
-
-
-    sportSummaryBlock.classList.add(
-      "hidden"
-    );
-
-
-    typeSummaryBlock.classList.add(
+    summaryBlock.classList.add(
       "hidden"
     );
 
@@ -3126,29 +2709,27 @@ require([
 
 
     analysisTotals.innerHTML =
-      CATCHMENT_RADII.map(
-        function (
-          radius
-        ) {
+      `
+        <div class="analysis-total-card">
+            <span>Within 1 km</span>
+            <strong>…</strong>
+        </div>
 
-          return `
-            <div class="analysis-total-card">
+        <div class="analysis-total-card">
+            <span>Within 2 km</span>
+            <strong>…</strong>
+        </div>
 
-                <span>
-                    Within ${radius} km
-                </span>
+        <div class="analysis-total-card">
+            <span>Within 4 km</span>
+            <strong>…</strong>
+        </div>
 
-                <strong>
-                    …
-                </strong>
-
-            </div>
-          `;
-
-        }
-      ).join(
-        ""
-      );
+        <div class="analysis-total-card">
+            <span>Within 8 km</span>
+            <strong>…</strong>
+        </div>
+      `;
 
 
     analysisTableContainer.innerHTML =
@@ -3161,151 +2742,39 @@ require([
     results
   ) {
 
-    rightPanelHeading.textContent =
-      "Catchment Area";
-
-
     analysisTitle.textContent =
       "Facility catchment";
 
 
     analysisSubtitle.textContent =
-      "Mapped facility centres falling within each straight-line catchment.";
+      "All sport categories are shown. Red zeroes highlight missing provision.";
 
 
     analysisTotals.innerHTML =
-      `
-        <div class="analysis-total-card">
-
-            <span>Within 1 km</span>
-
-            <strong>
-                ${results[0].length}
-            </strong>
-
-        </div>
-
-
-        <div class="analysis-total-card">
-
-            <span>Within 2 km</span>
-
-            <strong>
-                ${results[1].length}
-            </strong>
-
-        </div>
-
-
-        <div class="analysis-total-card">
-
-            <span>Within 4 km</span>
-
-            <strong>
-                ${results[2].length}
-            </strong>
-
-        </div>
-
-
-        <div class="analysis-total-card">
-
-            <span>Within 8 km</span>
-
-            <strong>
-                ${results[3].length}
-            </strong>
-
-        </div>
-      `;
-
-
-    const sports =
-      new Set();
-
-
-    results.forEach(
-      function (
-        list
-      ) {
-
-        list.forEach(
-          function (
-            feature
-          ) {
-
-            sports.add(
-              cleanCategory(
-                feature.attributes.Sport
-              )
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-    const rows =
-      Array.from(
-        sports
-      ).map(
+      CATCHMENT_RADII.map(
         function (
-          sport
+          radius,
+          index
         ) {
 
-          return {
+          return `
+            <div class="analysis-total-card">
 
-            sport:
-              sport,
+                <span>
+                    Within ${radius} km
+                </span>
 
+                <strong>
+                    ${results[index].length}
+                </strong>
 
-            counts:
-              results.map(
-                function (
-                  list
-                ) {
-
-                  return (
-                    list.filter(
-                      function (
-                        feature
-                      ) {
-
-                        return (
-                          cleanCategory(
-                            feature.attributes.Sport
-                          ) ===
-                          sport
-                        );
-
-                      }
-                    ).length
-                  );
-
-                }
-              )
-
-          };
+            </div>
+          `;
 
         }
+      ).join(
+        ""
       );
-
-
-    rows.sort(
-      function (
-        a,
-        b
-      ) {
-
-        return (
-          b.counts[3] -
-          a.counts[3]
-        );
-
-      }
-    );
 
 
     let html =
@@ -3328,36 +2797,87 @@ require([
       `;
 
 
-    rows.forEach(
-      function (
-        row
-      ) {
+    allSportValues
+      .slice()
+      .sort(
+        function (
+          a,
+          b
+        ) {
 
-        html +=
-          `
-            <tr>
+          return (
+            a.name.localeCompare(
+              b.name
+            )
+          );
 
-                <td>
-                    ${escapeHtml(
-                      displaySportName(
-                        row.sport
-                      )
-                    )}
-                </td>
+        }
+      )
+      .forEach(
+        function (
+          sport
+        ) {
 
-                <td>${row.counts[0]}</td>
+          const counts =
+            results.map(
+              function (
+                list
+              ) {
 
-                <td>${row.counts[1]}</td>
+                return (
+                  list.filter(
+                    function (
+                      feature
+                    ) {
 
-                <td>${row.counts[2]}</td>
+                      return (
+                        feature.attributes.Sport ===
+                        sport.code
+                      );
 
-                <td>${row.counts[3]}</td>
+                    }
+                  ).length
+                );
 
-            </tr>
-          `;
+              }
+            );
 
-      }
-    );
+
+          html +=
+            `
+              <tr>
+
+                  <td>
+                      ${escapeHtml(
+                        displaySportName(
+                          sport.name
+                        )
+                      )}
+                  </td>
+
+                  ${counts.map(
+                    function (
+                      count
+                    ) {
+
+                      return `
+                        <td class="${
+                          count === 0
+                            ? "zero-result"
+                            : ""
+                        }">
+                            ${count}
+                        </td>
+                      `;
+
+                    }
+                  ).join("")}
+
+              </tr>
+            `;
+
+        }
+      );
 
 
     html +=
@@ -3375,10 +2895,10 @@ require([
 
 
   // =========================================================
-  // FOCUS SEARCH
+  // LIVE FOCUS SEARCH
   // =========================================================
 
-  async function runLensAnalysis() {
+  function scheduleFocusRefresh() {
 
     if (
       analysisMode !==
@@ -3390,14 +2910,7 @@ require([
     }
 
 
-    showFixedLens();
-
-
     updateLensSize();
-
-
-    const requestId =
-      ++lensRequestId;
 
 
     lensLoading.classList.remove(
@@ -3405,50 +2918,115 @@ require([
     );
 
 
-    const point =
-      view.center;
+    clearTimeout(
+      lensRefreshTimer
+    );
+
+
+    lensRefreshTimer =
+      setTimeout(
+        runFocusSearch,
+        LIVE_FOCUS_DELAY
+      );
+
+  }
+
+
+  view.watch(
+    "center",
+    scheduleFocusRefresh
+  );
+
+
+  view.watch(
+    "resolution",
+    scheduleFocusRefresh
+  );
+
+
+  view.watch(
+    "stationary",
+    function (
+      stationary
+    ) {
+
+      if (
+        stationary &&
+        analysisMode ===
+        "coverage"
+      ) {
+
+        refreshCoverage();
+
+      }
+
+    }
+  );
+
+
+  // =========================================================
+  // FOCUS SEARCH
+  // =========================================================
+
+  async function runFocusSearch() {
+
+    if (
+      analysisMode !==
+      "lens"
+    ) {
+
+      return;
+
+    }
+
+
+    const requestId =
+      ++lensRequestId;
+
+
+    updateLensSize();
 
 
     const buffer =
       geometryEngine.geodesicBuffer(
-        point,
+        view.center,
         lensRadiusKm,
         "kilometers"
       );
 
 
+    const query =
+      facilitiesLayer.createQuery();
+
+
+    query.geometry =
+      buffer;
+
+
+    query.spatialRelationship =
+      "intersects";
+
+
+    query.where =
+      buildAnalysisWhere();
+
+
+    query.returnGeometry =
+      true;
+
+
+    query.outFields = [
+      "OBJECTID",
+      "Sport",
+      "Infrastructure_Type",
+      "Owner",
+      "Surface",
+      "Facility_Size",
+      "Floodlights"
+    ];
+
+
     try {
-
-      const query =
-        facilitiesLayer.createQuery();
-
-
-      query.geometry =
-        buffer;
-
-
-      query.spatialRelationship =
-        "intersects";
-
-
-      query.where =
-        buildAnalysisWhere();
-
-
-      query.returnGeometry =
-        true;
-
-
-      query.outFields = [
-
-        "OBJECTID",
-
-        "Sport",
-
-        "Infrastructure_Type"
-
-      ];
-
 
       const response =
         await facilitiesLayer.queryFeatures(
@@ -3466,7 +3044,7 @@ require([
       }
 
 
-      const features =
+      lastFocusFeatures =
         deduplicateFeatures(
           response.features
         ).filter(
@@ -3475,64 +3053,21 @@ require([
           ) {
 
             const centre =
-              getFacilityCentreForAnalysis(
+              getGeometryCentre(
                 feature.geometry
               );
 
 
-            if (!centre) {
-
-              return false;
-
-            }
-
-
-            try {
-
-              return (
-                geometryEngine.intersects(
-                  buffer,
-                  centre
-                )
-              );
-
-            }
-            catch {
-
-              return false;
-
-            }
+            return (
+              centre &&
+              geometryEngine.intersects(
+                buffer,
+                centre
+              )
+            );
 
           }
         );
-
-
-      const sportCounts =
-        countByField(
-          features,
-          "Sport"
-        );
-
-
-      const typeCounts =
-        countByField(
-          features,
-          "Infrastructure_Type"
-        );
-
-
-      lastFocusSummary = {
-
-        total:
-          features.length,
-
-        sportCounts:
-          sportCounts,
-
-        typeCounts:
-          typeCounts
-
-      };
 
 
       lensLoading.classList.add(
@@ -3540,17 +3075,20 @@ require([
       );
 
 
+      const sportCounts =
+        countByField(
+          lastFocusFeatures,
+          "Sport"
+        );
+
+
       renderLens(
-        features.length,
+        lastFocusFeatures.length,
         sportCounts
       );
 
 
-      renderLensPanel(
-        features.length,
-        sportCounts,
-        typeCounts
-      );
+      renderFocusPanel();
 
     }
     catch (
@@ -3558,13 +3096,7 @@ require([
     ) {
 
       console.error(
-        "FOCUS SEARCH ERROR:",
         error
-      );
-
-
-      lensLoading.classList.add(
-        "hidden"
       );
 
     }
@@ -3572,8 +3104,393 @@ require([
   }
 
 
+  function renderFocusPanel() {
+
+    rightPanelHeading.textContent =
+      "Focus Search";
+
+
+    showAnalysisPanel();
+
+
+    focusBreakdownControls.classList.remove(
+      "hidden"
+    );
+
+
+    summaryBlock.classList.remove(
+      "hidden"
+    );
+
+
+    analysisTitle.textContent =
+      `${lensRadiusKm} km focus area`;
+
+
+    analysisSubtitle.textContent =
+      "Live summary of facilities inside the current focus area.";
+
+
+    const sportCounts =
+      countByField(
+        lastFocusFeatures,
+        "Sport"
+      );
+
+
+    analysisTotals.innerHTML =
+      `
+        <div class="analysis-total-card">
+
+            <span>
+                Facilities
+            </span>
+
+            <strong>
+                ${lastFocusFeatures.length}
+            </strong>
+
+        </div>
+
+        <div class="analysis-total-card">
+
+            <span>
+                Sports represented
+            </span>
+
+            <strong>
+                ${Object.keys(sportCounts).length}
+            </strong>
+
+        </div>
+      `;
+
+
+    analysisTableContainer.innerHTML =
+      "";
+
+
+    renderFocusBreakdown();
+
+  }
+
+
+  function renderFocusBreakdown() {
+
+    if (
+      analysisMode !==
+      "lens"
+    ) {
+
+      return;
+
+    }
+
+
+    const field =
+      focusBreakdownField.value;
+
+
+    const headingNames = {
+
+      "Sport":
+        "Sports",
+
+      "Infrastructure_Type":
+        "Facility types",
+
+      "Owner":
+        "Ownership types",
+
+      "Surface":
+        "Surface types",
+
+      "Facility_Size":
+        "Facility sizes",
+
+      "Floodlights":
+        "Floodlights"
+
+    };
+
+
+    summaryHeading.textContent =
+      headingNames[field] ||
+      "Results";
+
+
+    const counts =
+      countByField(
+        lastFocusFeatures,
+        field
+      );
+
+
+    let entries =
+      Object.entries(
+        counts
+      ).sort(
+        function (
+          a,
+          b
+        ) {
+
+          return (
+            b[1] -
+            a[1]
+          );
+
+        }
+      );
+
+
+    const limit =
+      focusResultsLimit.value;
+
+
+    if (
+      limit !==
+      "all"
+    ) {
+
+      entries =
+        entries.slice(
+          0,
+          Number(
+            limit
+          )
+        );
+
+    }
+
+
+    analysisSummary.innerHTML =
+      entries.map(
+        function (
+          entry,
+          index
+        ) {
+
+          let label =
+            entry[0];
+
+
+          if (
+            field ===
+            "Sport"
+          ) {
+
+            label =
+              displaySportName(
+                label
+              );
+
+          }
+
+
+          if (
+            field ===
+            "Floodlights"
+          ) {
+
+            label =
+              formatFloodlights(
+                label
+              );
+
+          }
+
+
+          const colour =
+            field === "Sport"
+              ? (
+                  sportColours[
+                    entry[0]
+                  ] ||
+                  [
+                    130,
+                    130,
+                    130
+                  ]
+                )
+              : breakdownColours[
+                  index %
+                  breakdownColours.length
+                ];
+
+
+          return `
+            <div class="analysis-summary-row">
+
+                <span
+                    class="analysis-swatch"
+                    style="background:rgb(${colour.join(",")})"
+                ></span>
+
+                <span>
+                    ${escapeHtml(label)}
+                </span>
+
+                <strong>
+                    ${entry[1]}
+                </strong>
+
+            </div>
+          `;
+
+        }
+      ).join(
+        ""
+      );
+
+  }
+
+
   // =========================================================
-  // STRONGER RADIAL CHART
+  // RESPONSIVE LENS SIZE
+  // =========================================================
+
+  function showFixedLens() {
+
+    fixedLens.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  function hideFixedLens() {
+
+    fixedLens.classList.add(
+      "hidden"
+    );
+
+  }
+
+
+  function updateLensSize() {
+
+    if (
+      analysisMode !==
+      "lens"
+    ) {
+
+      return;
+
+    }
+
+
+    const buffer =
+      geometryEngine.geodesicBuffer(
+        view.center,
+        lensRadiusKm,
+        "kilometers"
+      );
+
+
+    if (
+      !buffer ||
+      !buffer.extent
+    ) {
+
+      return;
+
+    }
+
+
+    const extent =
+      buffer.extent;
+
+
+    const left =
+      new Point({
+
+        x:
+          extent.xmin,
+
+        y:
+          extent.center.y,
+
+        spatialReference:
+          extent.spatialReference
+
+      });
+
+
+    const right =
+      new Point({
+
+        x:
+          extent.xmax,
+
+        y:
+          extent.center.y,
+
+        spatialReference:
+          extent.spatialReference
+
+      });
+
+
+    const leftScreen =
+      view.toScreen(
+        left
+      );
+
+
+    const rightScreen =
+      view.toScreen(
+        right
+      );
+
+
+    if (
+      !leftScreen ||
+      !rightScreen
+    ) {
+
+      return;
+
+    }
+
+
+    const diameter =
+      Math.abs(
+        rightScreen.x -
+        leftScreen.x
+      );
+
+
+    fixedLens.dataset.diameter =
+      diameter;
+
+
+    fixedLens.style.width =
+      diameter +
+      "px";
+
+
+    fixedLens.style.height =
+      diameter +
+      "px";
+
+
+    lensSvg.style.width =
+      diameter +
+      150 +
+      "px";
+
+
+    lensSvg.style.height =
+      diameter +
+      150 +
+      "px";
+
+  }
+
+
+  // =========================================================
+  // RESPONSIVE RADIAL GRAPH
   // =========================================================
 
   function renderLens(
@@ -3587,6 +3504,41 @@ require([
 
     lensSvg.innerHTML =
       "";
+
+
+    const diameter =
+      Number(
+        fixedLens.dataset.diameter
+      ) ||
+      0;
+
+
+    if (
+      diameter <
+      170
+    ) {
+
+      lensSvg.style.display =
+        "none";
+
+
+      fixedLens.classList.add(
+        "compact-lens"
+      );
+
+
+      return;
+
+    }
+
+
+    lensSvg.style.display =
+      "block";
+
+
+    fixedLens.classList.remove(
+      "compact-lens"
+    );
 
 
     const entries =
@@ -3606,16 +3558,25 @@ require([
     }
 
 
+    const compact =
+      diameter <
+      280;
+
+
     const centre =
       210;
 
 
     const baseRadius =
-      148;
+      compact
+        ? 135
+        : 148;
 
 
     const maxExtra =
-      72;
+      compact
+        ? 42
+        : 72;
 
 
     const maximum =
@@ -3661,10 +3622,15 @@ require([
 
         const extra =
           Math.max(
-            24,
+
+            compact
+              ? 14
+              : 24,
+
             value /
             maximum *
             maxExtra
+
           );
 
 
@@ -3681,25 +3647,19 @@ require([
 
         const startX =
           centre +
-          Math.cos(
-            angle
-          ) *
+          Math.cos(angle) *
           baseRadius;
 
 
         const startY =
           centre +
-          Math.sin(
-            angle
-          ) *
+          Math.sin(angle) *
           baseRadius;
 
 
         const endX =
           centre +
-          Math.cos(
-            angle
-          ) *
+          Math.cos(angle) *
           (
             baseRadius +
             extra
@@ -3708,16 +3668,12 @@ require([
 
         const endY =
           centre +
-          Math.sin(
-            angle
-          ) *
+          Math.sin(angle) *
           (
             baseRadius +
             extra
           );
 
-
-        // WHITE HALO
 
         const halo =
           createSvg(
@@ -3751,13 +3707,15 @@ require([
 
         halo.setAttribute(
           "stroke",
-          "rgba(255,255,255,0.96)"
+          "white"
         );
 
 
         halo.setAttribute(
           "stroke-width",
-          "27"
+          compact
+            ? "20"
+            : "27"
         );
 
 
@@ -3772,135 +3730,70 @@ require([
         );
 
 
-        // COLOUR BAR
-
-        const line =
+        const bar =
           createSvg(
             "line"
           );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "x1",
           startX
         );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "y1",
           startY
         );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "x2",
           endX
         );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "y2",
           endY
         );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "stroke",
           `rgb(${colour.join(",")})`
         );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "stroke-width",
-          "18"
+          compact
+            ? "12"
+            : "18"
         );
 
 
-        line.setAttribute(
+        bar.setAttribute(
           "stroke-linecap",
           "round"
         );
 
 
         lensSvg.appendChild(
-          line
+          bar
         );
 
 
         const labelRadius =
           baseRadius +
           extra +
-          32;
-
-
-        const labelX =
-          centre +
-          Math.cos(
-            angle
-          ) *
-          labelRadius;
-
-
-        const labelY =
-          centre +
-          Math.sin(
-            angle
-          ) *
-          labelRadius;
-
-
-        const labelText =
-          `${displaySportName(sport)} ${value}`;
-
-
-        // WHITE LABEL HALO
-
-        const labelBackground =
-          createSvg(
-            "text"
+          (
+            compact
+              ? 18
+              : 32
           );
 
-
-        labelBackground.setAttribute(
-          "x",
-          labelX
-        );
-
-
-        labelBackground.setAttribute(
-          "y",
-          labelY
-        );
-
-
-        labelBackground.setAttribute(
-          "text-anchor",
-          "middle"
-        );
-
-
-        labelBackground.setAttribute(
-          "dominant-baseline",
-          "middle"
-        );
-
-
-        labelBackground.setAttribute(
-          "class",
-          "radial-label-background"
-        );
-
-
-        labelBackground.textContent =
-          labelText;
-
-
-        lensSvg.appendChild(
-          labelBackground
-        );
-
-
-        // VISIBLE LABEL
 
         const label =
           createSvg(
@@ -3910,13 +3803,17 @@ require([
 
         label.setAttribute(
           "x",
-          labelX
+          centre +
+          Math.cos(angle) *
+          labelRadius
         );
 
 
         label.setAttribute(
           "y",
-          labelY
+          centre +
+          Math.sin(angle) *
+          labelRadius
         );
 
 
@@ -3939,7 +3836,9 @@ require([
 
 
         label.textContent =
-          labelText;
+          compact
+            ? String(value)
+            : `${displaySportName(sport)} ${value}`;
 
 
         lensSvg.appendChild(
@@ -3953,247 +3852,40 @@ require([
 
 
   // =========================================================
-  // FOCUS PANEL
-  // =========================================================
-
-  function renderLensPanel(
-    total,
-    sportCounts,
-    typeCounts
-  ) {
-
-    rightPanelHeading.textContent =
-      "Focus Search";
-
-
-    emptyState.classList.add(
-      "hidden"
-    );
-
-
-    facilityDetails.classList.add(
-      "hidden"
-    );
-
-
-    analysisDetails.classList.remove(
-      "hidden"
-    );
-
-
-    focusResultsControls.classList.remove(
-      "hidden"
-    );
-
-
-    sportSummaryBlock.classList.remove(
-      "hidden"
-    );
-
-
-    typeSummaryBlock.classList.remove(
-      "hidden"
-    );
-
-
-    analysisTitle.textContent =
-      `${lensRadiusKm} km focus area`;
-
-
-    analysisSubtitle.textContent =
-      "The circle represents the selected real-world search radius.";
-
-
-    analysisTotals.innerHTML =
-      `
-        <div class="analysis-total-card">
-
-            <span>
-                Facilities
-            </span>
-
-            <strong>
-                ${total}
-            </strong>
-
-        </div>
-
-
-        <div class="analysis-total-card">
-
-            <span>
-                Sports represented
-            </span>
-
-            <strong>
-                ${Object.keys(sportCounts).length}
-            </strong>
-
-        </div>
-      `;
-
-
-    analysisSportSummary.innerHTML =
-      renderSummaryRows(
-        getDisplayedEntries(
-          sportCounts
-        ),
-        true
-      );
-
-
-    analysisTypeSummary.innerHTML =
-      renderSummaryRows(
-        getDisplayedEntries(
-          typeCounts
-        ),
-        false
-      );
-
-
-    analysisTableContainer.innerHTML =
-      "";
-
-  }
-
-
-  // =========================================================
-  // TOP 5 / TOP 10 / ALL
-  // =========================================================
-
-  function getDisplayedEntries(
-    counts
-  ) {
-
-    const entries =
-      Object.entries(
-        counts
-      ).sort(
-        function (
-          a,
-          b
-        ) {
-
-          return (
-            b[1] -
-            a[1]
-          );
-
-        }
-      );
-
-
-    const choice =
-      focusResultsLimit.value;
-
-
-    if (
-      choice ===
-      "all"
-    ) {
-
-      return entries;
-
-    }
-
-
-    return (
-      entries.slice(
-        0,
-        Number(
-          choice
-        )
-      )
-    );
-
-  }
-
-
-  function renderSummaryRows(
-    entries,
-    sports
-  ) {
-
-    return (
-      entries.map(
-        function (
-          entry,
-          index
-        ) {
-
-          const colour =
-            sports
-              ? (
-                  sportColours[
-                    entry[0]
-                  ] ||
-                  [
-                    130,
-                    130,
-                    130
-                  ]
-                )
-              : typeColours[
-                  index %
-                  typeColours.length
-                ];
-
-
-          return `
-            <div class="analysis-summary-row">
-
-                <span
-                    class="analysis-swatch"
-                    style="background:rgb(${colour.join(",")})"
-                ></span>
-
-                <span>
-                    ${escapeHtml(
-                      sports
-                        ? displaySportName(
-                            entry[0]
-                          )
-                        : entry[0]
-                    )}
-                </span>
-
-                <strong>
-                    ${entry[1]}
-                </strong>
-
-            </div>
-          `;
-
-        }
-      ).join(
-        ""
-      )
-    );
-
-  }
-
-
-  // =========================================================
-  // COVERAGE OVERLAY
+  // COVERAGE GAPS
   // =========================================================
 
   async function refreshCoverage() {
-
-    const requestId =
-      ++coverageRequestId;
-
 
     coverageLayer.removeAll();
 
 
     if (
-      !coverageSport ||
-      coverageRadiusKm <=
-      0
+      analysisMode !==
+      "coverage"
+    ) {
+
+      return;
+
+    }
+
+
+    coverageSport =
+      coverageSportSelect.value;
+
+
+    coverageRadiusKm =
+      Number(
+        coverageRadiusSelect.value
+      );
+
+
+    if (
+      !coverageSport
     ) {
 
       coverageStatus.textContent =
-        "Select one sport and radius.";
+        "Select a sport to show coverage.";
 
 
       return;
@@ -4207,12 +3899,16 @@ require([
     ) {
 
       coverageStatus.textContent =
-        "Zoom in further to display coverage.";
+        "Zoom in further to display coverage circles.";
 
 
       return;
 
     }
+
+
+    const requestId =
+      ++coverageRequestId;
 
 
     const query =
@@ -4236,11 +3932,8 @@ require([
 
 
     query.outFields = [
-
       "OBJECTID",
-
       "Sport"
-
     ];
 
 
@@ -4295,9 +3988,9 @@ require([
         coverageSport
       ] ||
       [
-        125,
-        125,
-        125
+        0,
+        145,
+        105
       ];
 
 
@@ -4311,7 +4004,7 @@ require([
       ) {
 
         const centre =
-          getFacilityCentreForAnalysis(
+          getGeometryCentre(
             feature.geometry
           );
 
@@ -4349,7 +4042,7 @@ require([
                 colour[0],
                 colour[1],
                 colour[2],
-                0.1
+                0.12
               ],
 
 
@@ -4359,12 +4052,12 @@ require([
                   colour[0],
                   colour[1],
                   colour[2],
-                  0.5
+                  0.65
                 ],
 
 
                 width:
-                  1
+                  1.4
 
               }
 
@@ -4384,7 +4077,64 @@ require([
 
 
     coverageStatus.textContent =
-      `${graphics.length} facilities shown at ${coverageRadiusKm} km.`;
+      `${graphics.length} facilities shown with ${coverageRadiusKm} km coverage.`;
+
+
+    rightPanelHeading.textContent =
+      "Coverage Gaps";
+
+
+    showAnalysisPanel();
+
+
+    focusBreakdownControls.classList.add(
+      "hidden"
+    );
+
+
+    summaryBlock.classList.add(
+      "hidden"
+    );
+
+
+    analysisTitle.textContent =
+      "Coverage Gaps";
+
+
+    analysisSubtitle.textContent =
+      `${displaySportName(coverageSport)} facilities with ${coverageRadiusKm} km straight-line coverage.`;
+
+
+    analysisTotals.innerHTML =
+      `
+        <div class="analysis-total-card">
+
+            <span>
+                Facilities shown
+            </span>
+
+            <strong>
+                ${graphics.length}
+            </strong>
+
+        </div>
+
+        <div class="analysis-total-card">
+
+            <span>
+                Radius
+            </span>
+
+            <strong>
+                ${coverageRadiusKm} km
+            </strong>
+
+        </div>
+      `;
+
+
+    analysisTableContainer.innerHTML =
+      "";
 
   }
 
@@ -4396,11 +4146,8 @@ require([
       PRIVATE_RESIDENCE_WHERE,
 
       "Sport = '" +
-      String(
+      escapeSql(
         coverageSport
-      ).replace(
-        /'/g,
-        "''"
       ) +
       "'"
 
@@ -4449,18 +4196,7 @@ require([
 
 
     selectedGraphics =
-      graphics ||
-      [];
-
-
-    if (
-      selectedGraphics.length ===
-      0
-    ) {
-
-      return;
-
-    }
+      graphics;
 
 
     selectedIndex =
@@ -4468,36 +4204,21 @@ require([
 
 
     const ids =
-      selectedGraphics
-        .map(
-          function (
-            graphic
-          ) {
+      graphics.map(
+        function (
+          feature
+        ) {
 
-            return (
-              graphic.getObjectId()
-            );
+          return (
+            feature.getObjectId()
+          );
 
-          }
-        )
-        .filter(
-          function (
-            id
-          ) {
-
-            return (
-              id !== null &&
-              id !== undefined
-            );
-
-          }
-        );
+        }
+      );
 
 
     if (
-      facilitiesLayerView &&
-      ids.length >
-      0
+      facilitiesLayerView
     ) {
 
       highlightHandle =
@@ -4508,7 +4229,7 @@ require([
     }
 
 
-    drawAllSelectedPolygons();
+    drawSelectedPolygons();
 
 
     showCurrentFacility();
@@ -4516,32 +4237,23 @@ require([
   }
 
 
-  function drawAllSelectedPolygons() {
+  function drawSelectedPolygons() {
 
     selectionGraphicsLayer.removeAll();
 
 
     selectedGraphics.forEach(
       function (
-        graphic,
+        feature,
         index
       ) {
-
-        if (
-          !graphic.geometry
-        ) {
-
-          return;
-
-        }
-
 
         selectionGraphicsLayer.add(
 
           new Graphic({
 
             geometry:
-              graphic.geometry,
+              feature.geometry,
 
 
             symbol: {
@@ -4555,8 +4267,8 @@ require([
                 190,
                 170,
                 index === selectedIndex
-                  ? 0.13
-                  : 0.045
+                  ? 0.14
+                  : 0.04
               ],
 
 
@@ -4567,14 +4279,12 @@ require([
                     ? [
                         0,
                         70,
-                        60,
-                        1
+                        60
                       ]
                     : [
                         0,
                         205,
-                        180,
-                        1
+                        180
                       ],
 
 
@@ -4605,20 +4315,13 @@ require([
       ];
 
 
-    drawAllSelectedPolygons();
+    drawSelectedPolygons();
 
 
     showFacilityDetails(
       selectedGraphic.attributes
     );
 
-
-    updateSelectionNavigator();
-
-  }
-
-
-  function updateSelectionNavigator() {
 
     selectionNavigator.classList.toggle(
       "hidden",
@@ -4636,16 +4339,6 @@ require([
   previousFacility.addEventListener(
     "click",
     function () {
-
-      if (
-        selectedGraphics.length <=
-        1
-      ) {
-
-        return;
-
-      }
-
 
       selectedIndex =
         (
@@ -4666,16 +4359,6 @@ require([
     "click",
     function () {
 
-      if (
-        selectedGraphics.length <=
-        1
-      ) {
-
-        return;
-
-      }
-
-
       selectedIndex =
         (
           selectedIndex +
@@ -4695,13 +4378,8 @@ require([
   // =========================================================
 
   function showFacilityDetails(
-    attributes
+    a
   ) {
-
-    focusResultsControls.classList.add(
-      "hidden"
-    );
-
 
     rightPanelHeading.textContent =
       "Facility details";
@@ -4724,7 +4402,7 @@ require([
 
     let title =
       cleanValue(
-        attributes.Owner_Name
+        a.Owner_Name
       );
 
 
@@ -4734,11 +4412,7 @@ require([
     ) {
 
       title =
-        `${cleanValue(
-          attributes.Sport
-        )} - ${cleanValue(
-          attributes.Infrastructure_Type
-        )}`;
+        `${cleanValue(a.Sport)} - ${cleanValue(a.Infrastructure_Type)}`;
 
     }
 
@@ -4752,20 +4426,34 @@ require([
     setText(
       "detailSportTag",
       displaySportName(
-        attributes.Sport
+        a.Sport
       )
     );
 
 
-    setSportTagColour(
-      attributes.Sport
-    );
+    const sportColour =
+      sportColours[
+        a.Sport
+      ] ||
+      [
+        130,
+        130,
+        130
+      ];
+
+
+    document
+      .getElementById(
+        "detailSportTag"
+      )
+      .style.background =
+      `rgb(${sportColour.join(",")})`;
 
 
     setText(
       "detailTypeTag",
       cleanValue(
-        attributes.Infrastructure_Type
+        a.Infrastructure_Type
       )
     );
 
@@ -4773,7 +4461,7 @@ require([
     setText(
       "detailSport",
       displaySportName(
-        attributes.Sport
+        a.Sport
       )
     );
 
@@ -4781,16 +4469,14 @@ require([
     setText(
       "detailInfrastructure",
       cleanValue(
-        attributes.Infrastructure_Type
+        a.Infrastructure_Type
       )
     );
 
 
     const pool =
-      attributes.Sport ===
-        "Swimming Indoor" ||
-      attributes.Sport ===
-        "Swimming Outdoor";
+      a.Sport === "Swimming Indoor" ||
+      a.Sport === "Swimming Outdoor";
 
 
     poolLengthRow.classList.toggle(
@@ -4810,7 +4496,7 @@ require([
       setText(
         "detailPoolLength",
         formatDimension(
-          attributes.Pool_Length
+          a.Pool_Length
         )
       );
 
@@ -4818,7 +4504,7 @@ require([
       setText(
         "detailPoolBreadth",
         formatDimension(
-          attributes.Pool_Breadth
+          a.Pool_Breadth
         )
       );
 
@@ -4828,7 +4514,7 @@ require([
     setText(
       "detailSurface",
       cleanValue(
-        attributes.Surface
+        a.Surface
       )
     );
 
@@ -4836,7 +4522,7 @@ require([
     setText(
       "detailFloodlights",
       formatFloodlights(
-        attributes.Floodlights
+        a.Floodlights
       )
     );
 
@@ -4844,7 +4530,7 @@ require([
     setText(
       "detailOwner",
       cleanValue(
-        attributes.Owner
+        a.Owner
       )
     );
 
@@ -4852,7 +4538,7 @@ require([
     setText(
       "detailOwnerName",
       cleanValue(
-        attributes.Owner_Name
+        a.Owner_Name
       )
     );
 
@@ -4860,7 +4546,7 @@ require([
     setText(
       "detailSize",
       cleanValue(
-        attributes.Facility_Size
+        a.Facility_Size
       )
     );
 
@@ -4868,7 +4554,7 @@ require([
     setText(
       "detailQuality",
       formatQuality(
-        attributes.Quality
+        a.Quality
       )
     );
 
@@ -4876,7 +4562,7 @@ require([
     setText(
       "detailMultiUse",
       cleanValue(
-        attributes.Multi_Use
+        a.Multi_Use
       )
     );
 
@@ -4884,7 +4570,7 @@ require([
     setText(
       "detailLA",
       titleCase(
-        attributes.Local_Authority
+        a.Local_Authority
       )
     );
 
@@ -4892,7 +4578,7 @@ require([
     setText(
       "detailLEA",
       titleCase(
-        attributes.LEA
+        a.LEA
       )
     );
 
@@ -4900,7 +4586,7 @@ require([
     setText(
       "detailArea",
       formatArea(
-        attributes.Area_msq
+        a.Area_msq
       )
     );
 
@@ -4910,6 +4596,136 @@ require([
   // =========================================================
   // PANEL HELPERS
   // =========================================================
+
+  function showNormalPanel() {
+
+    rightPanelHeading.textContent =
+      "Facility details";
+
+
+    emptyState.classList.remove(
+      "hidden"
+    );
+
+
+    facilityDetails.classList.add(
+      "hidden"
+    );
+
+
+    analysisDetails.classList.add(
+      "hidden"
+    );
+
+  }
+
+
+  function showAnalysisPanel() {
+
+    emptyState.classList.add(
+      "hidden"
+    );
+
+
+    facilityDetails.classList.add(
+      "hidden"
+    );
+
+
+    analysisDetails.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  function showAnalysisMessage(
+    title,
+    subtitle
+  ) {
+
+    rightPanelHeading.textContent =
+      title;
+
+
+    showAnalysisPanel();
+
+
+    focusBreakdownControls.classList.add(
+      "hidden"
+    );
+
+
+    summaryBlock.classList.add(
+      "hidden"
+    );
+
+
+    analysisTitle.textContent =
+      title;
+
+
+    analysisSubtitle.textContent =
+      subtitle;
+
+
+    analysisTotals.innerHTML =
+      "";
+
+
+    analysisTableContainer.innerHTML =
+      "";
+
+  }
+
+
+  function clearAnalysis() {
+
+    analysisLayer.removeAll();
+
+
+    coverageLayer.removeAll();
+
+
+    if (
+      analysisMode ===
+      "catchment"
+    ) {
+
+      lastCatchmentPoint =
+        null;
+
+
+      showAnalysisMessage(
+        "Catchment Area",
+        "Click a point on the map."
+      );
+
+    }
+
+
+    if (
+      analysisMode ===
+      "coverage"
+    ) {
+
+      coverageSportSelect.value =
+        "";
+
+
+      coverageSport =
+        "";
+
+
+      showAnalysisMessage(
+        "Coverage Gaps",
+        "Choose a sport and coverage radius."
+      );
+
+    }
+
+  }
+
 
   function clearSelection() {
 
@@ -4936,208 +4752,74 @@ require([
     selectedGraphic =
       null;
 
+  }
 
-    facilityDetails.classList.add(
-      "hidden"
+
+  // =========================================================
+  // HELPERS
+  // =========================================================
+
+  function getField(
+    name
+  ) {
+
+    return (
+      facilitiesLayer.fields.find(
+        function (
+          field
+        ) {
+
+          return (
+            field.name ===
+            name
+          );
+
+        }
+      )
     );
+
+  }
+
+
+  function getGeometryCentre(
+    geometry
+  ) {
+
+    if (!geometry) {
+
+      return null;
+
+    }
 
 
     if (
-      analysisMode ===
-      "normal"
+      geometry.centroid
     ) {
 
-      showNormalPanel();
+      return geometry.centroid;
 
     }
+
+
+    if (
+      geometry.extent
+    ) {
+
+      return geometry.extent.center;
+
+    }
+
+
+    return null;
 
   }
 
-
-  function showNormalPanel() {
-
-    focusResultsControls.classList.add(
-      "hidden"
-    );
-
-
-    rightPanelHeading.textContent =
-      "Facility details";
-
-
-    analysisDetails.classList.add(
-      "hidden"
-    );
-
-
-    facilityDetails.classList.add(
-      "hidden"
-    );
-
-
-    emptyState.classList.remove(
-      "hidden"
-    );
-
-  }
-
-
-  function showAnalysisMessage(
-    title,
-    subtitle
-  ) {
-
-    focusResultsControls.classList.add(
-      "hidden"
-    );
-
-
-    rightPanelHeading.textContent =
-      title;
-
-
-    emptyState.classList.add(
-      "hidden"
-    );
-
-
-    facilityDetails.classList.add(
-      "hidden"
-    );
-
-
-    analysisDetails.classList.remove(
-      "hidden"
-    );
-
-
-    sportSummaryBlock.classList.add(
-      "hidden"
-    );
-
-
-    typeSummaryBlock.classList.add(
-      "hidden"
-    );
-
-
-    analysisTitle.textContent =
-      title;
-
-
-    analysisSubtitle.textContent =
-      subtitle;
-
-
-    analysisTotals.innerHTML =
-      "";
-
-
-    analysisTableContainer.innerHTML =
-      "";
-
-  }
-
-
-  closeDetails.addEventListener(
-    "click",
-    function () {
-
-      if (
-        analysisMode ===
-        "normal"
-      ) {
-
-        clearSelection();
-
-      }
-
-
-      if (
-        analysisMode ===
-        "catchment"
-      ) {
-
-        analysisLayer.removeAll();
-
-
-        lastCatchmentPoint =
-          null;
-
-
-        showAnalysisMessage(
-          "Catchment Area",
-          "Click a point on the map."
-        );
-
-      }
-
-    }
-  );
-
-
-  // =========================================================
-  // ZOOM / HOME
-  // =========================================================
-
-  zoomToFacility.addEventListener(
-    "click",
-    function () {
-
-      if (
-        !selectedGraphic ||
-        !selectedGraphic.geometry
-      ) {
-
-        return;
-
-      }
-
-
-      const target =
-        selectedGraphic.geometry.extent
-          ? selectedGraphic.geometry.extent.expand(
-              2.2
-            )
-          : selectedGraphic.geometry;
-
-
-      view.goTo(
-        target
-      );
-
-    }
-  );
-
-
-  homeButton.addEventListener(
-    "click",
-    function () {
-
-      view.goTo({
-
-        center:
-          IRELAND_CENTER,
-
-
-        zoom:
-          IRELAND_ZOOM
-
-      });
-
-    }
-  );
-
-
-  // =========================================================
-  // GENERAL HELPERS
-  // =========================================================
 
   function deduplicateFeatures(
     features
   ) {
 
-    const seen =
+    const ids =
       new Set();
 
 
@@ -5152,7 +4834,7 @@ require([
 
 
           if (
-            seen.has(
+            ids.has(
               id
             )
           ) {
@@ -5162,7 +4844,7 @@ require([
           }
 
 
-          seen.add(
+          ids.add(
             id
           );
 
@@ -5191,7 +4873,7 @@ require([
       ) {
 
         const value =
-          cleanCategory(
+          cleanValue(
             feature.attributes[
               field
             ]
@@ -5245,143 +4927,27 @@ require([
   }
 
 
-  function getFacilityCentreForAnalysis(
-    geometry
-  ) {
-
-    if (!geometry) {
-
-      return null;
-
-    }
-
-
-    if (
-      geometry.centroid
-    ) {
-
-      return geometry.centroid;
-
-    }
-
-
-    if (
-      geometry.extent &&
-      geometry.extent.center
-    ) {
-
-      return geometry.extent.center;
-
-    }
-
-
-    return null;
-
-  }
-
-
-  function cleanCategory(
-    value
-  ) {
-
-    if (
-      value === null ||
-      value === undefined ||
-      value === ""
-    ) {
-
-      return "Not recorded";
-
-    }
-
-
-    return String(
-      value
-    );
-
-  }
-
-
   function getPolygonArea(
     geometry
   ) {
 
     try {
 
-      const area =
+      return (
         Math.abs(
           geometryEngine.geodesicArea(
             geometry,
             "square-meters"
           )
-        );
-
-
-      if (
-        Number.isFinite(
-          area
         )
-      ) {
-
-        return area;
-
-      }
+      );
 
     }
     catch {
-      // ignore
-    }
 
-
-    return Infinity;
-
-  }
-
-
-  function setSportTagColour(
-    sport
-  ) {
-
-    const tag =
-      document.getElementById(
-        "detailSportTag"
-      );
-
-
-    const colour =
-      sportColours[
-        sport
-      ] ||
-      [
-        130,
-        130,
-        130
-      ];
-
-
-    tag.style.background =
-      `rgb(${colour.join(",")})`;
-
-  }
-
-
-  function displaySportName(
-    value
-  ) {
-
-    if (
-      value ===
-      "Sports Hall"
-    ) {
-
-      return "Sports Halls";
+      return Infinity;
 
     }
-
-
-    return cleanValue(
-      value
-    );
 
   }
 
@@ -5409,64 +4975,16 @@ require([
   }
 
 
-  function formatDimension(
-    value
+  function displaySportName(
+    sport
   ) {
 
-    const number =
-      Number(
-        value
-      );
-
-
-    if (
-      !Number.isFinite(
-        number
-      )
-    ) {
-
-      return "Not recorded";
-
-    }
-
-
     return (
-      number.toLocaleString(
-        "en-IE",
-        {
-          maximumFractionDigits:
-            1
-        }
-      ) +
-      " m"
-    );
-
-  }
-
-
-  function formatQuality(
-    value
-  ) {
-
-    const values = {
-
-      1:
-        "Poor",
-
-      2:
-        "Good / Satisfactory",
-
-      3:
-        "Excellent"
-
-    };
-
-
-    return (
-      values[value] ||
-      cleanValue(
-        value
-      )
+      sport === "Sports Hall"
+        ? "Sports Halls"
+        : cleanValue(
+            sport
+          )
     );
 
   }
@@ -5503,39 +5021,57 @@ require([
   }
 
 
-  function titleCase(
+  function formatDimension(
     value
   ) {
 
-    const cleaned =
-      cleanValue(
+    const n =
+      Number(
         value
       );
 
 
-    if (
-      cleaned ===
-      "Not recorded"
-    ) {
+    return (
+      Number.isFinite(
+        n
+      )
+        ? n.toLocaleString(
+            "en-IE",
+            {
+              maximumFractionDigits:
+                1
+            }
+          ) +
+          " m"
+        : "Not recorded"
+    );
 
-      return cleaned;
+  }
 
-    }
+
+  function formatQuality(
+    value
+  ) {
+
+    const labels = {
+
+      1:
+        "Poor",
+
+      2:
+        "Good / Satisfactory",
+
+      3:
+        "Excellent"
+
+    };
 
 
     return (
-      cleaned
-        .toLowerCase()
-        .replace(
-          /\b\w/g,
-          function (
-            letter
-          ) {
-
-            return letter.toUpperCase();
-
-          }
-        )
+      labels[value] ||
+      cleanValue(
+        value
+      )
     );
 
   }
@@ -5545,7 +5081,7 @@ require([
     value
   ) {
 
-    const number =
+    const n =
       Number(
         value
       );
@@ -5553,7 +5089,7 @@ require([
 
     if (
       !Number.isFinite(
-        number
+        n
       )
     ) {
 
@@ -5563,13 +5099,13 @@ require([
 
 
     if (
-      number >=
+      n >=
       10000
     ) {
 
       return (
         (
-          number /
+          n /
           10000
         ).toLocaleString(
           "en-IE",
@@ -5586,7 +5122,7 @@ require([
 
     return (
       Math.round(
-        number
+        n
       ).toLocaleString(
         "en-IE"
       ) +
@@ -5596,23 +5132,58 @@ require([
   }
 
 
-  function setText(
-    id,
+  function titleCase(
     value
   ) {
 
-    const element =
-      document.getElementById(
-        id
+    const text =
+      cleanValue(
+        value
       );
 
 
-    if (element) {
+    if (
+      text ===
+      "Not recorded"
+    ) {
 
-      element.textContent =
-        value;
+      return text;
 
     }
+
+
+    return (
+      text
+        .toLowerCase()
+        .replace(
+          /\b\w/g,
+          function (
+            letter
+          ) {
+
+            return (
+              letter.toUpperCase()
+            );
+
+          }
+        )
+    );
+
+  }
+
+
+  function escapeSql(
+    value
+  ) {
+
+    return (
+      String(
+        value
+      ).replace(
+        /'/g,
+        "''"
+      )
+    );
 
   }
 
@@ -5646,6 +5217,27 @@ require([
           "&#039;"
         )
     );
+
+  }
+
+
+  function setText(
+    id,
+    value
+  ) {
+
+    const element =
+      document.getElementById(
+        id
+      );
+
+
+    if (element) {
+
+      element.textContent =
+        value;
+
+    }
 
   }
 
