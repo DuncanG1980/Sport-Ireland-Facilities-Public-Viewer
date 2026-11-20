@@ -41,8 +41,8 @@ require([
   const IRELAND_ZOOM =
     7;
 
-  const MAX_LENSES =
-    3;
+  const CATCHMENT_RADII =
+    [1, 2, 4, 8];
 
   const COVERAGE_MIN_ZOOM =
     9;
@@ -156,17 +156,16 @@ require([
 
 
   const typeColours = [
-    [0, 125, 145],
-    [230, 125, 35],
-    [95, 125, 185],
-    [170, 90, 165],
-    [55, 155, 125],
-    [155, 135, 70]
+    [0, 132, 150],
+    [235, 132, 30],
+    [85, 115, 185],
+    [170, 85, 165],
+    [55, 155, 125]
   ];
 
 
   // =========================================================
-  // FACILITY RENDERER
+  // RENDERER
   // =========================================================
 
   const rendererInfos =
@@ -177,7 +176,7 @@ require([
         [sport, colour]
       ) {
 
-        const isPool =
+        const pool =
           sport === "Swimming Indoor" ||
           sport === "Swimming Outdoor";
 
@@ -196,7 +195,7 @@ require([
               colour[0],
               colour[1],
               colour[2],
-              isPool
+              pool
                 ? 0.62
                 : 0.44
             ],
@@ -211,7 +210,7 @@ require([
               ],
 
               width:
-                isPool
+                pool
                   ? 3
                   : 2
 
@@ -226,7 +225,7 @@ require([
 
 
   // =========================================================
-  // GRAPHICS
+  // LAYERS
   // =========================================================
 
   const coverageLayer =
@@ -236,10 +235,6 @@ require([
   const analysisLayer =
     new GraphicsLayer();
 
-
-  // =========================================================
-  // FEATURE LAYER
-  // =========================================================
 
   const facilitiesLayer =
     new FeatureLayer({
@@ -368,6 +363,23 @@ require([
         minZoom:
           6
 
+      },
+
+      highlightOptions: {
+
+        color: [
+          0,
+          190,
+          175,
+          1
+        ],
+
+        haloOpacity:
+          0.9,
+
+        fillOpacity:
+          0.1
+
       }
 
     });
@@ -377,7 +389,10 @@ require([
     new Search({
 
       view:
-        view
+        view,
+
+      locationEnabled:
+        false
 
     });
 
@@ -400,6 +415,10 @@ require([
     null;
 
 
+  let currentOverlayGraphic =
+    null;
+
+
   let selectedGraphics =
     [];
 
@@ -412,10 +431,6 @@ require([
     null;
 
 
-  let currentOverlayGraphic =
-    null;
-
-
   let analysisMode =
     "normal";
 
@@ -424,19 +439,7 @@ require([
     2;
 
 
-  let lensCounter =
-    0;
-
-
-  let lenses =
-    [];
-
-
-  let selectedLensId =
-    null;
-
-
-  let coverageRadiusKm =
+  let lensRequestId =
     0;
 
 
@@ -444,25 +447,21 @@ require([
     "";
 
 
+  let coverageRadiusKm =
+    0;
+
+
   let coverageRequestId =
+    0;
+
+
+  let catchmentRequestId =
     0;
 
 
   // =========================================================
   // DOM
   // =========================================================
-
-  const mapContainer =
-    document.getElementById(
-      "mapContainer"
-    );
-
-
-  const lensLayer =
-    document.getElementById(
-      "lensLayer"
-    );
-
 
   const resultCount =
     document.getElementById(
@@ -548,15 +547,33 @@ require([
     );
 
 
-  const addLensButton =
+  const fixedLens =
     document.getElementById(
-      "addLensButton"
+      "fixedLens"
     );
 
 
-  const clearLensesButton =
+  const lensSvg =
     document.getElementById(
-      "clearLensesButton"
+      "lensSvg"
+    );
+
+
+  const lensTotal =
+    document.getElementById(
+      "lensTotal"
+    );
+
+
+  const lensRadiusLabel =
+    document.getElementById(
+      "lensRadiusLabel"
+    );
+
+
+  const lensLoading =
+    document.getElementById(
+      "lensLoading"
     );
 
 
@@ -781,7 +798,7 @@ require([
 
 
   // =========================================================
-  // FILTER UI
+  // SPORT FILTERS
   // =========================================================
 
   function buildSportFilters() {
@@ -1014,6 +1031,10 @@ require([
 
   }
 
+
+  // =========================================================
+  // DOMAIN FILTERS
+  // =========================================================
 
   function buildDomainFilter(
     fieldName,
@@ -1291,7 +1312,7 @@ require([
 
 
   // =========================================================
-  // COVERAGE SPORTS
+  // COVERAGE SPORT LIST
   // =========================================================
 
   function buildCoverageSportList() {
@@ -1390,7 +1411,14 @@ require([
     await updateResultCount();
 
 
-    refreshAllLenses();
+    if (
+      analysisMode ===
+      "lens"
+    ) {
+
+      runLensAnalysis();
+
+    }
 
 
     refreshCoverage();
@@ -1404,19 +1432,22 @@ require([
       [];
 
 
-    const selectors = [
+    const groups = [
       [
         "Sport",
         ".sport-filter"
       ],
+
       [
         "Owner",
         ".owner-filter"
       ],
+
       [
         "Surface",
         ".surface-filter"
       ],
+
       [
         "Floodlights",
         ".floodlight-filter"
@@ -1428,7 +1459,7 @@ require([
       0;
 
 
-    selectors.forEach(
+    groups.forEach(
       function (
         pair
       ) {
@@ -1494,9 +1525,9 @@ require([
 
     if (
       checked.length ===
-        0 ||
+      0 ||
       checked.length ===
-        all.length
+      all.length
     ) {
 
       return;
@@ -1568,7 +1599,14 @@ require([
       await updateResultCount();
 
 
-      refreshAllLenses();
+      if (
+        analysisMode ===
+        "lens"
+      ) {
+
+        runLensAnalysis();
+
+      }
 
     }
   );
@@ -1605,7 +1643,14 @@ require([
       await updateResultCount();
 
 
-      refreshAllLenses();
+      if (
+        analysisMode ===
+        "lens"
+      ) {
+
+        runLensAnalysis();
+
+      }
 
     }
   );
@@ -1640,7 +1685,7 @@ require([
 
 
   // =========================================================
-  // ANALYSIS MODES
+  // MODES
   // =========================================================
 
   function setupAnalysisControls() {
@@ -1691,33 +1736,14 @@ require([
           );
 
 
-        lenses.forEach(
-          function (
-            lens
-          ) {
-
-            lens.radiusKm =
-              lensRadiusKm;
-
-          }
-        );
+        lensRadiusLabel.textContent =
+          lensRadiusKm +
+          " km";
 
 
-        refreshAllLenses();
+        runLensAnalysis();
 
       }
-    );
-
-
-    addLensButton.addEventListener(
-      "click",
-      addLens
-    );
-
-
-    clearLensesButton.addEventListener(
-      "click",
-      clearLenses
     );
 
 
@@ -1763,7 +1789,12 @@ require([
           "lens"
         ) {
 
-          clearLenses();
+          lensSvg.innerHTML =
+            "";
+
+
+          lensTotal.textContent =
+            "—";
 
         }
 
@@ -1809,7 +1840,25 @@ require([
     );
 
 
+    fixedLens.classList.toggle(
+      "hidden",
+      mode !==
+      "lens"
+    );
+
+
     analysisLayer.removeAll();
+
+
+    coverageLayer.removeAll();
+
+
+    coverageRadiusSelect.value =
+      "0";
+
+
+    coverageRadiusKm =
+      0;
 
 
     if (
@@ -1846,7 +1895,7 @@ require([
 
 
       analysisModeStatus.textContent =
-        "Click anywhere to calculate 1, 2, 4 and 8 km catchments.";
+        "Click a location for 1, 2, 4 and 8 km facility counts.";
 
 
       showAnalysisMessage(
@@ -1872,23 +1921,15 @@ require([
 
 
       analysisModeStatus.textContent =
-        "Add lenses and drag them around to compare areas.";
+        "Pan or zoom the map underneath the fixed lens.";
 
 
-      showAnalysisMessage(
-        "Lens Explorer",
-        "Add a lens, then drag it around the map."
-      );
+      lensRadiusLabel.textContent =
+        lensRadiusKm +
+        " km";
 
 
-      if (
-        lenses.length ===
-        0
-      ) {
-
-        addLens();
-
-      }
+      runLensAnalysis();
 
     }
 
@@ -1901,7 +1942,7 @@ require([
 
   view.on(
     "click",
-    async function (
+    function (
       event
     ) {
 
@@ -1939,7 +1980,8 @@ require([
 
 
   // =========================================================
-  // RESTORED FORGIVING NORMAL CLICK
+  // NORMAL MAP:
+  // NEAR CLICK + OVERLAPPING POLYGONS
   // =========================================================
 
   async function selectFacilityFromClick(
@@ -1950,9 +1992,9 @@ require([
       event.mapPoint;
 
 
-    if (
-      !clickedPoint
-    ) {
+    if (!clickedPoint) {
+
+      clearSelection();
 
       return;
 
@@ -1997,7 +2039,7 @@ require([
     }
 
 
-    const searchExtent =
+    const extent =
       new Extent({
 
         xmin:
@@ -2035,7 +2077,7 @@ require([
 
 
     query.geometry =
-      searchExtent;
+      extent;
 
 
     query.spatialRelationship =
@@ -2050,9 +2092,8 @@ require([
       true;
 
 
-    query.outFields = [
-      "*"
-    ];
+    query.outFields =
+      ["*"];
 
 
     const response =
@@ -2078,10 +2119,10 @@ require([
     }
 
 
-    // First preference:
-    // polygons containing the exact click.
+    // Exact click:
+    // return ALL overlapping polygons.
 
-    const exact =
+    const overlapping =
       nearby.filter(
         function (
           feature
@@ -2108,11 +2149,10 @@ require([
 
 
     if (
-      exact.length >
-      0
+      overlapping.length
     ) {
 
-      exact.sort(
+      overlapping.sort(
         function (
           a,
           b
@@ -2132,7 +2172,7 @@ require([
 
 
       selectFacilities(
-        exact
+        overlapping
       );
 
 
@@ -2141,8 +2181,8 @@ require([
     }
 
 
-    // Otherwise choose nearest feature
-    // inside our 14-pixel search box.
+    // No exact hit:
+    // rank all nearby polygons.
 
     let nearest =
       null;
@@ -2162,7 +2202,8 @@ require([
           const distance =
             geometryEngine.distance(
               clickedPoint,
-              feature.geometry
+              feature.geometry,
+              "meters"
             );
 
 
@@ -2171,7 +2212,7 @@ require([
               distance
             ) &&
             distance <
-              nearestDistance
+            nearestDistance
           ) {
 
             nearestDistance =
@@ -2192,26 +2233,18 @@ require([
     );
 
 
-    if (nearest) {
-
-      selectFacilities(
-        [nearest]
-      );
-
-    }
-    else {
-
-      selectFacilities(
-        [nearby[0]]
-      );
-
-    }
+    selectFacilities(
+      [
+        nearest ||
+        nearby[0]
+      ]
+    );
 
   }
 
 
   // =========================================================
-  // CORRECTED CATCHMENT ANALYSIS
+  // FAST CATCHMENT
   // =========================================================
 
   async function runCatchment(
@@ -2223,20 +2256,15 @@ require([
     }
 
 
+    const requestId =
+      ++catchmentRequestId;
+
+
     analysisLayer.removeAll();
 
 
-    const radii =
-      [
-        1,
-        2,
-        4,
-        8
-      ];
-
-
     const buffers =
-      radii.map(
+      CATCHMENT_RADII.map(
         function (
           radius
         ) {
@@ -2343,15 +2371,72 @@ require([
     );
 
 
-    // Query the largest actual buffer once.
-    // Then deduplicate by OBJECTID.
+    showCatchmentLoading();
+
+
+    try {
+
+      const results =
+        await Promise.all(
+          buffers.map(
+            function (
+              buffer
+            ) {
+
+              return (
+                queryCatchmentStatistics(
+                  buffer
+                )
+              );
+
+            }
+          )
+        );
+
+
+      if (
+        requestId !==
+        catchmentRequestId
+      ) {
+
+        return;
+
+      }
+
+
+      renderCatchmentResults(
+        results
+      );
+
+    }
+    catch (
+      error
+    ) {
+
+      console.error(
+        "CATCHMENT ERROR:",
+        error
+      );
+
+
+      analysisSubtitle.textContent =
+        "Unable to calculate catchment.";
+
+    }
+
+  }
+
+
+  async function queryCatchmentStatistics(
+    buffer
+  ) {
 
     const query =
       facilitiesLayer.createQuery();
 
 
     query.geometry =
-      buffers[3];
+      buffer;
 
 
     query.spatialRelationship =
@@ -2363,14 +2448,33 @@ require([
 
 
     query.returnGeometry =
-      true;
+      false;
 
 
-    query.outFields = [
-      "OBJECTID",
-      "Sport",
-      "Infrastructure_Type"
+    query.outStatistics = [
+
+      {
+
+        statisticType:
+          "count",
+
+        onStatisticField:
+          "OBJECTID",
+
+        outStatisticFieldName:
+          "Facility_Count"
+
+      }
+
     ];
+
+
+    query.groupByFieldsForStatistics =
+      ["Sport"];
+
+
+    query.orderByFields =
+      ["Facility_Count DESC"];
 
 
     const response =
@@ -2379,58 +2483,64 @@ require([
       );
 
 
-    const unique =
-      deduplicateFeatures(
-        response.features
-      );
+    const counts =
+      {};
 
 
-    const resultSets =
-      buffers.map(
+    response.features.forEach(
+      function (
+        feature
+      ) {
+
+        const sport =
+          cleanCategory(
+            feature.attributes.Sport
+          );
+
+
+        counts[sport] =
+          Number(
+            feature.attributes.Facility_Count
+          ) ||
+          0;
+
+      }
+    );
+
+
+    const total =
+      Object.values(
+        counts
+      ).reduce(
         function (
-          buffer
+          sum,
+          value
         ) {
 
           return (
-            unique.filter(
-              function (
-                feature
-              ) {
-
-                try {
-
-                  return (
-                    geometryEngine.intersects(
-                      feature.geometry,
-                      buffer
-                    )
-                  );
-
-                }
-                catch {
-
-                  return false;
-
-                }
-
-              }
-            )
+            sum +
+            value
           );
 
-        }
+        },
+        0
       );
 
 
-    renderCatchmentPanel(
-      resultSets
-    );
+    return {
+
+      total:
+        total,
+
+      sports:
+        counts
+
+    };
 
   }
 
 
-  function renderCatchmentPanel(
-    results
-  ) {
+  function showCatchmentLoading() {
 
     rightPanelHeading.textContent =
       "Catchment summary";
@@ -2466,31 +2576,74 @@ require([
 
 
     analysisSubtitle.textContent =
-      "Unique mapped facility polygons intersecting each straight-line catchment.";
+      "Counting facilities…";
 
 
     analysisTotals.innerHTML =
-      `
-        <div class="analysis-total-card">
-            <span>Within 1 km</span>
-            <strong>${results[0].length}</strong>
-        </div>
+      CATCHMENT_RADII.map(
+        function (
+          radius
+        ) {
 
-        <div class="analysis-total-card">
-            <span>Within 2 km</span>
-            <strong>${results[1].length}</strong>
-        </div>
+          return `
+            <div class="analysis-total-card">
 
-        <div class="analysis-total-card">
-            <span>Within 4 km</span>
-            <strong>${results[2].length}</strong>
-        </div>
+                <span>
+                    Within ${radius} km
+                </span>
 
-        <div class="analysis-total-card">
-            <span>Within 8 km</span>
-            <strong>${results[3].length}</strong>
-        </div>
-      `;
+                <strong>
+                    …
+                </strong>
+
+            </div>
+          `;
+
+        }
+      ).join(
+        ""
+      );
+
+
+    analysisTableContainer.innerHTML =
+      "";
+
+  }
+
+
+  function renderCatchmentResults(
+    results
+  ) {
+
+    analysisSubtitle.textContent =
+      "Straight-line facility counts from the selected point.";
+
+
+    analysisTotals.innerHTML =
+      results.map(
+        function (
+          result,
+          index
+        ) {
+
+          return `
+            <div class="analysis-total-card">
+
+                <span>
+                    Within ${CATCHMENT_RADII[index]} km
+                </span>
+
+                <strong>
+                    ${result.total}
+                </strong>
+
+            </div>
+          `;
+
+        }
+      ).join(
+        ""
+      );
 
 
     const sports =
@@ -2499,18 +2652,18 @@ require([
 
     results.forEach(
       function (
-        list
+        result
       ) {
 
-        list.forEach(
+        Object.keys(
+          result.sports
+        ).forEach(
           function (
-            feature
+            sport
           ) {
 
             sports.add(
-              cleanCategory(
-                feature.attributes.Sport
-              )
+              sport
             );
 
           }
@@ -2536,24 +2689,14 @@ require([
             counts:
               results.map(
                 function (
-                  list
+                  result
                 ) {
 
                   return (
-                    list.filter(
-                      function (
-                        feature
-                      ) {
-
-                        return (
-                          cleanCategory(
-                            feature.attributes.Sport
-                          ) ===
-                          sport
-                        );
-
-                      }
-                    ).length
+                    result.sports[
+                      sport
+                    ] ||
+                    0
                   );
 
                 }
@@ -2610,7 +2753,11 @@ require([
             <tr>
 
                 <td>
-                    ${escapeHtml(displaySportName(row.sport))}
+                    ${escapeHtml(
+                      displaySportName(
+                        row.sport
+                      )
+                    )}
                 </td>
 
                 <td>${row.counts[0]}</td>
@@ -2642,452 +2789,129 @@ require([
 
 
   // =========================================================
-  // LENS EXPLORER
+  // FIXED LENS
   // =========================================================
 
-  function addLens() {
-
-    if (
-      lenses.length >=
-      MAX_LENSES
+  view.watch(
+    "stationary",
+    function (
+      stationary
     ) {
 
-      analysisModeStatus.textContent =
-        "Maximum of three comparison lenses.";
+      if (
+        analysisMode ===
+        "lens"
+      ) {
 
+        if (stationary) {
+
+          runLensAnalysis();
+
+        }
+        else {
+
+          lensLoading.classList.remove(
+            "hidden"
+          );
+
+        }
+
+      }
+
+
+      if (
+        stationary &&
+        coverageSport &&
+        coverageRadiusKm >
+        0
+      ) {
+
+        refreshCoverage();
+
+      }
+
+    }
+  );
+
+
+  async function runLensAnalysis() {
+
+    if (
+      analysisMode !==
+      "lens"
+    ) {
 
       return;
 
     }
 
 
-    lensCounter +=
-      1;
-
-
-    const id =
-      "lens-" +
-      lensCounter;
-
-
-    const rect =
-      mapContainer.getBoundingClientRect();
-
-
-    const offset =
-      lenses.length *
-      35;
-
-
-    const x =
-      rect.width *
-      0.50 +
-      offset;
-
-
-    const y =
-      rect.height *
-      0.48 +
-      offset;
-
-
-    const element =
-      document.createElement(
-        "div"
-      );
-
-
-    element.className =
-      "analysis-lens";
-
-
-    element.innerHTML =
-      `
-        <svg
-            viewBox="0 0 380 380"
-            aria-hidden="true"
-        ></svg>
-
-        <div class="lens-number">
-            Lens ${lensCounter}
-        </div>
-
-        <div class="lens-centre-card">
-
-            <strong>
-                —
-            </strong>
-
-            <span>
-                facilities
-            </span>
-
-        </div>
-
-        <div class="lens-loading hidden">
-            analysing…
-        </div>
-      `;
-
-
-    lensLayer.appendChild(
-      element
-    );
-
-
-    const lens = {
-
-      id:
-        id,
-
-      number:
-        lensCounter,
-
-      element:
-        element,
-
-      svg:
-        element.querySelector(
-          "svg"
-        ),
-
-      totalElement:
-        element.querySelector(
-          ".lens-centre-card strong"
-        ),
-
-      loadingElement:
-        element.querySelector(
-          ".lens-loading"
-        ),
-
-      x:
-        x,
-
-      y:
-        y,
-
-      radiusKm:
-        lensRadiusKm,
-
-      features:
-        []
-
-    };
-
-
-    lenses.push(
-      lens
-    );
-
-
-    positionLens(
-      lens
-    );
-
-
-    installLensDrag(
-      lens
-    );
-
-
-    selectLens(
-      lens
-    );
-
-
-    queryLens(
-      lens
-    );
-
-  }
-
-
-  function positionLens(
-    lens
-  ) {
-
-    lens.element.style.left =
-      lens.x +
-      "px";
-
-
-    lens.element.style.top =
-      lens.y +
-      "px";
-
-  }
-
-
-  function installLensDrag(
-    lens
-  ) {
-
-    let dragging =
-      false;
-
-
-    let pointerId =
-      null;
-
-
-    lens.element.addEventListener(
-      "pointerdown",
-      function (
-        event
-      ) {
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-
-        dragging =
-          true;
-
-
-        pointerId =
-          event.pointerId;
-
-
-        lens.element.setPointerCapture(
-          pointerId
-        );
-
-
-        lens.element.classList.add(
-          "dragging"
-        );
-
-
-        selectLens(
-          lens
-        );
-
-      }
-    );
-
-
-    lens.element.addEventListener(
-      "pointermove",
-      function (
-        event
-      ) {
-
-        if (!dragging) {
-          return;
-        }
-
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-
-        const rect =
-          mapContainer.getBoundingClientRect();
-
-
-        lens.x =
-          clamp(
-            event.clientX -
-            rect.left,
-            80,
-            rect.width -
-            80
-          );
-
-
-        lens.y =
-          clamp(
-            event.clientY -
-            rect.top,
-            80,
-            rect.height -
-            80
-          );
-
-
-        positionLens(
-          lens
-        );
-
-      }
-    );
-
-
-    lens.element.addEventListener(
-      "pointerup",
-      function (
-        event
-      ) {
-
-        if (!dragging) {
-          return;
-        }
-
-
-        dragging =
-          false;
-
-
-        lens.element.classList.remove(
-          "dragging"
-        );
-
-
-        if (
-          pointerId !==
-          null
-        ) {
-
-          try {
-
-            lens.element.releasePointerCapture(
-              pointerId
-            );
-
-          }
-          catch {
-            // ignore
-          }
-
-        }
-
-
-        queryLens(
-          lens
-        );
-
-      }
-    );
-
-
-    lens.element.addEventListener(
-      "click",
-      function (
-        event
-      ) {
-
-        event.stopPropagation();
-
-
-        selectLens(
-          lens
-        );
-
-      }
-    );
-
-  }
-
-
-  function selectLens(
-    lens
-  ) {
-
-    selectedLensId =
-      lens.id;
-
-
-    lenses.forEach(
-      function (
-        item
-      ) {
-
-        item.element.classList.toggle(
-          "selected",
-          item.id ===
-          lens.id
-        );
-
-      }
-    );
-
-
-    if (
-      lens.features &&
-      lens.features.length
-    ) {
-
-      renderLensPanel(
-        lens
-      );
-
-    }
-
-  }
-
-
-  async function queryLens(
-    lens
-  ) {
-
-    lens.loadingElement.classList.remove(
-      "hidden"
-    );
+    const requestId =
+      ++lensRequestId;
 
 
     const point =
-      view.toMap({
-
-        x:
-          lens.x,
-
-        y:
-          lens.y
-
-      });
-
-
-    if (!point) {
-
-      lens.loadingElement.classList.add(
-        "hidden"
-      );
-
-
-      return;
-
-    }
+      view.center;
 
 
     const buffer =
       geometryEngine.geodesicBuffer(
         point,
-        lens.radiusKm,
+        lensRadiusKm,
         "kilometers"
       );
 
 
-    const query =
-      facilitiesLayer.createQuery();
-
-
-    query.geometry =
-      buffer;
-
-
-    query.spatialRelationship =
-      "intersects";
-
-
-    query.where =
-      buildCurrentFilterWhere();
-
-
-    query.returnGeometry =
-      false;
-
-
-    query.outFields = [
-      "OBJECTID",
-      "Sport",
-      "Infrastructure_Type"
-    ];
+    lensLoading.classList.remove(
+      "hidden"
+    );
 
 
     try {
+
+      const query =
+        facilitiesLayer.createQuery();
+
+
+      query.geometry =
+        buffer;
+
+
+      query.spatialRelationship =
+        "intersects";
+
+
+      query.where =
+        buildCurrentFilterWhere();
+
+
+      query.returnGeometry =
+        false;
+
+
+      query.outStatistics = [
+
+        {
+
+          statisticType:
+            "count",
+
+          onStatisticField:
+            "OBJECTID",
+
+          outStatisticFieldName:
+            "Facility_Count"
+
+        }
+
+      ];
+
+
+      query.groupByFieldsForStatistics = [
+        "Sport",
+        "Infrastructure_Type"
+      ];
+
 
       const response =
         await facilitiesLayer.queryFeatures(
@@ -3095,32 +2919,91 @@ require([
         );
 
 
-      lens.features =
-        deduplicateFeatures(
-          response.features
-        );
+      if (
+        requestId !==
+        lensRequestId
+      ) {
+
+        return;
+
+      }
 
 
-      lens.loadingElement.classList.add(
+      const sportCounts =
+        {};
+
+
+      const typeCounts =
+        {};
+
+
+      let total =
+        0;
+
+
+      response.features.forEach(
+        function (
+          feature
+        ) {
+
+          const count =
+            Number(
+              feature.attributes.Facility_Count
+            ) ||
+            0;
+
+
+          const sport =
+            cleanCategory(
+              feature.attributes.Sport
+            );
+
+
+          const type =
+            cleanCategory(
+              feature.attributes.Infrastructure_Type
+            );
+
+
+          total +=
+            count;
+
+
+          sportCounts[sport] =
+            (
+              sportCounts[sport] ||
+              0
+            ) +
+            count;
+
+
+          typeCounts[type] =
+            (
+              typeCounts[type] ||
+              0
+            ) +
+            count;
+
+        }
+      );
+
+
+      lensLoading.classList.add(
         "hidden"
       );
 
 
-      renderLensGraphic(
-        lens
+      renderLens(
+        total,
+        sportCounts
       );
 
 
-      if (
-        selectedLensId ===
-        lens.id
-      ) {
-
-        renderLensPanel(
-          lens
-        );
-
-      }
+      renderLensPanel(
+        total,
+        sportCounts,
+        typeCounts
+      );
 
     }
     catch (
@@ -3128,12 +3011,12 @@ require([
     ) {
 
       console.error(
-        "LENS QUERY ERROR:",
+        "LENS ERROR:",
         error
       );
 
 
-      lens.loadingElement.classList.add(
+      lensLoading.classList.add(
         "hidden"
       );
 
@@ -3142,72 +3025,32 @@ require([
   }
 
 
-  function renderLensGraphic(
-    lens
+  // =========================================================
+  // LENS CHART
+  // =========================================================
+
+  function renderLens(
+    total,
+    sportCounts
   ) {
 
-    const sportCounts =
-      countByField(
-        lens.features,
-        "Sport"
-      );
+    lensTotal.textContent =
+      total;
 
 
-    const typeCounts =
-      countByField(
-        lens.features,
-        "Infrastructure_Type"
-      );
-
-
-    lens.totalElement.textContent =
-      lens.features.length;
-
-
-    lens.svg.innerHTML =
+    lensSvg.innerHTML =
       "";
 
 
-    drawRadialSeries(
-      lens.svg,
+    const entries =
       topEntries(
         sportCounts,
-        6
-      ),
-      190,
-      82,
-      44,
-      true
-    );
+        8
+      );
 
-
-    drawRadialSeries(
-      lens.svg,
-      topEntries(
-        typeCounts,
-        6
-      ),
-      190,
-      132,
-      45,
-      false
-    );
-
-  }
-
-
-  function drawRadialSeries(
-    svg,
-    entries,
-    centre,
-    baseRadius,
-    extraLength,
-    useSportColours
-  ) {
 
     if (
-      entries.length ===
-      0
+      !entries.length
     ) {
 
       return;
@@ -3215,7 +3058,19 @@ require([
     }
 
 
-    const maxValue =
+    const centre =
+      210;
+
+
+    const baseRadius =
+      166;
+
+
+    const maxExtra =
+      38;
+
+
+    const maximum =
       Math.max(
         ...entries.map(
           function (
@@ -3229,7 +3084,7 @@ require([
       );
 
 
-    const step =
+    const angleStep =
       Math.PI *
       2 /
       entries.length;
@@ -3241,7 +3096,7 @@ require([
         index
       ) {
 
-        const label =
+        const sport =
           entry[0];
 
 
@@ -3250,18 +3105,18 @@ require([
 
 
         const angle =
-          step *
+          angleStep *
           index -
           Math.PI /
           2;
 
 
-        const length =
+        const extra =
           Math.max(
             10,
             value /
-            maxValue *
-            extraLength
+            maximum *
+            maxExtra
           );
 
 
@@ -3288,7 +3143,7 @@ require([
           ) *
           (
             baseRadius +
-            length
+            extra
           );
 
 
@@ -3299,37 +3154,19 @@ require([
           ) *
           (
             baseRadius +
-            length
+            extra
           );
 
 
-        let colour;
-
-
-        if (
-          useSportColours
-        ) {
-
-          colour =
-            sportColours[
-              label
-            ] ||
-            [
-              125,
-              125,
-              125
-            ];
-
-        }
-        else {
-
-          colour =
-            typeColours[
-              index %
-              typeColours.length
-            ];
-
-        }
+        const colour =
+          sportColours[
+            sport
+          ] ||
+          [
+            125,
+            125,
+            125
+          ];
 
 
         const line =
@@ -3370,9 +3207,7 @@ require([
 
         line.setAttribute(
           "stroke-width",
-          useSportColours
-            ? "13"
-            : "9"
+          "15"
         );
 
 
@@ -3382,18 +3217,18 @@ require([
         );
 
 
-        svg.appendChild(
+        lensSvg.appendChild(
           line
         );
 
 
-        const valueText =
+        const number =
           createSvg(
             "text"
           );
 
 
-        valueText.setAttribute(
+        number.setAttribute(
           "x",
           centre +
           Math.cos(
@@ -3401,13 +3236,13 @@ require([
           ) *
           (
             baseRadius +
-            length +
-            15
+            extra +
+            16
           )
         );
 
 
-        valueText.setAttribute(
+        number.setAttribute(
           "y",
           centre +
           Math.sin(
@@ -3415,36 +3250,36 @@ require([
           ) *
           (
             baseRadius +
-            length +
-            15
+            extra +
+            16
           )
         );
 
 
-        valueText.setAttribute(
+        number.setAttribute(
           "text-anchor",
           "middle"
         );
 
 
-        valueText.setAttribute(
+        number.setAttribute(
           "dominant-baseline",
           "middle"
         );
 
 
-        valueText.setAttribute(
+        number.setAttribute(
           "class",
-          "radial-value"
+          "radial-number"
         );
 
 
-        valueText.textContent =
+        number.textContent =
           value;
 
 
-        svg.appendChild(
-          valueText
+        lensSvg.appendChild(
+          number
         );
 
       }
@@ -3453,8 +3288,14 @@ require([
   }
 
 
+  // =========================================================
+  // LENS RIGHT PANEL
+  // =========================================================
+
   function renderLensPanel(
-    lens
+    total,
+    sportCounts,
+    typeCounts
   ) {
 
     rightPanelHeading.textContent =
@@ -3487,25 +3328,11 @@ require([
 
 
     analysisTitle.textContent =
-      `Lens ${lens.number}`;
+      `${lensRadiusKm} km area`;
 
 
     analysisSubtitle.textContent =
-      `${lens.radiusKm} km radius. Drag the lens to compare another location.`;
-
-
-    const sportCounts =
-      countByField(
-        lens.features,
-        "Sport"
-      );
-
-
-    const typeCounts =
-      countByField(
-        lens.features,
-        "Infrastructure_Type"
-      );
+      "Pan or zoom the map underneath the lens to explore another area.";
 
 
     analysisTotals.innerHTML =
@@ -3517,7 +3344,7 @@ require([
             </span>
 
             <strong>
-                ${lens.features.length}
+                ${total}
             </strong>
 
         </div>
@@ -3540,7 +3367,7 @@ require([
       renderSummaryRows(
         topEntries(
           sportCounts,
-          8
+          5
         ),
         true
       );
@@ -3550,7 +3377,7 @@ require([
       renderSummaryRows(
         topEntries(
           typeCounts,
-          8
+          5
         ),
         false
       );
@@ -3574,31 +3401,22 @@ require([
           index
         ) {
 
-          let colour;
-
-
-          if (sports) {
-
-            colour =
-              sportColours[
-                entry[0]
-              ] ||
-              [
-                130,
-                130,
-                130
-              ];
-
-          }
-          else {
-
-            colour =
-              typeColours[
-                index %
-                typeColours.length
-              ];
-
-          }
+          const colour =
+            sports
+              ? (
+                  sportColours[
+                    entry[0]
+                  ] ||
+                  [
+                    130,
+                    130,
+                    130
+                  ]
+                )
+              : typeColours[
+                  index %
+                  typeColours.length
+                ];
 
 
           return `
@@ -3612,7 +3430,9 @@ require([
                 <span>
                     ${escapeHtml(
                       sports
-                        ? displaySportName(entry[0])
+                        ? displaySportName(
+                            entry[0]
+                          )
                         : entry[0]
                     )}
                 </span>
@@ -3625,53 +3445,9 @@ require([
           `;
 
         }
-      ).join("")
-    );
-
-  }
-
-
-  function refreshAllLenses() {
-
-    lenses.forEach(
-      function (
-        lens
-      ) {
-
-        queryLens(
-          lens
-        );
-
-      }
-    );
-
-  }
-
-
-  function clearLenses() {
-
-    lenses.forEach(
-      function (
-        lens
-      ) {
-
-        lens.element.remove();
-
-      }
-    );
-
-
-    lenses =
-      [];
-
-
-    selectedLensId =
-      null;
-
-
-    showAnalysisMessage(
-      "Lens Explorer",
-      "Add a lens to begin comparing areas."
+      ).join(
+        ""
+      )
     );
 
   }
@@ -3683,12 +3459,8 @@ require([
 
   async function refreshCoverage() {
 
-    coverageRequestId +=
-      1;
-
-
     const requestId =
-      coverageRequestId;
+      ++coverageRequestId;
 
 
     coverageLayer.removeAll();
@@ -3701,7 +3473,7 @@ require([
     ) {
 
       coverageStatus.textContent =
-        "Select one sport and radius to show its coverage.";
+        "Select one sport and radius.";
 
 
       return;
@@ -3810,9 +3582,7 @@ require([
       [];
 
 
-    deduplicateFeatures(
-      response.features
-    ).forEach(
+    response.features.forEach(
       function (
         feature
       ) {
@@ -3852,7 +3622,7 @@ require([
                 colour[0],
                 colour[1],
                 colour[2],
-                0.12
+                0.1
               ],
 
               outline: {
@@ -3861,11 +3631,11 @@ require([
                   colour[0],
                   colour[1],
                   colour[2],
-                  0.55
+                  0.5
                 ],
 
                 width:
-                  1.1
+                  1
 
               }
 
@@ -3885,7 +3655,7 @@ require([
 
 
     coverageStatus.textContent =
-      `${graphics.length} ${displaySportName(coverageSport)} facilities shown at ${coverageRadiusKm} km.`;
+      `${graphics.length} facilities shown at ${coverageRadiusKm} km.`;
 
   }
 
@@ -3936,29 +3706,8 @@ require([
   }
 
 
-  view.watch(
-    "stationary",
-    function (
-      stationary
-    ) {
-
-      if (
-        stationary &&
-        coverageSport &&
-        coverageRadiusKm >
-        0
-      ) {
-
-        refreshCoverage();
-
-      }
-
-    }
-  );
-
-
   // =========================================================
-  // FACILITY DETAILS
+  // FACILITY SELECTION
   // =========================================================
 
   function selectFacilities(
@@ -4028,6 +3777,9 @@ require([
       ];
 
 
+    updateCurrentOverlay();
+
+
     showFacilityDetails(
       selectedGraphic.attributes
     );
@@ -4037,6 +3789,149 @@ require([
 
   }
 
+
+  function updateCurrentOverlay() {
+
+    if (
+      currentOverlayGraphic
+    ) {
+
+      view.graphics.remove(
+        currentOverlayGraphic
+      );
+
+
+      currentOverlayGraphic =
+        null;
+
+    }
+
+
+    if (
+      !selectedGraphic ||
+      !selectedGraphic.geometry
+    ) {
+
+      return;
+
+    }
+
+
+    currentOverlayGraphic =
+      selectedGraphic.clone();
+
+
+    currentOverlayGraphic.symbol = {
+
+      type:
+        "simple-fill",
+
+      color: [
+        0,
+        170,
+        150,
+        0.06
+      ],
+
+      outline: {
+
+        color: [
+          0,
+          90,
+          75,
+          1
+        ],
+
+        width:
+          4
+
+      }
+
+    };
+
+
+    view.graphics.add(
+      currentOverlayGraphic
+    );
+
+  }
+
+
+  function updateSelectionNavigator() {
+
+    selectionNavigator.classList.toggle(
+      "hidden",
+      selectedGraphics.length <=
+      1
+    );
+
+
+    selectionPosition.textContent =
+      `${selectedIndex + 1} of ${selectedGraphics.length}`;
+
+  }
+
+
+  previousFacility.addEventListener(
+    "click",
+    function () {
+
+      if (
+        selectedGraphics.length <=
+        1
+      ) {
+
+        return;
+
+      }
+
+
+      selectedIndex =
+        (
+          selectedIndex -
+          1 +
+          selectedGraphics.length
+        ) %
+        selectedGraphics.length;
+
+
+      showCurrentFacility();
+
+    }
+  );
+
+
+  nextFacility.addEventListener(
+    "click",
+    function () {
+
+      if (
+        selectedGraphics.length <=
+        1
+      ) {
+
+        return;
+
+      }
+
+
+      selectedIndex =
+        (
+          selectedIndex +
+          1
+        ) %
+        selectedGraphics.length;
+
+
+      showCurrentFacility();
+
+    }
+  );
+
+
+  // =========================================================
+  // FACILITY DETAILS
+  // =========================================================
 
   function showFacilityDetails(
     attributes
@@ -4073,9 +3968,7 @@ require([
     ) {
 
       title =
-        cleanValue(
-          attributes.Sport
-        );
+        `${cleanValue(attributes.Sport)} - ${cleanValue(attributes.Infrastructure_Type)}`;
 
     }
 
@@ -4172,7 +4065,7 @@ require([
 
     setText(
       "detailFloodlights",
-      cleanValue(
+      formatFloodlights(
         attributes.Floodlights
       )
     );
@@ -4204,7 +4097,7 @@ require([
 
     setText(
       "detailQuality",
-      cleanValue(
+      formatQuality(
         attributes.Quality
       )
     );
@@ -4220,7 +4113,7 @@ require([
 
     setText(
       "detailLA",
-      cleanValue(
+      titleCase(
         attributes.Local_Authority
       )
     );
@@ -4228,7 +4121,7 @@ require([
 
     setText(
       "detailLEA",
-      cleanValue(
+      titleCase(
         attributes.LEA
       )
     );
@@ -4244,80 +4137,8 @@ require([
   }
 
 
-  function updateSelectionNavigator() {
-
-    selectionNavigator.classList.toggle(
-      "hidden",
-      selectedGraphics.length <=
-      1
-    );
-
-
-    selectionPosition.textContent =
-      `${selectedIndex + 1} of ${selectedGraphics.length}`;
-
-  }
-
-
-  previousFacility.addEventListener(
-    "click",
-    function () {
-
-      if (
-        selectedGraphics.length <=
-        1
-      ) {
-
-        return;
-
-      }
-
-
-      selectedIndex =
-        (
-          selectedIndex -
-          1 +
-          selectedGraphics.length
-        ) %
-        selectedGraphics.length;
-
-
-      showCurrentFacility();
-
-    }
-  );
-
-
-  nextFacility.addEventListener(
-    "click",
-    function () {
-
-      if (
-        selectedGraphics.length <=
-        1
-      ) {
-
-        return;
-
-      }
-
-
-      selectedIndex =
-        (
-          selectedIndex +
-          1
-        ) %
-        selectedGraphics.length;
-
-
-      showCurrentFacility();
-
-    }
-  );
-
-
   // =========================================================
-  // PANELS
+  // PANEL HELPERS
   // =========================================================
 
   function clearSelection() {
@@ -4528,87 +4349,6 @@ require([
   // HELPERS
   // =========================================================
 
-  function deduplicateFeatures(
-    features
-  ) {
-
-    const seen =
-      new Set();
-
-
-    return (
-      features.filter(
-        function (
-          feature
-        ) {
-
-          const id =
-            feature.attributes.OBJECTID;
-
-
-          if (
-            seen.has(
-              id
-            )
-          ) {
-
-            return false;
-
-          }
-
-
-          seen.add(
-            id
-          );
-
-
-          return true;
-
-        }
-      )
-    );
-
-  }
-
-
-  function countByField(
-    features,
-    field
-  ) {
-
-    const counts =
-      {};
-
-
-    features.forEach(
-      function (
-        feature
-      ) {
-
-        const value =
-          cleanCategory(
-            feature.attributes[
-              field
-            ]
-          );
-
-
-        counts[value] =
-          (
-            counts[value] ||
-            0
-          ) +
-          1;
-
-      }
-    );
-
-
-    return counts;
-
-  }
-
-
   function topEntries(
     counts,
     limit
@@ -4670,14 +4410,8 @@ require([
     geometry
   ) {
 
-    if (!geometry) {
-
-      return null;
-
-    }
-
-
     if (
+      geometry &&
       geometry.centroid
     ) {
 
@@ -4689,6 +4423,7 @@ require([
 
 
     if (
+      geometry &&
       geometry.extent
     ) {
 
@@ -4799,7 +4534,8 @@ require([
     if (
       value === null ||
       value === undefined ||
-      value === ""
+      value === "" ||
+      value === "NULL"
     ) {
 
       return (
@@ -4842,8 +4578,119 @@ require([
 
 
     return (
-      number +
+      number.toLocaleString(
+        "en-IE",
+        {
+          maximumFractionDigits:
+            1
+        }
+      ) +
       " m"
+    );
+
+  }
+
+
+  function formatQuality(
+    value
+  ) {
+
+    const values = {
+
+      1:
+        "Poor",
+
+      2:
+        "Good / Satisfactory",
+
+      3:
+        "Excellent"
+
+    };
+
+
+    return (
+      values[value] ||
+      cleanValue(
+        value
+      )
+    );
+
+  }
+
+
+  function formatFloodlights(
+    value
+  ) {
+
+    if (
+      value ===
+      "Floodlights"
+    ) {
+
+      return (
+        "Yes"
+      );
+
+    }
+
+
+    if (
+      value ===
+      "No Floodlights"
+    ) {
+
+      return (
+        "No"
+      );
+
+    }
+
+
+    return (
+      cleanValue(
+        value
+      )
+    );
+
+  }
+
+
+  function titleCase(
+    value
+  ) {
+
+    const cleaned =
+      cleanValue(
+        value
+      );
+
+
+    if (
+      cleaned ===
+      "Not recorded"
+    ) {
+
+      return cleaned;
+
+    }
+
+
+    return (
+      cleaned
+        .toLowerCase()
+        .replace(
+          /\b\w/g,
+          function (
+            letter
+          ) {
+
+            return (
+              letter.toUpperCase()
+            );
+
+          }
+        )
     );
 
   }
@@ -4881,8 +4728,12 @@ require([
         (
           number /
           10000
-        ).toFixed(
-          2
+        ).toLocaleString(
+          "en-IE",
+          {
+            maximumFractionDigits:
+              2
+          }
         ) +
         " ha"
       );
@@ -4964,25 +4815,6 @@ require([
       document.createElementNS(
         "http://www.w3.org/2000/svg",
         type
-      )
-    );
-
-  }
-
-
-  function clamp(
-    value,
-    minimum,
-    maximum
-  ) {
-
-    return (
-      Math.max(
-        minimum,
-        Math.min(
-          maximum,
-          value
-        )
       )
     );
 
