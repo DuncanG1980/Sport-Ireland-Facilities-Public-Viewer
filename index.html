@@ -220,8 +220,6 @@
             <div id="viewDiv"></div>
 
 
-            <!-- FULL IRELAND -->
-
             <button
                 id="homeButton"
                 class="map-home-button"
@@ -236,8 +234,6 @@
 
             </button>
 
-
-            <!-- LEGEND -->
 
             <div
                 id="legend"
@@ -255,8 +251,6 @@
             </div>
 
 
-            <!-- DATASET BUTTON -->
-
             <a
                 href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
                 target="_blank"
@@ -270,7 +264,7 @@
         </main>
 
 
-        <!-- DETAILS -->
+        <!-- DETAILS PANEL -->
 
         <aside class="details-panel">
 
@@ -321,6 +315,7 @@
                         id="previousFacility"
                         class="navigator-button"
                         type="button"
+                        title="Previous facility"
                     >
                         ‹
                     </button>
@@ -341,6 +336,7 @@
                         id="nextFacility"
                         class="navigator-button"
                         type="button"
+                        title="Next facility"
                     >
                         ›
                     </button>
@@ -382,6 +378,26 @@
                         <span>Facility type</span>
                         <strong id="detailInfrastructure">—</strong>
                     </div>
+
+
+                    <!-- POOL DETAILS -->
+
+                    <div
+                        id="poolLengthRow"
+                        class="detail-row hidden"
+                    >
+                        <span>Pool length</span>
+                        <strong id="detailPoolLength">—</strong>
+                    </div>
+
+                    <div
+                        id="poolBreadthRow"
+                        class="detail-row hidden"
+                    >
+                        <span>Pool breadth</span>
+                        <strong id="detailPoolBreadth">—</strong>
+                    </div>
+
 
                     <div class="detail-row">
                         <span>Surface</span>
