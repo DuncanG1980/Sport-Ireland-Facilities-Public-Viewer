@@ -52,7 +52,7 @@
 
 
     <!-- =====================================================
-         LEFT FILTER PANEL
+         LEFT PANEL
          ===================================================== -->
 
     <aside class="filter-panel">
@@ -71,7 +71,7 @@
                     Select all
                 </button>
 
-                <span class="filter-divider">|</span>
+                <span>|</span>
 
                 <button
                     id="deselectAllFilters"
@@ -106,10 +106,7 @@
 
                 <span>More sports</span>
 
-                <span
-                    id="moreSportsArrow"
-                    class="dropdown-arrow"
-                >
+                <span id="moreSportsArrow">
                     ▾
                 </span>
 
@@ -136,10 +133,7 @@
 
                 <span>Ownership type</span>
 
-                <span
-                    id="ownerFilterArrow"
-                    class="dropdown-arrow"
-                >
+                <span id="ownerFilterArrow">
                     ▾
                 </span>
 
@@ -165,10 +159,7 @@
 
                 <span>Surface type</span>
 
-                <span
-                    id="surfaceFilterArrow"
-                    class="dropdown-arrow"
-                >
+                <span id="surfaceFilterArrow">
                     ▾
                 </span>
 
@@ -194,10 +185,7 @@
 
                 <span>Floodlights</span>
 
-                <span
-                    id="floodlightFilterArrow"
-                    class="dropdown-arrow"
-                >
+                <span id="floodlightFilterArrow">
                     ▾
                 </span>
 
@@ -245,10 +233,18 @@
                     Focus Search
                 </button>
 
+                <button
+                    id="coverageModeButton"
+                    class="analysis-mode-button"
+                    type="button"
+                >
+                    Coverage Gaps
+                </button>
+
             </div>
 
 
-            <!-- FOCUS SEARCH CONTROLS -->
+            <!-- FOCUS -->
 
             <div
                 id="lensControls"
@@ -264,9 +260,7 @@
                     class="analysis-select"
                 >
 
-                    <option value="1">
-                        1 km
-                    </option>
+                    <option value="1">1 km</option>
 
                     <option
                         value="2"
@@ -275,13 +269,9 @@
                         2 km
                     </option>
 
-                    <option value="4">
-                        4 km
-                    </option>
+                    <option value="4">4 km</option>
 
-                    <option value="8">
-                        8 km
-                    </option>
+                    <option value="8">8 km</option>
 
                 </select>
 
@@ -289,81 +279,66 @@
                     Pan or zoom the map underneath the focus area.
                 </p>
 
-
-                <!-- OPTIONAL COVERAGE -->
-
-                <details class="coverage-details">
-
-                    <summary>
-                        Optional coverage overlay
-                    </summary>
-
-                    <div class="coverage-content">
-
-                        <label for="coverageSportSelect">
-                            Sport
-                        </label>
-
-                        <select
-                            id="coverageSportSelect"
-                            class="analysis-select"
-                        >
-
-                            <option value="">
-                                Select sport...
-                            </option>
-
-                        </select>
+            </div>
 
 
-                        <label
-                            for="coverageRadiusSelect"
-                            class="second-analysis-label"
-                        >
-                            Radius
-                        </label>
+            <!-- COVERAGE -->
 
-                        <select
-                            id="coverageRadiusSelect"
-                            class="analysis-select"
-                        >
+            <div
+                id="coverageControls"
+                class="analysis-control hidden"
+            >
 
-                            <option
-                                value="0"
-                                selected
-                            >
-                                Off
-                            </option>
+                <label for="coverageSportSelect">
+                    Sport
+                </label>
 
-                            <option value="1">
-                                1 km
-                            </option>
+                <select
+                    id="coverageSportSelect"
+                    class="analysis-select"
+                >
 
-                            <option value="2">
-                                2 km
-                            </option>
+                    <option value="">
+                        Select sport...
+                    </option>
 
-                            <option value="4">
-                                4 km
-                            </option>
-
-                            <option value="8">
-                                8 km
-                            </option>
-
-                        </select>
+                </select>
 
 
-                        <div
-                            id="coverageStatus"
-                            class="analysis-help"
-                        >
-                            Select one sport and radius.
-                        </div>
+                <label
+                    for="coverageRadiusSelect"
+                    class="second-analysis-label"
+                >
+                    Coverage radius
+                </label>
 
-                    </div>
+                <select
+                    id="coverageRadiusSelect"
+                    class="analysis-select"
+                >
 
-                </details>
+                    <option
+                        value="1"
+                        selected
+                    >
+                        1 km
+                    </option>
+
+                    <option value="2">2 km</option>
+
+                    <option value="4">4 km</option>
+
+                    <option value="8">8 km</option>
+
+                </select>
+
+
+                <div
+                    id="coverageStatus"
+                    class="analysis-status"
+                >
+                    Select a sport to show coverage.
+                </div>
 
             </div>
 
@@ -377,8 +352,6 @@
 
         </section>
 
-
-        <!-- TOTAL -->
 
         <div class="results-box">
 
@@ -395,10 +368,7 @@
          MAP
          ===================================================== -->
 
-    <main
-        id="mapContainer"
-        class="map-container"
-    >
+    <main class="map-container">
 
         <div id="viewDiv"></div>
 
@@ -427,7 +397,7 @@
         </div>
 
 
-        <!-- DATA.GOV -->
+        <!-- DATASET -->
 
         <a
             href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
@@ -439,7 +409,7 @@
         </a>
 
 
-        <!-- FOCUS SEARCH LENS -->
+        <!-- FOCUS LENS -->
 
         <div
             id="fixedLens"
@@ -449,7 +419,6 @@
             <svg
                 id="lensSvg"
                 viewBox="0 0 420 420"
-                aria-hidden="true"
             ></svg>
 
 
@@ -526,9 +495,7 @@
                 ⌖
             </div>
 
-            <h3>
-                Select a facility
-            </h3>
+            <h3>Select a facility</h3>
 
             <p>
                 Click a facility on the map to view its details.
@@ -695,7 +662,7 @@
         </div>
 
 
-        <!-- ANALYSIS DETAILS -->
+        <!-- ANALYSIS -->
 
         <div
             id="analysisDetails"
@@ -708,9 +675,7 @@
                     Analysis
                 </h2>
 
-                <p id="analysisSubtitle">
-                    Move the map to explore.
-                </p>
+                <p id="analysisSubtitle"></p>
 
             </div>
 
@@ -721,14 +686,53 @@
             ></div>
 
 
-            <!-- NEW RESULTS DROPDOWN -->
+            <!-- FOCUS BREAKDOWN -->
 
             <div
-                id="focusResultsControls"
-                class="focus-results-controls hidden"
+                id="focusBreakdownControls"
+                class="focus-controls hidden"
             >
 
-                <label for="focusResultsLimit">
+                <label for="focusBreakdownField">
+                    Breakdown by
+                </label>
+
+                <select
+                    id="focusBreakdownField"
+                    class="analysis-select"
+                >
+
+                    <option value="Sport">
+                        Sport
+                    </option>
+
+                    <option value="Infrastructure_Type">
+                        Facility type
+                    </option>
+
+                    <option value="Owner">
+                        Ownership type
+                    </option>
+
+                    <option value="Surface">
+                        Surface type
+                    </option>
+
+                    <option value="Facility_Size">
+                        Facility size
+                    </option>
+
+                    <option value="Floodlights">
+                        Floodlights
+                    </option>
+
+                </select>
+
+
+                <label
+                    for="focusResultsLimit"
+                    class="second-analysis-label"
+                >
                     Results shown
                 </label>
 
@@ -758,29 +762,15 @@
 
 
             <section
-                id="sportSummaryBlock"
+                id="summaryBlock"
                 class="summary-block hidden"
             >
 
-                <h3>
-                    Sports
+                <h3 id="summaryHeading">
+                    Results
                 </h3>
 
-                <div id="analysisSportSummary"></div>
-
-            </section>
-
-
-            <section
-                id="typeSummaryBlock"
-                class="summary-block hidden"
-            >
-
-                <h3>
-                    Facility types
-                </h3>
-
-                <div id="analysisTypeSummary"></div>
+                <div id="analysisSummary"></div>
 
             </section>
 
