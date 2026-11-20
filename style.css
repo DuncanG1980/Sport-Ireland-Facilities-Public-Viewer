@@ -7,8 +7,8 @@ body {
     width: 100%;
     height: 100%;
 
-    padding: 0;
     margin: 0;
+    padding: 0;
 
     font-family:
         Corbel,
@@ -66,14 +66,14 @@ button {
     align-items: center;
     justify-content: space-between;
 
-    color: white;
-
     background:
         linear-gradient(
             90deg,
             #008565,
             #00664f
         );
+
+    color: white;
 }
 
 .header-description {
@@ -88,13 +88,10 @@ button {
 
     display: flex;
     align-items: center;
-    justify-content: flex-end;
 
     padding:
         6px
-        28px
-        6px
-        20px;
+        28px;
 }
 
 .sport-ireland-logo {
@@ -115,7 +112,7 @@ button {
 
 .filter-panel,
 .details-panel {
-    background: #ffffff;
+    background: white;
 
     margin: 8px;
 
@@ -160,7 +157,7 @@ button {
 
 
 /* =========================================================
-   FILTER ACTIONS
+   FILTERS
    ========================================================= */
 
 .filter-actions {
@@ -188,15 +185,6 @@ button {
     font-size: 13px;
 }
 
-.text-button:hover {
-    text-decoration: underline;
-}
-
-
-/* =========================================================
-   FILTERS
-   ========================================================= */
-
 .filter-section {
     padding:
         14px
@@ -217,8 +205,7 @@ button {
     margin:
         0
         0
-        11px
-        0;
+        11px;
 
     font-size: 16px;
 }
@@ -247,29 +234,21 @@ button {
     width: 17px;
     height: 17px;
 
-    flex-shrink: 0;
-
     accent-color: #008c68;
 }
 
 .colour-square {
-    display: inline-block;
-
     width: 18px;
     height: 18px;
 
     flex-shrink: 0;
 
     border-radius: 4px;
-
-    border:
-        1px solid
-        rgba(0, 0, 0, 0.08);
 }
 
 
 /* =========================================================
-   DROPDOWN FILTERS
+   DROPDOWNS
    ========================================================= */
 
 .filter-dropdown-button {
@@ -297,40 +276,25 @@ button {
     font-weight: 700;
 }
 
-.filter-dropdown-button:hover {
-    background: #e7f4ef;
-}
-
-.dropdown-arrow {
-    font-size: 15px;
-}
-
 .dropdown-list {
     margin-top: 10px;
-
-    padding:
-        4px
-        3px
-        5px;
 }
 
 
 /* =========================================================
-   RESULT COUNT
+   COUNT
    ========================================================= */
 
 .results-box {
     margin: 15px;
 
-    padding:
-        11px
-        12px;
+    padding: 11px;
+
+    border-radius: 22px;
 
     background: #008c68;
 
     color: white;
-
-    border-radius: 22px;
 
     text-align: center;
 
@@ -349,9 +313,6 @@ button {
 
 .analysis-mode-buttons {
     display: grid;
-
-    grid-template-columns:
-        1fr;
 
     gap: 7px;
 }
@@ -379,10 +340,6 @@ button {
     text-align: left;
 }
 
-.analysis-mode-button:hover {
-    background: #edf8f4;
-}
-
 .analysis-mode-button.active {
     background: #008c68;
 
@@ -392,7 +349,7 @@ button {
 }
 
 .analysis-control {
-    margin-top: 13px;
+    margin-top: 14px;
 
     padding-top: 13px;
 
@@ -401,29 +358,26 @@ button {
         #dce5e1;
 }
 
+.analysis-subheading {
+    margin-bottom: 11px;
+
+    color: #173e2c;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .analysis-control label {
     display: block;
 
     margin-bottom: 6px;
 
-    color: #34443e;
-
     font-size: 13px;
     font-weight: 700;
 }
 
-.analysis-control p,
-.analysis-help {
-    margin:
-        7px
-        0
-        0;
-
-    color: #69766f;
-
-    font-size: 11px;
-
-    line-height: 1.4;
+.second-analysis-label {
+    margin-top: 10px;
 }
 
 .analysis-select {
@@ -442,10 +396,15 @@ button {
     border-radius: 7px;
 
     background: white;
+}
 
-    color: #23332d;
+.analysis-help,
+.analysis-control p {
+    color: #65736d;
 
-    font-size: 13px;
+    font-size: 11px;
+
+    line-height: 1.4;
 }
 
 .analysis-status {
@@ -462,8 +421,6 @@ button {
     color: #52625b;
 
     font-size: 11px;
-
-    line-height: 1.4;
 }
 
 
@@ -485,8 +442,6 @@ button {
     border-radius: 12px;
 
     overflow: hidden;
-
-    background: #f4f5f4;
 }
 
 #viewDiv {
@@ -506,11 +461,6 @@ button {
 
     top: 110px;
     left: 15px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 7px;
 
     height: 38px;
 
@@ -532,22 +482,13 @@ button {
 
     color: #00664f;
 
-    font-size: 13px;
     font-weight: 700;
 
     box-shadow:
         0
         2px
         8px
-        rgba(0, 0, 0, 0.20);
-}
-
-.map-home-button:hover {
-    background: #e6f5ed;
-}
-
-.home-icon {
-    font-size: 21px;
+        rgba(0, 0, 0, 0.2);
 }
 
 
@@ -565,9 +506,9 @@ button {
 
     width: 245px;
 
-    padding:
-        12px
-        14px;
+    padding: 12px;
+
+    border-radius: 10px;
 
     background:
         rgba(
@@ -576,8 +517,6 @@ button {
             255,
             0.95
         );
-
-    border-radius: 10px;
 
     box-shadow:
         0
@@ -590,10 +529,7 @@ button {
     margin:
         0
         0
-        10px
-        0;
-
-    font-size: 15px;
+        10px;
 }
 
 .legend-item {
@@ -611,19 +547,11 @@ button {
     width: 18px;
     height: 14px;
 
-    flex-shrink: 0;
-
     border-radius: 3px;
 }
 
 .legend-note {
-    margin-top: 8px;
-
     padding-top: 8px;
-
-    border-top:
-        1px solid
-        #e1e5e3;
 
     color: #65716c;
 
@@ -632,7 +560,7 @@ button {
 
 
 /* =========================================================
-   DATASET BUTTON
+   DATASET
    ========================================================= */
 
 .dataset-button {
@@ -643,14 +571,8 @@ button {
     right: 16px;
     bottom: 18px;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 40px;
-
     padding:
-        0
+        11px
         15px;
 
     border:
@@ -673,27 +595,210 @@ button {
 
     font-size: 13px;
     font-weight: 700;
-
-    box-shadow:
-        0
-        2px
-        8px
-        rgba(0, 0, 0, 0.18);
-}
-
-.dataset-button:hover {
-    background: #e6f5ed;
 }
 
 
 /* =========================================================
-   ANALYSIS BADGE
+   RADIAL AREA LENS
+   ========================================================= */
+
+.area-lens {
+    position: absolute;
+
+    z-index: 40;
+
+    width: 230px;
+    height: 230px;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    pointer-events: none;
+
+    border:
+        3px solid
+        rgba(
+            0,
+            105,
+            78,
+            0.9
+        );
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.10
+        );
+
+    box-shadow:
+        0
+        0
+        0
+        1px
+        rgba(
+            255,
+            255,
+            255,
+            0.8
+        ),
+        0
+        4px
+        18px
+        rgba(
+            0,
+            0,
+            0,
+            0.16
+        );
+
+    overflow: visible;
+}
+
+.area-lens svg {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 150%;
+    height: 150%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    overflow: visible;
+}
+
+.lens-centre {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    min-width: 82px;
+
+    padding:
+        10px
+        12px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.94
+        );
+
+    text-align: center;
+
+    box-shadow:
+        0
+        2px
+        9px
+        rgba(
+            0,
+            0,
+            0,
+            0.16
+        );
+}
+
+.lens-centre strong {
+    display: block;
+
+    color: #006f54;
+
+    font-size: 24px;
+}
+
+.lens-centre span {
+    color: #5d6d66;
+
+    font-size: 10px;
+}
+
+.lens-loading {
+    position: absolute;
+
+    left: 50%;
+    bottom: 18%;
+
+    transform:
+        translateX(-50%);
+
+    padding:
+        4px
+        8px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.9
+        );
+
+    color: #006f54;
+
+    font-size: 10px;
+}
+
+
+/* SVG RADIAL BARS */
+
+.radial-bar {
+    stroke-linecap: round;
+}
+
+.radial-guide {
+    stroke:
+        rgba(
+            0,
+            0,
+            0,
+            0.10
+        );
+
+    stroke-width: 1;
+}
+
+.radial-count {
+    fill: #24342e;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   MAP ANALYSIS BADGE
    ========================================================= */
 
 .map-analysis-badge {
     position: absolute;
 
-    z-index: 25;
+    z-index: 30;
 
     top: 16px;
     left: 50%;
@@ -703,7 +808,7 @@ button {
 
     padding:
         9px
-        15px;
+        14px;
 
     border-radius: 20px;
 
@@ -719,19 +824,11 @@ button {
 
     font-size: 13px;
     font-weight: 700;
-
-    pointer-events: none;
-
-    box-shadow:
-        0
-        2px
-        8px
-        rgba(0, 0, 0, 0.18);
 }
 
 
 /* =========================================================
-   RIGHT PANEL
+   DETAILS
    ========================================================= */
 
 .close-button {
@@ -755,126 +852,42 @@ button {
 }
 
 .empty-icon {
-    margin-bottom: 15px;
-
     color: #008c68;
 
     font-size: 48px;
 }
 
-.empty-state h3 {
-    margin-bottom: 7px;
-
-    color: #22342d;
-}
-
-.empty-state p {
-    margin: 0;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   FACILITY DETAILS
-   ========================================================= */
-
-.facility-details {
+.facility-details,
+.analysis-details {
     padding: 15px;
 }
 
-.selection-navigator {
-    display: grid;
-
-    grid-template-columns:
-        42px
-        1fr
-        42px;
-
-    align-items: center;
-
-    gap: 10px;
+.facility-title-box,
+.analysis-title-box {
+    padding: 16px;
 
     margin-bottom: 14px;
 
-    padding:
-        8px
-        10px;
-
-    border:
-        1px solid
-        #b9d9cd;
-
     border-radius: 10px;
-
-    background: #f3faf7;
-}
-
-.navigator-button {
-    width: 38px;
-    height: 38px;
-
-    border:
-        1px solid
-        #9ecdbd;
-
-    border-radius: 50%;
-
-    background: white;
-
-    color: #007b5e;
-
-    font-size: 27px;
-}
-
-.navigator-centre {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    text-align: center;
-
-    color: #42524b;
-
-    font-size: 12px;
-}
-
-.navigator-centre strong {
-    color: #006f54;
-
-    font-size: 15px;
-}
-
-.facility-title-box {
-    padding: 16px;
-
-    margin-bottom: 16px;
 
     background: #e6f5ed;
-
-    border-radius: 10px;
 }
 
-.facility-title-box h2 {
+.facility-title-box h2,
+.analysis-title-box h2 {
     margin:
         0
         0
-        10px
-        0;
-
-    font-size: 22px;
+        6px;
 }
 
 .facility-tags {
     display: flex;
-    flex-wrap: wrap;
 
     gap: 7px;
 }
 
 .tag {
-    display: inline-block;
-
     padding:
         5px
         12px;
@@ -895,7 +908,7 @@ button {
 
 
 /* =========================================================
-   DETAILS TABLE
+   FACILITY TABLE
    ========================================================= */
 
 .details-table {
@@ -924,105 +937,57 @@ button {
     font-size: 14px;
 }
 
-.detail-row span {
-    color: #44534d;
+
+/* =========================================================
+   NAV
+   ========================================================= */
+
+.selection-navigator {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        1fr
+        42px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 14px;
 }
 
-.detail-row strong {
-    font-weight: 600;
+.navigator-button {
+    height: 38px;
+
+    border:
+        1px solid
+        #9ecdbd;
+
+    border-radius: 50%;
+
+    background: white;
+
+    color: #007b5e;
+
+    font-size: 27px;
 }
 
-.primary-button {
-    width: 100%;
-
-    margin-top: 18px;
-
-    padding:
-        12px
-        14px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: #008c68;
-
-    color: white;
-
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.primary-button:hover {
-    background: #006f54;
+.navigator-centre {
+    text-align: center;
 }
 
 
 /* =========================================================
-   ANALYSIS RIGHT PANEL
+   ANALYSIS PANEL
    ========================================================= */
-
-.analysis-details {
-    padding: 15px;
-}
-
-.analysis-title-box {
-    padding:
-        14px
-        15px;
-
-    margin-bottom: 14px;
-
-    border-radius: 10px;
-
-    background: #e6f5ed;
-}
-
-.analysis-title-box h2 {
-    margin:
-        0
-        0
-        5px;
-
-    color: #173d2e;
-
-    font-size: 21px;
-}
-
-.analysis-title-box p {
-    margin: 0;
-
-    color: #52635b;
-
-    font-size: 13px;
-
-    line-height: 1.4;
-}
-
-.analysis-loading,
-.analysis-empty {
-    padding:
-        14px
-        12px;
-
-    margin-bottom: 12px;
-
-    border-radius: 8px;
-
-    background: #f3f6f4;
-
-    color: #647169;
-
-    text-align: center;
-
-    font-size: 13px;
-}
 
 .analysis-totals {
     display: grid;
 
     grid-template-columns:
-        repeat(2, 1fr);
+        1fr
+        1fr;
 
     gap: 8px;
 
@@ -1030,25 +995,19 @@ button {
 }
 
 .analysis-total-card {
-    padding:
-        10px
-        11px;
+    padding: 11px;
 
     border:
         1px solid
-        #cfe0da;
+        #cee0d9;
 
     border-radius: 8px;
-
-    background: #fbfdfc;
 }
 
 .analysis-total-card span {
     display: block;
 
-    margin-bottom: 3px;
-
-    color: #69766f;
+    color: #65736d;
 
     font-size: 11px;
 }
@@ -1056,13 +1015,41 @@ button {
 .analysis-total-card strong {
     color: #006f54;
 
-    font-size: 21px;
+    font-size: 22px;
 }
 
-.analysis-table-container {
-    overflow-x: auto;
+.analysis-sport-summary {
+    margin-bottom: 15px;
+}
 
-    margin-bottom: 14px;
+.analysis-sport-row {
+    display: grid;
+
+    grid-template-columns:
+        12px
+        1fr
+        auto;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding:
+        7px
+        2px;
+
+    border-bottom:
+        1px solid
+        #e3e8e5;
+
+    font-size: 13px;
+}
+
+.analysis-swatch {
+    width: 10px;
+    height: 10px;
+
+    border-radius: 3px;
 }
 
 .analysis-table {
@@ -1075,17 +1062,13 @@ button {
 
 .analysis-table th,
 .analysis-table td {
-    padding:
-        7px
-        5px;
+    padding: 7px;
 
     border-bottom:
         1px solid
         #dfe5e2;
 
     text-align: right;
-
-    white-space: nowrap;
 }
 
 .analysis-table th:first-child,
@@ -1093,53 +1076,44 @@ button {
     text-align: left;
 }
 
-.analysis-table th {
-    color: #44534d;
+.analysis-loading,
+.analysis-empty {
+    padding: 13px;
 
-    background: #f4f8f6;
+    text-align: center;
+
+    color: #65736d;
+}
+
+.secondary-analysis-button,
+.primary-button {
+    width: 100%;
+
+    min-height: 42px;
+
+    border-radius: 8px;
 
     font-weight: 700;
 }
 
-.analysis-sport {
-    display: flex;
-    align-items: center;
+.primary-button {
+    margin-top: 16px;
 
-    gap: 6px;
-}
+    border: none;
 
-.analysis-swatch {
-    width: 10px;
-    height: 10px;
+    background: #008c68;
 
-    display: inline-block;
-
-    flex-shrink: 0;
-
-    border-radius: 3px;
+    color: white;
 }
 
 .secondary-analysis-button {
-    width: 100%;
-
-    min-height: 40px;
-
     border:
         1px solid
         #9ecdbd;
 
-    border-radius: 8px;
-
     background: white;
 
     color: #006f54;
-
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.secondary-analysis-button:hover {
-    background: #edf8f4;
 }
 
 
@@ -1154,14 +1128,6 @@ button {
             260px
             minmax(400px, 1fr)
             340px;
-    }
-
-    .sport-ireland-logo {
-        max-width: 220px;
-    }
-
-    .home-label {
-        display: none;
     }
 
 }
