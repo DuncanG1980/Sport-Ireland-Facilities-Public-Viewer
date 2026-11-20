@@ -49,13 +49,17 @@
     </header>
 
 
-    <!-- LEFT PANEL -->
+    <!-- =====================================================
+         LEFT PANEL
+         ===================================================== -->
 
     <aside class="filter-panel">
 
         <div class="panel-heading">
 
-            <h2>Filters</h2>
+            <h2>
+                Filters
+            </h2>
 
             <div class="filter-actions">
 
@@ -67,7 +71,9 @@
                     Select all
                 </button>
 
-                <span class="filter-divider">|</span>
+                <span class="filter-divider">
+                    |
+                </span>
 
                 <button
                     id="deselectAllFilters"
@@ -86,7 +92,9 @@
 
         <section class="filter-section">
 
-            <h3>Sport</h3>
+            <h3>
+                Sport
+            </h3>
 
             <div
                 id="mainSportFilters"
@@ -213,7 +221,9 @@
         </section>
 
 
-        <!-- ANALYSIS -->
+        <!-- =================================================
+             ANALYSIS
+             ================================================= -->
 
         <section class="filter-section analysis-section">
 
@@ -241,29 +251,33 @@
                 </button>
 
                 <button
-                    id="areaModeButton"
+                    id="lensModeButton"
                     class="analysis-mode-button"
                     type="button"
                 >
-                    Area Explorer
+                    Lens Explorer
                 </button>
 
             </div>
 
 
-            <!-- AREA EXPLORER -->
+            <!-- LENS CONTROLS -->
 
             <div
-                id="areaRadiusControls"
+                id="lensControls"
                 class="analysis-control hidden"
             >
 
-                <label for="areaRadiusSelect">
-                    Explorer radius
+                <div class="analysis-subheading">
+                    Comparison lenses
+                </div>
+
+                <label for="lensRadiusSelect">
+                    Lens radius
                 </label>
 
                 <select
-                    id="areaRadiusSelect"
+                    id="lensRadiusSelect"
                     class="analysis-select"
                 >
 
@@ -288,8 +302,29 @@
 
                 </select>
 
+
+                <div class="lens-control-buttons">
+
+                    <button
+                        id="addLensButton"
+                        class="analysis-action-button"
+                        type="button"
+                    >
+                        + Add lens
+                    </button>
+
+                    <button
+                        id="clearLensesButton"
+                        class="analysis-action-button secondary"
+                        type="button"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
                 <p>
-                    Move the lens around the map. The chart updates after you pause.
+                    Add up to three lenses, then drag them around the map to compare areas.
                 </p>
 
             </div>
@@ -360,7 +395,7 @@
                     id="coverageStatus"
                     class="analysis-help"
                 >
-                    Shows the straight-line area around facilities of one selected sport.
+                    Select one sport and radius to show its coverage.
                 </div>
 
             </div>
@@ -389,9 +424,14 @@
     </aside>
 
 
-    <!-- MAP -->
+    <!-- =====================================================
+         MAP
+         ===================================================== -->
 
-    <main class="map-container">
+    <main
+        id="mapContainer"
+        class="map-container"
+    >
 
         <div id="viewDiv"></div>
 
@@ -400,21 +440,20 @@
             id="homeButton"
             class="map-home-button"
             type="button"
-            title="Return to full Ireland view"
         >
 
             <span class="home-icon">
                 ⌂
             </span>
 
-            <span class="home-label">
+            <span>
                 Full Ireland
             </span>
 
         </button>
 
 
-        <!-- NORMAL LEGEND -->
+        <!-- LEGEND -->
 
         <div
             id="legend"
@@ -446,39 +485,12 @@
         </a>
 
 
-        <!-- AREA EXPLORER LENS -->
+        <!-- LENSES ARE INSERTED HERE BY JS -->
 
         <div
-            id="areaLens"
-            class="area-lens hidden"
-        >
-
-            <svg
-                id="areaLensSvg"
-                viewBox="0 0 360 360"
-                aria-hidden="true"
-            ></svg>
-
-            <div class="lens-centre">
-
-                <strong id="lensTotal">
-                    —
-                </strong>
-
-                <span>
-                    facilities
-                </span>
-
-            </div>
-
-            <div
-                id="lensLoading"
-                class="lens-loading hidden"
-            >
-                analysing…
-            </div>
-
-        </div>
+            id="lensLayer"
+            class="lens-layer"
+        ></div>
 
 
         <div
@@ -489,7 +501,9 @@
     </main>
 
 
-    <!-- RIGHT PANEL -->
+    <!-- =====================================================
+         RIGHT PANEL
+         ===================================================== -->
 
     <aside class="details-panel">
 
@@ -532,7 +546,7 @@
         </div>
 
 
-        <!-- FACILITY -->
+        <!-- FACILITY DETAILS -->
 
         <div
             id="facilityDetails"
@@ -610,7 +624,6 @@
                     <strong id="detailInfrastructure">—</strong>
                 </div>
 
-
                 <div
                     id="poolLengthRow"
                     class="detail-row hidden"
@@ -619,7 +632,6 @@
                     <strong id="detailPoolLength">—</strong>
                 </div>
 
-
                 <div
                     id="poolBreadthRow"
                     class="detail-row hidden"
@@ -627,7 +639,6 @@
                     <span>Pool breadth</span>
                     <strong id="detailPoolBreadth">—</strong>
                 </div>
-
 
                 <div class="detail-row">
                     <span>Surface</span>
@@ -707,17 +718,9 @@
                 </h2>
 
                 <p id="analysisSubtitle">
-                Select an area.
+                    Select an area.
                 </p>
 
-            </div>
-
-
-            <div
-                id="analysisLoading"
-                class="analysis-loading hidden"
-            >
-                Analysing facilities…
             </div>
 
 
@@ -728,23 +731,37 @@
 
 
             <div
-                id="analysisSportSummary"
-                class="analysis-sport-summary"
-            ></div>
+                id="sportSummaryBlock"
+                class="summary-block hidden"
+            >
+
+                <h3>
+                    Sports
+                </h3>
+
+                <div id="analysisSportSummary"></div>
+
+            </div>
+
+
+            <div
+                id="typeSummaryBlock"
+                class="summary-block hidden"
+            >
+
+                <h3>
+                    Facility types
+                </h3>
+
+                <div id="analysisTypeSummary"></div>
+
+            </div>
 
 
             <div
                 id="analysisTableContainer"
                 class="analysis-table-container"
             ></div>
-
-
-            <div
-                id="analysisEmptyMessage"
-                class="analysis-empty hidden"
-            >
-                No facilities found.
-            </div>
 
 
             <button
