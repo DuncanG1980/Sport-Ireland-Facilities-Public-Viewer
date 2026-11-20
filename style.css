@@ -6,6 +6,7 @@ html,
 body {
     width: 100%;
     height: 100%;
+
     padding: 0;
     margin: 0;
 
@@ -15,11 +16,17 @@ body {
         sans-serif;
 
     color: #151515;
+
     background: #f3f5f4;
 }
 
-button {
+button,
+select {
     font-family: inherit;
+}
+
+button {
+    cursor: pointer;
 }
 
 .hidden {
@@ -37,7 +44,7 @@ button {
     grid-template-columns:
         300px
         minmax(500px, 1fr)
-        360px;
+        380px;
 
     grid-template-rows:
         80px
@@ -59,14 +66,14 @@ button {
     align-items: center;
     justify-content: space-between;
 
+    color: white;
+
     background:
         linear-gradient(
             90deg,
             #008565,
             #00664f
         );
-
-    color: white;
 }
 
 .header-description {
@@ -159,11 +166,13 @@ button {
 .filter-actions {
     display: flex;
     align-items: center;
+
     gap: 6px;
 }
 
 .filter-divider {
     color: #9aa5a0;
+
     font-size: 13px;
 }
 
@@ -171,13 +180,12 @@ button {
     padding: 0;
 
     border: none;
+
     background: transparent;
 
     color: #007b5e;
 
     font-size: 13px;
-
-    cursor: pointer;
 }
 
 .text-button:hover {
@@ -261,7 +269,7 @@ button {
 
 
 /* =========================================================
-   DROPDOWNS
+   DROPDOWN FILTERS
    ========================================================= */
 
 .filter-dropdown-button {
@@ -287,8 +295,6 @@ button {
 
     font-size: 13px;
     font-weight: 700;
-
-    cursor: pointer;
 }
 
 .filter-dropdown-button:hover {
@@ -310,7 +316,7 @@ button {
 
 
 /* =========================================================
-   RESULTS
+   RESULT COUNT
    ========================================================= */
 
 .results-box {
@@ -330,6 +336,134 @@ button {
 
     font-size: 14px;
     font-weight: 700;
+}
+
+
+/* =========================================================
+   ANALYSIS CONTROLS
+   ========================================================= */
+
+.analysis-section {
+    background: #fbfdfc;
+}
+
+.analysis-mode-buttons {
+    display: grid;
+
+    grid-template-columns:
+        1fr;
+
+    gap: 7px;
+}
+
+.analysis-mode-button {
+    min-height: 38px;
+
+    padding:
+        8px
+        10px;
+
+    border:
+        1px solid
+        #a8cfc2;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #006f54;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-align: left;
+}
+
+.analysis-mode-button:hover {
+    background: #edf8f4;
+}
+
+.analysis-mode-button.active {
+    background: #008c68;
+
+    border-color: #008c68;
+
+    color: white;
+}
+
+.analysis-control {
+    margin-top: 13px;
+
+    padding-top: 13px;
+
+    border-top:
+        1px solid
+        #dce5e1;
+}
+
+.analysis-control label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #34443e;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.analysis-control p,
+.analysis-help {
+    margin:
+        7px
+        0
+        0;
+
+    color: #69766f;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+.analysis-select {
+    width: 100%;
+
+    min-height: 38px;
+
+    padding:
+        7px
+        9px;
+
+    border:
+        1px solid
+        #a8cfc2;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #23332d;
+
+    font-size: 13px;
+}
+
+.analysis-status {
+    margin-top: 13px;
+
+    padding:
+        9px
+        10px;
+
+    border-radius: 7px;
+
+    background: #edf7f3;
+
+    color: #52625b;
+
+    font-size: 11px;
+
+    line-height: 1.4;
 }
 
 
@@ -400,8 +534,6 @@ button {
 
     font-size: 13px;
     font-weight: 700;
-
-    cursor: pointer;
 
     box-shadow:
         0
@@ -555,7 +687,51 @@ button {
 
 
 /* =========================================================
-   DETAILS
+   ANALYSIS BADGE
+   ========================================================= */
+
+.map-analysis-badge {
+    position: absolute;
+
+    z-index: 25;
+
+    top: 16px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    padding:
+        9px
+        15px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(
+            0,
+            103,
+            78,
+            0.93
+        );
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    pointer-events: none;
+
+    box-shadow:
+        0
+        2px
+        8px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   RIGHT PANEL
    ========================================================= */
 
 .close-button {
@@ -566,8 +742,6 @@ button {
     color: #00664e;
 
     font-size: 28px;
-
-    cursor: pointer;
 }
 
 .empty-state {
@@ -651,8 +825,6 @@ button {
     color: #007b5e;
 
     font-size: 27px;
-
-    cursor: pointer;
 }
 
 .navigator-centre {
@@ -672,11 +844,6 @@ button {
 
     font-size: 15px;
 }
-
-
-/* =========================================================
-   TITLE
-   ========================================================= */
 
 .facility-title-box {
     padding: 16px;
@@ -765,11 +932,6 @@ button {
     font-weight: 600;
 }
 
-
-/* =========================================================
-   PRIMARY BUTTON
-   ========================================================= */
-
 .primary-button {
     width: 100%;
 
@@ -789,8 +951,6 @@ button {
 
     font-size: 14px;
     font-weight: 700;
-
-    cursor: pointer;
 }
 
 .primary-button:hover {
@@ -799,7 +959,192 @@ button {
 
 
 /* =========================================================
-   SMALLER SCREENS
+   ANALYSIS RIGHT PANEL
+   ========================================================= */
+
+.analysis-details {
+    padding: 15px;
+}
+
+.analysis-title-box {
+    padding:
+        14px
+        15px;
+
+    margin-bottom: 14px;
+
+    border-radius: 10px;
+
+    background: #e6f5ed;
+}
+
+.analysis-title-box h2 {
+    margin:
+        0
+        0
+        5px;
+
+    color: #173d2e;
+
+    font-size: 21px;
+}
+
+.analysis-title-box p {
+    margin: 0;
+
+    color: #52635b;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+.analysis-loading,
+.analysis-empty {
+    padding:
+        14px
+        12px;
+
+    margin-bottom: 12px;
+
+    border-radius: 8px;
+
+    background: #f3f6f4;
+
+    color: #647169;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+.analysis-totals {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+.analysis-total-card {
+    padding:
+        10px
+        11px;
+
+    border:
+        1px solid
+        #cfe0da;
+
+    border-radius: 8px;
+
+    background: #fbfdfc;
+}
+
+.analysis-total-card span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #69766f;
+
+    font-size: 11px;
+}
+
+.analysis-total-card strong {
+    color: #006f54;
+
+    font-size: 21px;
+}
+
+.analysis-table-container {
+    overflow-x: auto;
+
+    margin-bottom: 14px;
+}
+
+.analysis-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 12px;
+}
+
+.analysis-table th,
+.analysis-table td {
+    padding:
+        7px
+        5px;
+
+    border-bottom:
+        1px solid
+        #dfe5e2;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+.analysis-table th:first-child,
+.analysis-table td:first-child {
+    text-align: left;
+}
+
+.analysis-table th {
+    color: #44534d;
+
+    background: #f4f8f6;
+
+    font-weight: 700;
+}
+
+.analysis-sport {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+}
+
+.analysis-swatch {
+    width: 10px;
+    height: 10px;
+
+    display: inline-block;
+
+    flex-shrink: 0;
+
+    border-radius: 3px;
+}
+
+.secondary-analysis-button {
+    width: 100%;
+
+    min-height: 40px;
+
+    border:
+        1px solid
+        #9ecdbd;
+
+    border-radius: 8px;
+
+    background: white;
+
+    color: #006f54;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.secondary-analysis-button:hover {
+    background: #edf8f4;
+}
+
+
+/* =========================================================
+   RESPONSIVE
    ========================================================= */
 
 @media (max-width: 1200px) {
@@ -808,7 +1153,7 @@ button {
         grid-template-columns:
             260px
             minmax(400px, 1fr)
-            330px;
+            340px;
     }
 
     .sport-ireland-logo {
