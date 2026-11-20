@@ -28,9 +28,7 @@
 
 <div class="app">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+    <!-- HEADER -->
 
     <header class="header">
 
@@ -51,17 +49,13 @@
     </header>
 
 
-    <!-- =====================================================
-         LEFT FILTER PANEL
-         ===================================================== -->
+    <!-- LEFT PANEL -->
 
     <aside class="filter-panel">
 
         <div class="panel-heading">
 
-            <h2>
-                Filters
-            </h2>
+            <h2>Filters</h2>
 
             <div class="filter-actions">
 
@@ -73,9 +67,7 @@
                     Select all
                 </button>
 
-                <span class="filter-divider">
-                    |
-                </span>
+                <span class="filter-divider">|</span>
 
                 <button
                     id="deselectAllFilters"
@@ -94,21 +86,19 @@
 
         <section class="filter-section">
 
-            <h3>
-                Sport
-            </h3>
+            <h3>Sport</h3>
 
             <div
                 id="mainSportFilters"
                 class="checkbox-list"
-            >
-            </div>
+            ></div>
 
             <button
                 id="moreSportsButton"
                 class="filter-dropdown-button"
                 type="button"
             >
+
                 <span>
                     More sports
                 </span>
@@ -119,13 +109,13 @@
                 >
                     ▾
                 </span>
+
             </button>
 
             <div
                 id="moreSportFilters"
                 class="checkbox-list dropdown-list hidden"
-            >
-            </div>
+            ></div>
 
         </section>
 
@@ -139,6 +129,7 @@
                 class="filter-dropdown-button"
                 type="button"
             >
+
                 <span>
                     Ownership type
                 </span>
@@ -149,13 +140,13 @@
                 >
                     ▾
                 </span>
+
             </button>
 
             <div
                 id="ownerFilters"
                 class="checkbox-list dropdown-list hidden"
-            >
-            </div>
+            ></div>
 
         </section>
 
@@ -169,6 +160,7 @@
                 class="filter-dropdown-button"
                 type="button"
             >
+
                 <span>
                     Surface type
                 </span>
@@ -179,13 +171,13 @@
                 >
                     ▾
                 </span>
+
             </button>
 
             <div
                 id="surfaceFilters"
                 class="checkbox-list dropdown-list hidden"
-            >
-            </div>
+            ></div>
 
         </section>
 
@@ -199,6 +191,7 @@
                 class="filter-dropdown-button"
                 type="button"
             >
+
                 <span>
                     Floodlights
                 </span>
@@ -209,26 +202,25 @@
                 >
                     ▾
                 </span>
+
             </button>
 
             <div
                 id="floodlightFilters"
                 class="checkbox-list dropdown-list hidden"
-            >
-            </div>
+            ></div>
 
         </section>
 
 
-        <!-- =================================================
-             ANALYSIS
-             ================================================= -->
+        <!-- ANALYSIS -->
 
         <section class="filter-section analysis-section">
 
             <h3>
                 Analysis
             </h3>
+
 
             <div class="analysis-mode-buttons">
 
@@ -259,7 +251,7 @@
             </div>
 
 
-            <!-- AREA EXPLORER RADIUS -->
+            <!-- AREA EXPLORER -->
 
             <div
                 id="areaRadiusControls"
@@ -274,11 +266,15 @@
                     id="areaRadiusSelect"
                     class="analysis-select"
                 >
+
                     <option value="1">
                         1 km
                     </option>
 
-                    <option value="2" selected>
+                    <option
+                        value="2"
+                        selected
+                    >
                         2 km
                     </option>
 
@@ -289,10 +285,11 @@
                     <option value="8">
                         8 km
                     </option>
+
                 </select>
 
                 <p>
-                    Move the mouse over the map to explore facilities around each location.
+                    Move the lens around the map. The chart updates after you pause.
                 </p>
 
             </div>
@@ -300,17 +297,44 @@
 
             <!-- COVERAGE -->
 
-            <div class="analysis-control coverage-control">
+            <div class="analysis-control">
 
-                <label for="coverageRadiusSelect">
-                    Facility coverage overlay
+                <div class="analysis-subheading">
+                    Coverage
+                </div>
+
+                <label for="coverageSportSelect">
+                    Sport
+                </label>
+
+                <select
+                    id="coverageSportSelect"
+                    class="analysis-select"
+                >
+
+                    <option value="">
+                        Select sport...
+                    </option>
+
+                </select>
+
+
+                <label
+                    for="coverageRadiusSelect"
+                    class="second-analysis-label"
+                >
+                    Radius
                 </label>
 
                 <select
                     id="coverageRadiusSelect"
                     class="analysis-select"
                 >
-                    <option value="0" selected>
+
+                    <option
+                        value="0"
+                        selected
+                    >
                         Off
                     </option>
 
@@ -329,13 +353,14 @@
                     <option value="8">
                         8 km
                     </option>
+
                 </select>
 
                 <div
                     id="coverageStatus"
                     class="analysis-help"
                 >
-                    Uses the currently selected facility filters.
+                    Shows the straight-line area around facilities of one selected sport.
                 </div>
 
             </div>
@@ -351,7 +376,7 @@
         </section>
 
 
-        <!-- RESULT COUNT -->
+        <!-- COUNT -->
 
         <div class="results-box">
 
@@ -364,9 +389,7 @@
     </aside>
 
 
-    <!-- =====================================================
-         MAP
-         ===================================================== -->
+    <!-- MAP -->
 
     <main class="map-container">
 
@@ -376,8 +399,8 @@
         <button
             id="homeButton"
             class="map-home-button"
-            title="Return to full Ireland view"
             type="button"
+            title="Return to full Ireland view"
         >
 
             <span class="home-icon">
@@ -391,7 +414,7 @@
         </button>
 
 
-        <!-- LEGEND -->
+        <!-- NORMAL LEGEND -->
 
         <div
             id="legend"
@@ -402,8 +425,7 @@
                 Sports
             </h3>
 
-            <div id="legendItems">
-            </div>
+            <div id="legendItems"></div>
 
             <div class="legend-note">
                 Additional sports are available in Filters
@@ -412,33 +434,62 @@
         </div>
 
 
-        <!-- DATASET -->
+        <!-- DATA LINK -->
 
         <a
             href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
             target="_blank"
             rel="noopener noreferrer"
             class="dataset-button"
-            title="View the Sport Ireland Facilities Mapping dataset on data.gov.ie"
         >
             View dataset on data.gov.ie ↗
         </a>
 
 
-        <!-- ANALYSIS BADGE -->
+        <!-- AREA EXPLORER LENS -->
+
+        <div
+            id="areaLens"
+            class="area-lens hidden"
+        >
+
+            <svg
+                id="areaLensSvg"
+                viewBox="0 0 360 360"
+                aria-hidden="true"
+            ></svg>
+
+            <div class="lens-centre">
+
+                <strong id="lensTotal">
+                    —
+                </strong>
+
+                <span>
+                    facilities
+                </span>
+
+            </div>
+
+            <div
+                id="lensLoading"
+                class="lens-loading hidden"
+            >
+                analysing…
+            </div>
+
+        </div>
+
 
         <div
             id="mapAnalysisBadge"
             class="map-analysis-badge hidden"
-        >
-        </div>
+        ></div>
 
     </main>
 
 
-    <!-- =====================================================
-         RIGHT PANEL
-         ===================================================== -->
+    <!-- RIGHT PANEL -->
 
     <aside class="details-panel">
 
@@ -451,7 +502,6 @@
             <button
                 id="closeDetails"
                 class="close-button"
-                title="Clear selection"
                 type="button"
             >
                 ×
@@ -460,7 +510,7 @@
         </div>
 
 
-        <!-- EMPTY NORMAL STATE -->
+        <!-- EMPTY -->
 
         <div
             id="emptyState"
@@ -482,9 +532,7 @@
         </div>
 
 
-        <!-- =================================================
-             FACILITY DETAILS
-             ================================================= -->
+        <!-- FACILITY -->
 
         <div
             id="facilityDetails"
@@ -500,7 +548,6 @@
                     id="previousFacility"
                     class="navigator-button"
                     type="button"
-                    title="Previous facility"
                 >
                     ‹
                 </button>
@@ -521,7 +568,6 @@
                     id="nextFacility"
                     class="navigator-button"
                     type="button"
-                    title="Next facility"
                 >
                     ›
                 </button>
@@ -540,14 +586,12 @@
                     <span
                         id="detailSportTag"
                         class="tag"
-                    >
-                    </span>
+                    ></span>
 
                     <span
                         id="detailTypeTag"
                         class="tag tag-secondary"
-                    >
-                    </span>
+                    ></span>
 
                 </div>
 
@@ -649,9 +693,7 @@
         </div>
 
 
-        <!-- =================================================
-             ANALYSIS DETAILS
-             ================================================= -->
+        <!-- ANALYSIS -->
 
         <div
             id="analysisDetails"
@@ -661,11 +703,11 @@
             <div class="analysis-title-box">
 
                 <h2 id="analysisTitle">
-                    Area summary
+                    Analysis
                 </h2>
 
                 <p id="analysisSubtitle">
-                Select a location on the map.
+                Select an area.
                 </p>
 
             </div>
@@ -682,22 +724,26 @@
             <div
                 id="analysisTotals"
                 class="analysis-totals"
-            >
-            </div>
+            ></div>
+
+
+            <div
+                id="analysisSportSummary"
+                class="analysis-sport-summary"
+            ></div>
 
 
             <div
                 id="analysisTableContainer"
                 class="analysis-table-container"
-            >
-            </div>
+            ></div>
 
 
             <div
                 id="analysisEmptyMessage"
                 class="analysis-empty hidden"
             >
-                No facilities found in this area.
+                No facilities found.
             </div>
 
 
