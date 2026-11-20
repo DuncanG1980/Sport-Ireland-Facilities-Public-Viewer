@@ -50,6 +50,13 @@ require([
   const COVERAGE_LIMIT =
     700;
 
+  // Keep the lens usable at extreme zoom levels.
+  const MIN_LENS_DIAMETER =
+    120;
+
+  const MAX_LENS_DIAMETER =
+    700;
+
 
   // =========================================================
   // SPORTS
@@ -236,6 +243,13 @@ require([
     new GraphicsLayer();
 
 
+  const selectionGraphicsLayer =
+    new GraphicsLayer({
+      title:
+        "Selected facilities"
+    });
+
+
   // =========================================================
   // FACILITY LAYER
   // =========================================================
@@ -341,7 +355,8 @@ require([
       layers: [
         coverageLayer,
         facilitiesLayer,
-        analysisLayer
+        analysisLayer,
+        selectionGraphicsLayer
       ]
 
     });
@@ -416,10 +431,6 @@ require([
 
 
   let highlightHandle =
-    null;
-
-
-  let currentOverlayGraphic =
     null;
 
 
@@ -1736,6 +1747,9 @@ require([
         }
 
 
+        updateLensSize();
+
+
         runLensAnalysis();
 
       }
@@ -1865,8 +1879,6 @@ require([
       0;
 
 
-    // NORMAL
-
     if (
       mode ===
       "normal"
@@ -1891,8 +1903,6 @@ require([
 
     }
 
-
-    // CATCHMENT
 
     if (
       mode ===
@@ -1926,14 +1936,15 @@ require([
     }
 
 
-    // LENS
-
     if (
       mode ===
       "lens"
     ) {
 
       showFixedLens();
+
+
+      updateLensSize();
 
 
       mapAnalysisBadge.textContent =
@@ -1982,76 +1993,15 @@ require([
 
   function showFixedLens() {
 
-    let lens =
+    const lens =
       document.getElementById(
         "fixedLens"
       );
 
 
-    // Recreate it if somehow missing.
-
     if (!lens) {
 
-      lens =
-        document.createElement(
-          "div"
-        );
-
-
-      lens.id =
-        "fixedLens";
-
-
-      lens.className =
-        "fixed-lens";
-
-
-      lens.innerHTML =
-        `
-          <svg
-              id="lensSvg"
-              viewBox="0 0 420 420"
-              aria-hidden="true"
-          ></svg>
-
-
-          <div class="lens-centre">
-
-              <strong id="lensTotal">
-                  —
-              </strong>
-
-              <span>
-                  facilities
-              </span>
-
-          </div>
-
-
-          <div
-              id="lensRadiusLabel"
-              class="lens-radius-label"
-          >
-              ${lensRadiusKm} km
-          </div>
-
-
-          <div
-              id="lensLoading"
-              class="lens-loading hidden"
-          >
-              analysing…
-          </div>
-        `;
-
-
-      document
-        .getElementById(
-          "mapContainer"
-        )
-        .appendChild(
-          lens
-        );
+      return;
 
     }
 
@@ -2112,6 +2062,95 @@ require([
 
       lens.style.display =
         "none";
+
+    }
+
+  }
+
+
+  // =========================================================
+  // TRUE MAP-SCALE LENS SIZE
+  // =========================================================
+
+  function updateLensSize() {
+
+    if (
+      analysisMode !==
+        "lens" ||
+      !fixedLens ||
+      !view.resolution ||
+      !view.spatialReference
+    ) {
+
+      return;
+
+    }
+
+
+    const metersPerUnit =
+      view.spatialReference.metersPerUnit ||
+      1;
+
+
+    // metres represented by one screen pixel
+    const metresPerPixel =
+      view.resolution *
+      metersPerUnit;
+
+
+    const radiusMetres =
+      lensRadiusKm *
+      1000;
+
+
+    const radiusPixels =
+      radiusMetres /
+      metresPerPixel;
+
+
+    let diameterPixels =
+      radiusPixels *
+      2;
+
+
+    diameterPixels =
+      Math.max(
+        MIN_LENS_DIAMETER,
+        Math.min(
+          MAX_LENS_DIAMETER,
+          diameterPixels
+        )
+      );
+
+
+    fixedLens.style.width =
+      diameterPixels +
+      "px";
+
+
+    fixedLens.style.height =
+      diameterPixels +
+      "px";
+
+
+    // Scale the radial-chart SVG with the lens.
+    if (
+      lensSvg
+    ) {
+
+      const svgSize =
+        diameterPixels +
+        100;
+
+
+      lensSvg.style.width =
+        svgSize +
+        "px";
+
+
+      lensSvg.style.height =
+        svgSize +
+        "px";
 
     }
 
@@ -2303,9 +2342,6 @@ require([
     }
 
 
-    // Exact click:
-    // select ALL polygons under the click.
-
     const overlapping =
       nearby.filter(
         function (
@@ -2366,9 +2402,6 @@ require([
     }
 
 
-    // Otherwise select nearest polygon
-    // within click tolerance.
-
     let nearest =
       null;
 
@@ -2397,7 +2430,7 @@ require([
               distance
             ) &&
             distance <
-            nearestDistance
+              nearestDistance
           ) {
 
             nearestDistance =
@@ -2429,8 +2462,7 @@ require([
 
 
   // =========================================================
-  // CORRECT CATCHMENT:
-  // POLYGON CENTRE MUST FALL INSIDE BUFFER
+  // CATCHMENT
   // =========================================================
 
   async function runCatchment(
@@ -2530,29 +2562,29 @@ require([
           type:
             "simple-marker",
 
-          size:
-            11,
+        size:
+          11,
 
-          color: [
-            0,
-            105,
-            78,
-            1
-          ],
+        color: [
+          0,
+          105,
+          78,
+          1
+        ],
 
-          outline: {
+        outline: {
 
-            color:
-              "white",
+          color:
+            "white",
 
-            width:
-              2
-
-          }
+          width:
+            2
 
         }
 
-      })
+      }
+
+    })
 
     );
 
@@ -2561,9 +2593,6 @@ require([
 
 
     try {
-
-      // Only one server query:
-      // fetch possible facilities inside/intersecting 8km.
 
       const query =
         facilitiesLayer.createQuery();
@@ -2964,21 +2993,13 @@ require([
                     )}
                 </td>
 
-                <td>
-                    ${row.counts[0]}
-                </td>
+                <td>${row.counts[0]}</td>
 
-                <td>
-                    ${row.counts[1]}
-                </td>
+                <td>${row.counts[1]}</td>
 
-                <td>
-                    ${row.counts[2]}
-                </td>
+                <td>${row.counts[2]}</td>
 
-                <td>
-                    ${row.counts[3]}
-                </td>
+                <td>${row.counts[3]}</td>
 
             </tr>
           `;
@@ -3001,7 +3022,7 @@ require([
 
 
   // =========================================================
-  // LENS UPDATE WHEN MAP STOPS
+  // MAP MOTION
   // =========================================================
 
   view.watch(
@@ -3014,6 +3035,10 @@ require([
         analysisMode ===
         "lens"
       ) {
+
+        // Lens size changes immediately with zoom.
+        updateLensSize();
+
 
         if (
           stationary
@@ -3050,6 +3075,24 @@ require([
   );
 
 
+  // Also resize while zooming rather than only after it stops.
+  view.watch(
+    "resolution",
+    function () {
+
+      if (
+        analysisMode ===
+        "lens"
+      ) {
+
+        updateLensSize();
+
+      }
+
+    }
+  );
+
+
   // =========================================================
   // LENS ANALYSIS
   // =========================================================
@@ -3067,6 +3110,9 @@ require([
 
 
     showFixedLens();
+
+
+    updateLensSize();
 
 
     const requestId =
@@ -3097,9 +3143,6 @@ require([
 
 
     try {
-
-      // Similar logic to catchment:
-      // fetch actual geometries so we can use centres.
 
       const query =
         facilitiesLayer.createQuery();
@@ -3527,7 +3570,7 @@ require([
 
 
   // =========================================================
-  // LENS RIGHT PANEL
+  // LENS PANEL
   // =========================================================
 
   function renderLensPanel(
@@ -3570,7 +3613,7 @@ require([
 
 
     analysisSubtitle.textContent =
-      "Pan or zoom the map underneath the lens to explore another area.";
+      "The visible lens now represents the selected real-world radius.";
 
 
     analysisTotals.innerHTML =
@@ -4017,7 +4060,91 @@ require([
     }
 
 
+    // Explicitly draw all selected polygons.
+    drawAllSelectedPolygons();
+
+
     showCurrentFacility();
+
+  }
+
+
+  function drawAllSelectedPolygons() {
+
+    selectionGraphicsLayer.removeAll();
+
+
+    selectedGraphics.forEach(
+      function (
+        graphic,
+        index
+      ) {
+
+        if (
+          !graphic.geometry
+        ) {
+
+          return;
+
+        }
+
+
+        selectionGraphicsLayer.add(
+
+          new Graphic({
+
+            geometry:
+              graphic.geometry,
+
+            symbol: {
+
+              type:
+                "simple-fill",
+
+              color: [
+                0,
+                170,
+                150,
+                index ===
+                  selectedIndex
+                  ? 0.12
+                  : 0.035
+              ],
+
+              outline: {
+
+                color:
+                  index ===
+                  selectedIndex
+                    ? [
+                        0,
+                        75,
+                        65,
+                        1
+                      ]
+                    : [
+                        0,
+                        185,
+                        165,
+                        0.95
+                      ],
+
+                width:
+                  index ===
+                  selectedIndex
+                    ? 4
+                    : 2.5
+
+              }
+
+            }
+
+          })
+
+        );
+
+      }
+    );
 
   }
 
@@ -4030,7 +4157,7 @@ require([
       ];
 
 
-    updateCurrentOverlay();
+    drawAllSelectedPolygons();
 
 
     showFacilityDetails(
@@ -4039,73 +4166,6 @@ require([
 
 
     updateSelectionNavigator();
-
-  }
-
-
-  function updateCurrentOverlay() {
-
-    if (
-      currentOverlayGraphic
-    ) {
-
-      view.graphics.remove(
-        currentOverlayGraphic
-      );
-
-
-      currentOverlayGraphic =
-        null;
-
-    }
-
-
-    if (
-      !selectedGraphic ||
-      !selectedGraphic.geometry
-    ) {
-
-      return;
-
-    }
-
-
-    currentOverlayGraphic =
-      selectedGraphic.clone();
-
-
-    currentOverlayGraphic.symbol = {
-
-      type:
-        "simple-fill",
-
-      color: [
-        0,
-        170,
-        150,
-        0.06
-      ],
-
-      outline: {
-
-        color: [
-          0,
-          90,
-          75,
-          1
-        ],
-
-        width:
-          4
-
-      }
-
-    };
-
-
-    view.graphics.add(
-      currentOverlayGraphic
-    );
 
   }
 
@@ -4391,7 +4451,7 @@ require([
 
 
   // =========================================================
-  // PANEL HELPERS
+  // PANELS
   // =========================================================
 
   function clearSelection() {
@@ -4409,19 +4469,7 @@ require([
     }
 
 
-    if (
-      currentOverlayGraphic
-    ) {
-
-      view.graphics.remove(
-        currentOverlayGraphic
-      );
-
-
-      currentOverlayGraphic =
-        null;
-
-    }
+    selectionGraphicsLayer.removeAll();
 
 
     selectedGraphics =
