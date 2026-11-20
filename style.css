@@ -69,14 +69,12 @@ button {
     color: white;
 }
 
-
 .header-description {
     padding-left: 28px;
 
     font-size: 22px;
     font-weight: 600;
 }
-
 
 .brand {
     height: 100%;
@@ -91,7 +89,6 @@ button {
         6px
         20px;
 }
-
 
 .sport-ireland-logo {
     display: block;
@@ -503,7 +500,7 @@ button {
 
 
 /* =========================================================
-   DATASET BUTTON - BOTTOM RIGHT
+   DATASET BUTTON
    ========================================================= */
 
 .dataset-button {
