@@ -28,9 +28,7 @@
 
 <div class="app">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+    <!-- HEADER -->
 
     <header class="header">
 
@@ -51,17 +49,13 @@
     </header>
 
 
-    <!-- =====================================================
-         LEFT PANEL
-         ===================================================== -->
+    <!-- LEFT PANEL -->
 
     <aside class="filter-panel">
 
         <div class="panel-heading">
 
-            <h2>
-                Filters
-            </h2>
+            <h2>Filters</h2>
 
             <div class="filter-actions">
 
@@ -223,15 +217,14 @@
         </section>
 
 
-        <!-- =================================================
-             ANALYSIS
-             ================================================= -->
+        <!-- ANALYSIS -->
 
         <section class="filter-section analysis-section">
 
             <h3>
                 Analysis
             </h3>
+
 
             <div class="analysis-mode-buttons">
 
@@ -262,7 +255,7 @@
             </div>
 
 
-            <!-- LENS CONTROLS -->
+            <!-- LENS -->
 
             <div
                 id="lensControls"
@@ -300,11 +293,11 @@
                 </select>
 
                 <p>
-                    Pan or zoom the map. The lens analyses the area underneath it when the map stops moving.
+                    Pan or zoom the map underneath the fixed lens.
                 </p>
 
 
-                <!-- OPTIONAL COVERAGE -->
+                <!-- COVERAGE -->
 
                 <details class="coverage-details">
 
@@ -322,9 +315,11 @@
                             id="coverageSportSelect"
                             class="analysis-select"
                         >
+
                             <option value="">
                                 Select sport...
                             </option>
+
                         </select>
 
 
@@ -402,9 +397,7 @@
     </aside>
 
 
-    <!-- =====================================================
-         MAP
-         ===================================================== -->
+    <!-- MAP -->
 
     <main
         id="mapContainer"
@@ -419,15 +412,7 @@
             class="map-home-button"
             type="button"
         >
-
-            <span class="home-icon">
-                ⌂
-            </span>
-
-            <span>
-                Full Ireland
-            </span>
-
+            ⌂ Full Ireland
         </button>
 
 
@@ -451,7 +436,7 @@
         </div>
 
 
-        <!-- DATA -->
+        <!-- DATASET -->
 
         <a
             href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
@@ -463,9 +448,7 @@
         </a>
 
 
-        <!-- =================================================
-             FIXED LENS
-             ================================================= -->
+        <!-- FIXED LENS -->
 
         <div
             id="fixedLens"
@@ -518,9 +501,7 @@
     </main>
 
 
-    <!-- =====================================================
-         RIGHT PANEL
-         ===================================================== -->
+    <!-- RIGHT PANEL -->
 
     <aside class="details-panel">
 
@@ -563,9 +544,7 @@
         </div>
 
 
-        <!-- =================================================
-             FACILITY DETAILS
-             ================================================= -->
+        <!-- FACILITY DETAILS -->
 
         <div
             id="facilityDetails"
@@ -723,9 +702,7 @@
         </div>
 
 
-        <!-- =================================================
-             ANALYSIS
-             ================================================= -->
+        <!-- ANALYSIS DETAILS -->
 
         <div
             id="analysisDetails"
