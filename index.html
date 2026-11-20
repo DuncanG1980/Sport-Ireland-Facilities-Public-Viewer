@@ -28,7 +28,9 @@
 
 <div class="app">
 
-    <!-- HEADER -->
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
     <header class="header">
 
@@ -231,7 +233,6 @@
                 Analysis
             </h3>
 
-
             <div class="analysis-mode-buttons">
 
                 <button
@@ -268,10 +269,6 @@
                 class="analysis-control hidden"
             >
 
-                <div class="analysis-subheading">
-                    Comparison lenses
-                </div>
-
                 <label for="lensRadiusSelect">
                     Lens radius
                 </label>
@@ -302,101 +299,82 @@
 
                 </select>
 
-
-                <div class="lens-control-buttons">
-
-                    <button
-                        id="addLensButton"
-                        class="analysis-action-button"
-                        type="button"
-                    >
-                        + Add lens
-                    </button>
-
-                    <button
-                        id="clearLensesButton"
-                        class="analysis-action-button secondary"
-                        type="button"
-                    >
-                        Clear
-                    </button>
-
-                </div>
-
                 <p>
-                    Add up to three lenses, then drag them around the map to compare areas.
+                    Pan or zoom the map. The lens analyses the area underneath it when the map stops moving.
                 </p>
 
-            </div>
+
+                <!-- OPTIONAL COVERAGE -->
+
+                <details class="coverage-details">
+
+                    <summary>
+                        Optional coverage overlay
+                    </summary>
+
+                    <div class="coverage-content">
+
+                        <label for="coverageSportSelect">
+                            Sport
+                        </label>
+
+                        <select
+                            id="coverageSportSelect"
+                            class="analysis-select"
+                        >
+                            <option value="">
+                                Select sport...
+                            </option>
+                        </select>
 
 
-            <!-- COVERAGE -->
+                        <label
+                            for="coverageRadiusSelect"
+                            class="second-analysis-label"
+                        >
+                            Radius
+                        </label>
 
-            <div class="analysis-control">
+                        <select
+                            id="coverageRadiusSelect"
+                            class="analysis-select"
+                        >
 
-                <div class="analysis-subheading">
-                    Coverage
-                </div>
+                            <option
+                                value="0"
+                                selected
+                            >
+                                Off
+                            </option>
 
-                <label for="coverageSportSelect">
-                    Sport
-                </label>
+                            <option value="1">
+                                1 km
+                            </option>
 
-                <select
-                    id="coverageSportSelect"
-                    class="analysis-select"
-                >
+                            <option value="2">
+                                2 km
+                            </option>
 
-                    <option value="">
-                        Select sport...
-                    </option>
+                            <option value="4">
+                                4 km
+                            </option>
 
-                </select>
+                            <option value="8">
+                                8 km
+                            </option>
 
+                        </select>
 
-                <label
-                    for="coverageRadiusSelect"
-                    class="second-analysis-label"
-                >
-                    Radius
-                </label>
+                        <div
+                            id="coverageStatus"
+                            class="analysis-help"
+                        >
+                            Select one sport and radius.
+                        </div>
 
-                <select
-                    id="coverageRadiusSelect"
-                    class="analysis-select"
-                >
+                    </div>
 
-                    <option
-                        value="0"
-                        selected
-                    >
-                        Off
-                    </option>
-
-                    <option value="1">
-                        1 km
-                    </option>
-
-                    <option value="2">
-                        2 km
-                    </option>
-
-                    <option value="4">
-                        4 km
-                    </option>
-
-                    <option value="8">
-                        8 km
-                    </option>
-
-                </select>
-
-                <div
-                    id="coverageStatus"
-                    class="analysis-help"
-                >
-                    Select one sport and radius to show its coverage.
-                </div>
+                </details>
 
             </div>
 
@@ -411,7 +389,7 @@
         </section>
 
 
-        <!-- COUNT -->
+        <!-- RESULT COUNT -->
 
         <div class="results-box">
 
@@ -473,7 +451,7 @@
         </div>
 
 
-        <!-- DATA LINK -->
+        <!-- DATA -->
 
         <a
             href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
@@ -485,12 +463,51 @@
         </a>
 
 
-        <!-- LENSES ARE INSERTED HERE BY JS -->
+        <!-- =================================================
+             FIXED LENS
+             ================================================= -->
 
         <div
-            id="lensLayer"
-            class="lens-layer"
-        ></div>
+            id="fixedLens"
+            class="fixed-lens hidden"
+        >
+
+            <svg
+                id="lensSvg"
+                viewBox="0 0 420 420"
+                aria-hidden="true"
+            ></svg>
+
+
+            <div class="lens-centre">
+
+                <strong id="lensTotal">
+                    —
+                </strong>
+
+                <span>
+                    facilities
+                </span>
+
+            </div>
+
+
+            <div
+                id="lensRadiusLabel"
+                class="lens-radius-label"
+            >
+                2 km
+            </div>
+
+
+            <div
+                id="lensLoading"
+                class="lens-loading hidden"
+            >
+                analysing…
+            </div>
+
+        </div>
 
 
         <div
@@ -546,7 +563,9 @@
         </div>
 
 
-        <!-- FACILITY DETAILS -->
+        <!-- =================================================
+             FACILITY DETAILS
+             ================================================= -->
 
         <div
             id="facilityDetails"
@@ -704,7 +723,9 @@
         </div>
 
 
-        <!-- ANALYSIS -->
+        <!-- =================================================
+             ANALYSIS
+             ================================================= -->
 
         <div
             id="analysisDetails"
@@ -718,7 +739,7 @@
                 </h2>
 
                 <p id="analysisSubtitle">
-                    Select an area.
+                    Move the map to explore.
                 </p>
 
             </div>
@@ -730,32 +751,32 @@
             ></div>
 
 
-            <div
+            <section
                 id="sportSummaryBlock"
                 class="summary-block hidden"
             >
 
                 <h3>
-                    Sports
+                    Top sports
                 </h3>
 
                 <div id="analysisSportSummary"></div>
 
-            </div>
+            </section>
 
 
-            <div
+            <section
                 id="typeSummaryBlock"
                 class="summary-block hidden"
             >
 
                 <h3>
-                    Facility types
+                    Top facility types
                 </h3>
 
                 <div id="analysisTypeSummary"></div>
 
-            </div>
+            </section>
 
 
             <div
