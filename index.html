@@ -26,446 +26,696 @@
 
 <body>
 
-    <div class="app">
+<div class="app">
 
-        <!-- HEADER -->
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
-        <header class="header">
+    <header class="header">
 
-            <div class="header-description">
-                Facilities Explorer
-            </div>
+        <div class="header-description">
+            Facilities Explorer
+        </div>
 
-            <div class="brand">
+        <div class="brand">
 
-                <img
-                    src="Transparent%20SI%20Logo.png"
-                    alt="Spórt Éireann Sport Ireland"
-                    class="sport-ireland-logo"
-                >
+            <img
+                src="Transparent%20SI%20Logo.png"
+                alt="Spórt Éireann Sport Ireland"
+                class="sport-ireland-logo"
+            >
 
-            </div>
+        </div>
 
-        </header>
-
-
-        <!-- FILTER PANEL -->
-
-        <aside class="filter-panel">
-
-            <div class="panel-heading">
-
-                <h2>Filters</h2>
-
-                <div class="filter-actions">
-
-                    <button
-                        id="selectAllFilters"
-                        class="text-button"
-                    >
-                        Select all
-                    </button>
-
-                    <span class="filter-divider">|</span>
-
-                    <button
-                        id="deselectAllFilters"
-                        class="text-button"
-                    >
-                        Deselect all
-                    </button>
-
-                </div>
-
-            </div>
+    </header>
 
 
-            <!-- SPORT -->
+    <!-- =====================================================
+         LEFT FILTER PANEL
+         ===================================================== -->
 
-            <section class="filter-section">
+    <aside class="filter-panel">
 
-                <h3>Sport</h3>
+        <div class="panel-heading">
 
-                <div
-                    id="mainSportFilters"
-                    class="checkbox-list"
-                >
-                </div>
+            <h2>
+                Filters
+            </h2>
+
+            <div class="filter-actions">
 
                 <button
-                    id="moreSportsButton"
-                    class="filter-dropdown-button"
+                    id="selectAllFilters"
+                    class="text-button"
                     type="button"
                 >
-                    <span>More sports</span>
-
-                    <span
-                        id="moreSportsArrow"
-                        class="dropdown-arrow"
-                    >
-                        ▾
-                    </span>
+                    Select all
                 </button>
 
-                <div
-                    id="moreSportFilters"
-                    class="checkbox-list dropdown-list hidden"
-                >
-                </div>
-
-            </section>
-
-
-            <!-- OWNERSHIP -->
-
-            <section class="filter-section compact-filter-section">
-
-                <button
-                    id="ownerFilterButton"
-                    class="filter-dropdown-button"
-                    type="button"
-                >
-                    <span>Ownership type</span>
-
-                    <span
-                        id="ownerFilterArrow"
-                        class="dropdown-arrow"
-                    >
-                        ▾
-                    </span>
-                </button>
-
-                <div
-                    id="ownerFilters"
-                    class="checkbox-list dropdown-list hidden"
-                >
-                </div>
-
-            </section>
-
-
-            <!-- SURFACE -->
-
-            <section class="filter-section compact-filter-section">
-
-                <button
-                    id="surfaceFilterButton"
-                    class="filter-dropdown-button"
-                    type="button"
-                >
-                    <span>Surface type</span>
-
-                    <span
-                        id="surfaceFilterArrow"
-                        class="dropdown-arrow"
-                    >
-                        ▾
-                    </span>
-                </button>
-
-                <div
-                    id="surfaceFilters"
-                    class="checkbox-list dropdown-list hidden"
-                >
-                </div>
-
-            </section>
-
-
-            <!-- FLOODLIGHTS -->
-
-            <section class="filter-section compact-filter-section">
-
-                <button
-                    id="floodlightFilterButton"
-                    class="filter-dropdown-button"
-                    type="button"
-                >
-                    <span>Floodlights</span>
-
-                    <span
-                        id="floodlightFilterArrow"
-                        class="dropdown-arrow"
-                    >
-                        ▾
-                    </span>
-                </button>
-
-                <div
-                    id="floodlightFilters"
-                    class="checkbox-list dropdown-list hidden"
-                >
-                </div>
-
-            </section>
-
-
-            <!-- RESULT COUNT -->
-
-            <div class="results-box">
-
-                <span id="resultCount">
-                    Loading facilities...
+                <span class="filter-divider">
+                    |
                 </span>
 
+                <button
+                    id="deselectAllFilters"
+                    class="text-button"
+                    type="button"
+                >
+                    Deselect all
+                </button>
+
             </div>
 
-        </aside>
+        </div>
 
 
-        <!-- MAP -->
+        <!-- SPORT -->
 
-        <main class="map-container">
+        <section class="filter-section">
 
-            <div id="viewDiv"></div>
+            <h3>
+                Sport
+            </h3>
+
+            <div
+                id="mainSportFilters"
+                class="checkbox-list"
+            >
+            </div>
+
+            <button
+                id="moreSportsButton"
+                class="filter-dropdown-button"
+                type="button"
+            >
+                <span>
+                    More sports
+                </span>
+
+                <span
+                    id="moreSportsArrow"
+                    class="dropdown-arrow"
+                >
+                    ▾
+                </span>
+            </button>
+
+            <div
+                id="moreSportFilters"
+                class="checkbox-list dropdown-list hidden"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- OWNERSHIP -->
+
+        <section class="filter-section compact-filter-section">
+
+            <button
+                id="ownerFilterButton"
+                class="filter-dropdown-button"
+                type="button"
+            >
+                <span>
+                    Ownership type
+                </span>
+
+                <span
+                    id="ownerFilterArrow"
+                    class="dropdown-arrow"
+                >
+                    ▾
+                </span>
+            </button>
+
+            <div
+                id="ownerFilters"
+                class="checkbox-list dropdown-list hidden"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- SURFACE -->
+
+        <section class="filter-section compact-filter-section">
+
+            <button
+                id="surfaceFilterButton"
+                class="filter-dropdown-button"
+                type="button"
+            >
+                <span>
+                    Surface type
+                </span>
+
+                <span
+                    id="surfaceFilterArrow"
+                    class="dropdown-arrow"
+                >
+                    ▾
+                </span>
+            </button>
+
+            <div
+                id="surfaceFilters"
+                class="checkbox-list dropdown-list hidden"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- FLOODLIGHTS -->
+
+        <section class="filter-section compact-filter-section">
+
+            <button
+                id="floodlightFilterButton"
+                class="filter-dropdown-button"
+                type="button"
+            >
+                <span>
+                    Floodlights
+                </span>
+
+                <span
+                    id="floodlightFilterArrow"
+                    class="dropdown-arrow"
+                >
+                    ▾
+                </span>
+            </button>
+
+            <div
+                id="floodlightFilters"
+                class="checkbox-list dropdown-list hidden"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ANALYSIS
+             ================================================= -->
+
+        <section class="filter-section analysis-section">
+
+            <h3>
+                Analysis
+            </h3>
+
+            <div class="analysis-mode-buttons">
+
+                <button
+                    id="normalModeButton"
+                    class="analysis-mode-button active"
+                    type="button"
+                >
+                    Normal map
+                </button>
+
+                <button
+                    id="catchmentModeButton"
+                    class="analysis-mode-button"
+                    type="button"
+                >
+                    Catchment
+                </button>
+
+                <button
+                    id="areaModeButton"
+                    class="analysis-mode-button"
+                    type="button"
+                >
+                    Area Explorer
+                </button>
+
+            </div>
+
+
+            <!-- AREA EXPLORER RADIUS -->
+
+            <div
+                id="areaRadiusControls"
+                class="analysis-control hidden"
+            >
+
+                <label for="areaRadiusSelect">
+                    Explorer radius
+                </label>
+
+                <select
+                    id="areaRadiusSelect"
+                    class="analysis-select"
+                >
+                    <option value="1">
+                        1 km
+                    </option>
+
+                    <option value="2" selected>
+                        2 km
+                    </option>
+
+                    <option value="4">
+                        4 km
+                    </option>
+
+                    <option value="8">
+                        8 km
+                    </option>
+                </select>
+
+                <p>
+                    Move the mouse over the map to explore facilities around each location.
+                </p>
+
+            </div>
+
+
+            <!-- COVERAGE -->
+
+            <div class="analysis-control coverage-control">
+
+                <label for="coverageRadiusSelect">
+                    Facility coverage overlay
+                </label>
+
+                <select
+                    id="coverageRadiusSelect"
+                    class="analysis-select"
+                >
+                    <option value="0" selected>
+                        Off
+                    </option>
+
+                    <option value="1">
+                        1 km
+                    </option>
+
+                    <option value="2">
+                        2 km
+                    </option>
+
+                    <option value="4">
+                        4 km
+                    </option>
+
+                    <option value="8">
+                        8 km
+                    </option>
+                </select>
+
+                <div
+                    id="coverageStatus"
+                    class="analysis-help"
+                >
+                    Uses the currently selected facility filters.
+                </div>
+
+            </div>
+
+
+            <div
+                id="analysisModeStatus"
+                class="analysis-status"
+            >
+                Normal facility selection enabled.
+            </div>
+
+        </section>
+
+
+        <!-- RESULT COUNT -->
+
+        <div class="results-box">
+
+            <span id="resultCount">
+                Loading facilities...
+            </span>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAP
+         ===================================================== -->
+
+    <main class="map-container">
+
+        <div id="viewDiv"></div>
+
+
+        <button
+            id="homeButton"
+            class="map-home-button"
+            title="Return to full Ireland view"
+            type="button"
+        >
+
+            <span class="home-icon">
+                ⌂
+            </span>
+
+            <span class="home-label">
+                Full Ireland
+            </span>
+
+        </button>
+
+
+        <!-- LEGEND -->
+
+        <div
+            id="legend"
+            class="custom-legend"
+        >
+
+            <h3>
+                Sports
+            </h3>
+
+            <div id="legendItems">
+            </div>
+
+            <div class="legend-note">
+                Additional sports are available in Filters
+            </div>
+
+        </div>
+
+
+        <!-- DATASET -->
+
+        <a
+            href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="dataset-button"
+            title="View the Sport Ireland Facilities Mapping dataset on data.gov.ie"
+        >
+            View dataset on data.gov.ie ↗
+        </a>
+
+
+        <!-- ANALYSIS BADGE -->
+
+        <div
+            id="mapAnalysisBadge"
+            class="map-analysis-badge hidden"
+        >
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         RIGHT PANEL
+         ===================================================== -->
+
+    <aside class="details-panel">
+
+        <div class="panel-heading">
+
+            <h2 id="rightPanelHeading">
+                Facility details
+            </h2>
+
+            <button
+                id="closeDetails"
+                class="close-button"
+                title="Clear selection"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- EMPTY NORMAL STATE -->
+
+        <div
+            id="emptyState"
+            class="empty-state"
+        >
+
+            <div class="empty-icon">
+                ⌖
+            </div>
+
+            <h3>
+                Select a facility
+            </h3>
+
+            <p>
+                Click a facility on the map to view its details.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             FACILITY DETAILS
+             ================================================= -->
+
+        <div
+            id="facilityDetails"
+            class="facility-details hidden"
+        >
+
+            <div
+                id="selectionNavigator"
+                class="selection-navigator hidden"
+            >
+
+                <button
+                    id="previousFacility"
+                    class="navigator-button"
+                    type="button"
+                    title="Previous facility"
+                >
+                    ‹
+                </button>
+
+                <div class="navigator-centre">
+
+                    <strong id="selectionPosition">
+                        1 of 1
+                    </strong>
+
+                    <span>
+                        facilities here
+                    </span>
+
+                </div>
+
+                <button
+                    id="nextFacility"
+                    class="navigator-button"
+                    type="button"
+                    title="Next facility"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            <div class="facility-title-box">
+
+                <h2 id="detailTitle">
+                    Facility
+                </h2>
+
+                <div class="facility-tags">
+
+                    <span
+                        id="detailSportTag"
+                        class="tag"
+                    >
+                    </span>
+
+                    <span
+                        id="detailTypeTag"
+                        class="tag tag-secondary"
+                    >
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-table">
+
+                <div class="detail-row">
+                    <span>Sport</span>
+                    <strong id="detailSport">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Facility type</span>
+                    <strong id="detailInfrastructure">—</strong>
+                </div>
+
+
+                <div
+                    id="poolLengthRow"
+                    class="detail-row hidden"
+                >
+                    <span>Pool length</span>
+                    <strong id="detailPoolLength">—</strong>
+                </div>
+
+
+                <div
+                    id="poolBreadthRow"
+                    class="detail-row hidden"
+                >
+                    <span>Pool breadth</span>
+                    <strong id="detailPoolBreadth">—</strong>
+                </div>
+
+
+                <div class="detail-row">
+                    <span>Surface</span>
+                    <strong id="detailSurface">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Floodlights</span>
+                    <strong id="detailFloodlights">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Ownership type</span>
+                    <strong id="detailOwner">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Owner</span>
+                    <strong id="detailOwnerName">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Size</span>
+                    <strong id="detailSize">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Quality</span>
+                    <strong id="detailQuality">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Usage</span>
+                    <strong id="detailMultiUse">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Local Authority</span>
+                    <strong id="detailLA">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>LEA</span>
+                    <strong id="detailLEA">—</strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Area</span>
+                    <strong id="detailArea">—</strong>
+                </div>
+
+            </div>
 
 
             <button
-                id="homeButton"
-                class="map-home-button"
-                title="Return to full Ireland view"
+                id="zoomToFacility"
+                class="primary-button"
+                type="button"
             >
-
-                <span class="home-icon">⌂</span>
-
-                <span class="home-label">
-                    Full Ireland
-                </span>
-
+                Zoom to facility
             </button>
 
-
-            <div
-                id="legend"
-                class="custom-legend"
-            >
-
-                <h3>Sports</h3>
-
-                <div id="legendItems"></div>
-
-                <div class="legend-note">
-                    Additional sports are available in Filters
-                </div>
-
-            </div>
+        </div>
 
 
-            <a
-                href="https://data.gov.ie/dataset/sport-ireland-facilities-mapping"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="dataset-button"
-                title="View the Sport Ireland Facilities Mapping dataset on data.gov.ie"
-            >
-                View dataset on data.gov.ie ↗
-            </a>
+        <!-- =================================================
+             ANALYSIS DETAILS
+             ================================================= -->
 
-        </main>
+        <div
+            id="analysisDetails"
+            class="analysis-details hidden"
+        >
 
+            <div class="analysis-title-box">
 
-        <!-- DETAILS PANEL -->
+                <h2 id="analysisTitle">
+                    Area summary
+                </h2>
 
-        <aside class="details-panel">
-
-            <div class="panel-heading">
-
-                <h2>Facility details</h2>
-
-                <button
-                    id="closeDetails"
-                    class="close-button"
-                    title="Close"
-                >
-                    ×
-                </button>
-
-            </div>
-
-
-            <div
-                id="emptyState"
-                class="empty-state"
-            >
-
-                <div class="empty-icon">
-                    ⌖
-                </div>
-
-                <h3>Select a facility</h3>
-
-                <p>
-                    Click a facility on the map to view its details.
+                <p id="analysisSubtitle">
+                Select a location on the map.
                 </p>
 
             </div>
 
 
             <div
-                id="facilityDetails"
-                class="facility-details hidden"
+                id="analysisLoading"
+                class="analysis-loading hidden"
             >
-
-                <div
-                    id="selectionNavigator"
-                    class="selection-navigator hidden"
-                >
-
-                    <button
-                        id="previousFacility"
-                        class="navigator-button"
-                        type="button"
-                        title="Previous facility"
-                    >
-                        ‹
-                    </button>
-
-                    <div class="navigator-centre">
-
-                        <strong id="selectionPosition">
-                            1 of 1
-                        </strong>
-
-                        <span>
-                            facilities here
-                        </span>
-
-                    </div>
-
-                    <button
-                        id="nextFacility"
-                        class="navigator-button"
-                        type="button"
-                        title="Next facility"
-                    >
-                        ›
-                    </button>
-
-                </div>
-
-
-                <div class="facility-title-box">
-
-                    <h2 id="detailTitle">
-                        Facility
-                    </h2>
-
-                    <div class="facility-tags">
-
-                        <span
-                            id="detailSportTag"
-                            class="tag"
-                        ></span>
-
-                        <span
-                            id="detailTypeTag"
-                            class="tag tag-secondary"
-                        ></span>
-
-                    </div>
-
-                </div>
-
-
-                <div class="details-table">
-
-                    <div class="detail-row">
-                        <span>Sport</span>
-                        <strong id="detailSport">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Facility type</span>
-                        <strong id="detailInfrastructure">—</strong>
-                    </div>
-
-
-                    <!-- POOL DETAILS -->
-
-                    <div
-                        id="poolLengthRow"
-                        class="detail-row hidden"
-                    >
-                        <span>Pool length</span>
-                        <strong id="detailPoolLength">—</strong>
-                    </div>
-
-                    <div
-                        id="poolBreadthRow"
-                        class="detail-row hidden"
-                    >
-                        <span>Pool width</span>
-                        <strong id="detailPoolBreadth">—</strong>
-                    </div>
-
-
-                    <div class="detail-row">
-                        <span>Surface</span>
-                        <strong id="detailSurface">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Floodlights</span>
-                        <strong id="detailFloodlights">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Ownership type</span>
-                        <strong id="detailOwner">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Owner</span>
-                        <strong id="detailOwnerName">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Size</span>
-                        <strong id="detailSize">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Quality</span>
-                        <strong id="detailQuality">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Usage</span>
-                        <strong id="detailMultiUse">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Local Authority</span>
-                        <strong id="detailLA">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>LEA</span>
-                        <strong id="detailLEA">—</strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Area</span>
-                        <strong id="detailArea">—</strong>
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="zoomToFacility"
-                    class="primary-button"
-                >
-                    Zoom to facility
-                </button>
-
+                Analysing facilities…
             </div>
 
-        </aside>
 
-    </div>
+            <div
+                id="analysisTotals"
+                class="analysis-totals"
+            >
+            </div>
 
-    <script src="app.js"></script>
+
+            <div
+                id="analysisTableContainer"
+                class="analysis-table-container"
+            >
+            </div>
+
+
+            <div
+                id="analysisEmptyMessage"
+                class="analysis-empty hidden"
+            >
+                No facilities found in this area.
+            </div>
+
+
+            <button
+                id="clearAnalysisButton"
+                class="secondary-analysis-button"
+                type="button"
+            >
+                Clear analysis
+            </button>
+
+        </div>
+
+    </aside>
+
+</div>
+
+<script src="app.js"></script>
 
 </body>
 
