@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,7 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Sport Ireland Facilities Explorer</title>
+    <title>
+        Sport Ireland Facilities Explorer
+    </title>
 
     <link
         rel="stylesheet"
@@ -22,13 +25,18 @@
     >
 
     <script src="https://js.arcgis.com/4.31/"></script>
+
 </head>
+
 
 <body>
 
 <div class="app">
 
-    <!-- HEADER -->
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
     <header class="header">
 
@@ -49,13 +57,20 @@
     </header>
 
 
-    <!-- LEFT PANEL -->
+
+    <!-- =====================================================
+         LEFT PANEL
+         ===================================================== -->
 
     <aside class="filter-panel">
 
+
         <div class="panel-heading">
 
-            <h2>Filters</h2>
+            <h2>
+                Filters
+            </h2>
+
 
             <div class="filter-actions">
 
@@ -67,9 +82,11 @@
                     Select all
                 </button>
 
+
                 <span class="filter-divider">
                     |
                 </span>
+
 
                 <button
                     id="deselectAllFilters"
@@ -84,6 +101,7 @@
         </div>
 
 
+
         <!-- SPORT -->
 
         <section class="filter-section">
@@ -92,10 +110,12 @@
                 Sport
             </h3>
 
+
             <div
                 id="mainSportFilters"
                 class="checkbox-list"
             ></div>
+
 
             <button
                 id="moreSportsButton"
@@ -116,12 +136,14 @@
 
             </button>
 
+
             <div
                 id="moreSportFilters"
                 class="checkbox-list dropdown-list hidden"
             ></div>
 
         </section>
+
 
 
         <!-- OWNERSHIP -->
@@ -147,12 +169,14 @@
 
             </button>
 
+
             <div
                 id="ownerFilters"
                 class="checkbox-list dropdown-list hidden"
             ></div>
 
         </section>
+
 
 
         <!-- SURFACE -->
@@ -178,12 +202,14 @@
 
             </button>
 
+
             <div
                 id="surfaceFilters"
                 class="checkbox-list dropdown-list hidden"
             ></div>
 
         </section>
+
 
 
         <!-- FLOODLIGHTS -->
@@ -209,6 +235,7 @@
 
             </button>
 
+
             <div
                 id="floodlightFilters"
                 class="checkbox-list dropdown-list hidden"
@@ -217,7 +244,10 @@
         </section>
 
 
-        <!-- ANALYSIS -->
+
+        <!-- =================================================
+             ANALYSIS
+             ================================================= -->
 
         <section class="filter-section analysis-section">
 
@@ -233,29 +263,32 @@
                     class="analysis-mode-button active"
                     type="button"
                 >
-                    Normal map
+                    Map Search
                 </button>
+
 
                 <button
                     id="catchmentModeButton"
                     class="analysis-mode-button"
                     type="button"
                 >
-                    Catchment
+                    Catchment Area
                 </button>
+
 
                 <button
                     id="lensModeButton"
                     class="analysis-mode-button"
                     type="button"
                 >
-                    Lens Explorer
+                    Focus Search
                 </button>
 
             </div>
 
 
-            <!-- LENS -->
+
+            <!-- FOCUS SEARCH -->
 
             <div
                 id="lensControls"
@@ -263,8 +296,9 @@
             >
 
                 <label for="lensRadiusSelect">
-                    Lens radius
+                    Search radius
                 </label>
+
 
                 <select
                     id="lensRadiusSelect"
@@ -292,12 +326,14 @@
 
                 </select>
 
+
                 <p>
-                    Pan or zoom the map underneath the fixed lens.
+                    Pan or zoom the map underneath the focus area.
                 </p>
 
 
-                <!-- COVERAGE -->
+
+                <!-- OPTIONAL COVERAGE -->
 
                 <details class="coverage-details">
 
@@ -305,11 +341,13 @@
                         Optional coverage overlay
                     </summary>
 
+
                     <div class="coverage-content">
 
                         <label for="coverageSportSelect">
                             Sport
                         </label>
+
 
                         <select
                             id="coverageSportSelect"
@@ -329,6 +367,7 @@
                         >
                             Radius
                         </label>
+
 
                         <select
                             id="coverageRadiusSelect"
@@ -360,6 +399,7 @@
 
                         </select>
 
+
                         <div
                             id="coverageStatus"
                             class="analysis-help"
@@ -374,14 +414,16 @@
             </div>
 
 
+
             <div
                 id="analysisModeStatus"
                 class="analysis-status"
             >
-                Normal facility selection enabled.
+                Map Search enabled.
             </div>
 
         </section>
+
 
 
         <!-- RESULT COUNT -->
@@ -397,14 +439,19 @@
     </aside>
 
 
-    <!-- MAP -->
+
+    <!-- =====================================================
+         MAP
+         ===================================================== -->
 
     <main
         id="mapContainer"
         class="map-container"
     >
 
+
         <div id="viewDiv"></div>
+
 
 
         <button
@@ -414,6 +461,7 @@
         >
             ⌂ Full Ireland
         </button>
+
 
 
         <!-- LEGEND -->
@@ -436,6 +484,7 @@
         </div>
 
 
+
         <!-- DATASET -->
 
         <a
@@ -448,7 +497,10 @@
         </a>
 
 
-        <!-- FIXED LENS -->
+
+        <!-- =================================================
+             FOCUS SEARCH LENS
+             ================================================= -->
 
         <div
             id="fixedLens"
@@ -493,6 +545,7 @@
         </div>
 
 
+
         <div
             id="mapAnalysisBadge"
             class="map-analysis-badge hidden"
@@ -501,15 +554,20 @@
     </main>
 
 
-    <!-- RIGHT PANEL -->
+
+    <!-- =====================================================
+         RIGHT PANEL
+         ===================================================== -->
 
     <aside class="details-panel">
+
 
         <div class="panel-heading">
 
             <h2 id="rightPanelHeading">
                 Facility details
             </h2>
+
 
             <button
                 id="closeDetails"
@@ -520,6 +578,7 @@
             </button>
 
         </div>
+
 
 
         <!-- EMPTY -->
@@ -544,12 +603,14 @@
         </div>
 
 
+
         <!-- FACILITY DETAILS -->
 
         <div
             id="facilityDetails"
             class="facility-details hidden"
         >
+
 
             <div
                 id="selectionNavigator"
@@ -564,6 +625,7 @@
                     ‹
                 </button>
 
+
                 <div class="navigator-centre">
 
                     <strong id="selectionPosition">
@@ -576,6 +638,7 @@
 
                 </div>
 
+
                 <button
                     id="nextFacility"
                     class="navigator-button"
@@ -587,11 +650,13 @@
             </div>
 
 
+
             <div class="facility-title-box">
 
                 <h2 id="detailTitle">
                     Facility
                 </h2>
+
 
                 <div class="facility-tags">
 
@@ -599,6 +664,7 @@
                         id="detailSportTag"
                         class="tag"
                     ></span>
+
 
                     <span
                         id="detailTypeTag"
@@ -610,17 +676,21 @@
             </div>
 
 
+
             <div class="details-table">
+
 
                 <div class="detail-row">
                     <span>Sport</span>
                     <strong id="detailSport">—</strong>
                 </div>
 
+
                 <div class="detail-row">
                     <span>Facility type</span>
                     <strong id="detailInfrastructure">—</strong>
                 </div>
+
 
                 <div
                     id="poolLengthRow"
@@ -630,6 +700,7 @@
                     <strong id="detailPoolLength">—</strong>
                 </div>
 
+
                 <div
                     id="poolBreadthRow"
                     class="detail-row hidden"
@@ -638,50 +709,60 @@
                     <strong id="detailPoolBreadth">—</strong>
                 </div>
 
+
                 <div class="detail-row">
                     <span>Surface</span>
                     <strong id="detailSurface">—</strong>
                 </div>
+
 
                 <div class="detail-row">
                     <span>Floodlights</span>
                     <strong id="detailFloodlights">—</strong>
                 </div>
 
+
                 <div class="detail-row">
                     <span>Ownership type</span>
                     <strong id="detailOwner">—</strong>
                 </div>
+
 
                 <div class="detail-row">
                     <span>Owner</span>
                     <strong id="detailOwnerName">—</strong>
                 </div>
 
+
                 <div class="detail-row">
                     <span>Size</span>
                     <strong id="detailSize">—</strong>
                 </div>
+
 
                 <div class="detail-row">
                     <span>Quality</span>
                     <strong id="detailQuality">—</strong>
                 </div>
 
+
                 <div class="detail-row">
                     <span>Usage</span>
                     <strong id="detailMultiUse">—</strong>
                 </div>
+
 
                 <div class="detail-row">
                     <span>Local Authority</span>
                     <strong id="detailLA">—</strong>
                 </div>
 
+
                 <div class="detail-row">
                     <span>LEA</span>
                     <strong id="detailLEA">—</strong>
                 </div>
+
 
                 <div class="detail-row">
                     <span>Area</span>
@@ -689,6 +770,7 @@
                 </div>
 
             </div>
+
 
 
             <button
@@ -702,12 +784,14 @@
         </div>
 
 
-        <!-- ANALYSIS DETAILS -->
+
+        <!-- ANALYSIS -->
 
         <div
             id="analysisDetails"
             class="analysis-details hidden"
         >
+
 
             <div class="analysis-title-box">
 
@@ -722,10 +806,12 @@
             </div>
 
 
+
             <div
                 id="analysisTotals"
                 class="analysis-totals"
             ></div>
+
 
 
             <section
@@ -742,6 +828,7 @@
             </section>
 
 
+
             <section
                 id="typeSummaryBlock"
                 class="summary-block hidden"
@@ -756,10 +843,12 @@
             </section>
 
 
+
             <div
                 id="analysisTableContainer"
                 class="analysis-table-container"
             ></div>
+
 
 
             <button
@@ -775,6 +864,7 @@
     </aside>
 
 </div>
+
 
 <script src="app.js"></script>
 
