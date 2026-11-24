@@ -68,6 +68,93 @@ require([
     700;
 
 
+  // Icons only appear when reasonably zoomed in.
+  const SPORT_ICON_MIN_ZOOM =
+    11;
+
+
+  const SPORT_ICON_SIZE =
+    23;
+
+
+  const SPORT_ICON_HALO_SIZE =
+    31;
+
+
+  // =========================================================
+  // SPORT ICONS
+  // =========================================================
+
+  /*
+    Disability icons are intentionally NOT included.
+
+    Each sport can have one or more standard icon files.
+
+    If you later add male/female variants, simply add them
+    to the array, for example:
+
+    "Soccer": [
+      "soccer_male.png",
+      "soccer_female.png"
+    ]
+
+    The app will automatically rotate the variants between
+    facilities using the OBJECTID.
+  */
+
+  const sportIcons = {
+
+    "Gaelic Games": [
+      "gaa.png"
+    ],
+
+    "Soccer": [
+      "soccer.png"
+    ],
+
+    "Golf": [
+      "golf.png"
+    ],
+
+    "Rugby": [
+      "rugby.png"
+    ],
+
+    "Swimming Indoor": [
+      "swimming.png"
+    ],
+
+    "Swimming Outdoor": [
+      "swimming.png"
+    ],
+
+    "Cycling": [
+      "cycling.png"
+    ],
+
+    "Boxing": [
+      "combat_sports.png"
+    ],
+
+    "Gym": [
+      "personal_exercise.png"
+    ],
+
+    "Tennis": [
+      "racket_sports.png"
+    ],
+
+    "Badminton": [
+      "racket_sports.png"
+    ],
+
+    "Padel": [
+      "racket_sports.png"
+    ]
+
+  };
+
+
   // =========================================================
   // SPORTS
   // =========================================================
@@ -311,6 +398,15 @@ require([
     new GraphicsLayer();
 
 
+  const sportIconLayer =
+    new GraphicsLayer({
+
+      title:
+        "Sport icons"
+
+    });
+
+
   const analysisLayer =
     new GraphicsLayer();
 
@@ -435,6 +531,7 @@ require([
       layers: [
         coverageLayer,
         facilitiesLayer,
+        sportIconLayer,
         analysisLayer,
         selectionGraphicsLayer
       ]
@@ -556,6 +653,10 @@ require([
 
   let allSportValues =
     [];
+
+
+  let sportIconRequestId =
+    0;
 
 
   // =========================================================
@@ -873,6 +974,9 @@ require([
 
 
       await updateResultCount();
+
+
+      refreshSportIcons();
 
     }
   );
@@ -1638,6 +1742,9 @@ require([
     await updateResultCount();
 
 
+    refreshSportIcons();
+
+
     if (
       analysisMode ===
       "catchment" &&
@@ -1734,7 +1841,7 @@ require([
 
 
   // =========================================================
-  // COUNT
+  // PUBLIC FACILITY COUNT
   // =========================================================
 
   async function updateResultCount() {
@@ -1758,6 +1865,352 @@ require([
         "en-IE"
       ) +
       " public facilities";
+
+  }
+
+
+  // =========================================================
+  // SPORT ICONS
+  // =========================================================
+
+  async function refreshSportIcons() {
+
+    const requestId =
+      ++sportIconRequestId;
+
+
+    sportIconLayer.removeAll();
+
+
+    if (
+      !view.extent ||
+      view.zoom <
+      SPORT_ICON_MIN_ZOOM
+    ) {
+
+      return;
+
+    }
+
+
+    const availableSports =
+      Object.keys(
+        sportIcons
+      );
+
+
+    if (
+      availableSports.length ===
+      0
+    ) {
+
+      return;
+
+    }
+
+
+    const iconSportsSql =
+      availableSports
+        .map(
+          function (
+            sport
+          ) {
+
+            return (
+              "'" +
+              escapeSql(
+                sport
+              ) +
+              "'"
+            );
+
+          }
+        )
+        .join(
+          ","
+        );
+
+
+    const query =
+      facilitiesLayer.createQuery();
+
+
+    query.geometry =
+      view.extent;
+
+
+    query.spatialRelationship =
+      "intersects";
+
+
+    const currentWhere =
+      buildAnalysisWhere();
+
+
+    if (
+      currentWhere ===
+      "1=0"
+    ) {
+
+      return;
+
+    }
+
+
+    query.where =
+      "(" +
+      currentWhere +
+      ")" +
+      " AND Sport IN (" +
+      iconSportsSql +
+      ")";
+
+
+    query.returnGeometry =
+      true;
+
+
+    query.outFields = [
+      "OBJECTID",
+      "Sport"
+    ];
+
+
+    try {
+
+      const response =
+        await facilitiesLayer.queryFeatures(
+          query
+        );
+
+
+      if (
+        requestId !==
+        sportIconRequestId
+      ) {
+
+        return;
+
+      }
+
+
+      const graphics =
+        [];
+
+
+      response.features.forEach(
+        function (
+          feature
+        ) {
+
+          if (
+            !feature.geometry
+          ) {
+
+            return;
+
+          }
+
+
+          const sport =
+            feature.attributes.Sport;
+
+
+          const centre =
+            getGeometryCentre(
+              feature.geometry
+            );
+
+
+          if (!centre) {
+
+            return;
+
+          }
+
+
+          const icon =
+            chooseSportIcon(
+              feature
+            );
+
+
+          if (!icon) {
+
+            return;
+
+          }
+
+
+          /*
+           * WHITE HALO
+           */
+
+          graphics.push(
+
+            new Graphic({
+
+              geometry:
+                centre,
+
+
+              symbol: {
+
+                type:
+                  "simple-marker",
+
+
+                style:
+                  "circle",
+
+
+                size:
+                  SPORT_ICON_HALO_SIZE,
+
+
+                color: [
+                  255,
+                  255,
+                  255,
+                  0.93
+                ],
+
+
+                outline: {
+
+                  color: [
+                    0,
+                    90,
+                    70,
+                    0.55
+                  ],
+
+
+                  width:
+                    1
+
+                }
+
+              }
+
+            })
+
+          );
+
+
+          /*
+           * SPORT ICON
+           */
+
+          graphics.push(
+
+            new Graphic({
+
+              geometry:
+                centre,
+
+
+              symbol: {
+
+                type:
+                  "picture-marker",
+
+
+                url:
+                  icon,
+
+
+                width:
+                  SPORT_ICON_SIZE +
+                  "px",
+
+
+                height:
+                  SPORT_ICON_SIZE +
+                  "px"
+
+              }
+
+            })
+
+          );
+
+        }
+      );
+
+
+      if (
+        requestId !==
+        sportIconRequestId
+      ) {
+
+        return;
+
+      }
+
+
+      sportIconLayer.addMany(
+        graphics
+      );
+
+    }
+    catch (
+      error
+    ) {
+
+      console.error(
+        "SPORT ICON ERROR:",
+        error
+      );
+
+    }
+
+  }
+
+
+  function chooseSportIcon(
+    feature
+  ) {
+
+    const sport =
+      feature.attributes.Sport;
+
+
+    const options =
+      sportIcons[
+        sport
+      ];
+
+
+    if (
+      !options ||
+      options.length === 0
+    ) {
+
+      return null;
+
+    }
+
+
+    const objectId =
+      Number(
+        feature.attributes.OBJECTID
+      ) ||
+      0;
+
+
+    const index =
+      Math.abs(
+        objectId
+      ) %
+      options.length;
+
+
+    return (
+      options[
+        index
+      ]
+    );
 
   }
 
@@ -1940,6 +2393,40 @@ require([
               : selectedGraphic.geometry
 
           );
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        "closeDetails"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          if (
+            analysisMode ===
+            "normal"
+          ) {
+
+            clearSelection();
+
+
+            showNormalPanel();
+
+          }
+
+
+          if (
+            analysisMode ===
+            "catchment"
+          ) {
+
+            clearAnalysis();
+
+          }
 
         }
       );
@@ -2311,7 +2798,8 @@ require([
 
 
     if (
-      nearby.length === 0
+      nearby.length ===
+      0
     ) {
 
       clearSelection();
@@ -2895,7 +3383,7 @@ require([
 
 
   // =========================================================
-  // LIVE FOCUS SEARCH
+  // LIVE MAP WATCHERS
   // =========================================================
 
   function scheduleFocusRefresh() {
@@ -2950,8 +3438,17 @@ require([
       stationary
     ) {
 
+      if (!stationary) {
+
+        return;
+
+      }
+
+
+      refreshSportIcons();
+
+
       if (
-        stationary &&
         analysisMode ===
         "coverage"
       ) {
@@ -3347,7 +3844,7 @@ require([
 
 
   // =========================================================
-  // RESPONSIVE LENS SIZE
+  // FOCUS LENS
   // =========================================================
 
   function showFixedLens() {
@@ -3488,10 +3985,6 @@ require([
 
   }
 
-
-  // =========================================================
-  // RESPONSIVE RADIAL GRAPH
-  // =========================================================
 
   function renderLens(
     total,
@@ -4340,6 +4833,16 @@ require([
     "click",
     function () {
 
+      if (
+        selectedGraphics.length ===
+        0
+      ) {
+
+        return;
+
+      }
+
+
       selectedIndex =
         (
           selectedIndex -
@@ -4358,6 +4861,16 @@ require([
   nextFacility.addEventListener(
     "click",
     function () {
+
+      if (
+        selectedGraphics.length ===
+        0
+      ) {
+
+        return;
+
+      }
+
 
       selectedIndex =
         (
