@@ -68,17 +68,29 @@ require([
     700;
 
 
-  // Icons only appear when reasonably zoomed in.
+  // =========================================================
+  // SPORT ICON SETTINGS
+  // =========================================================
+
   const SPORT_ICON_MIN_ZOOM =
     11;
 
 
-  const SPORT_ICON_SIZE =
-    23;
+  const SPORT_ICON_MAX_SIZE =
+    22;
 
 
-  const SPORT_ICON_HALO_SIZE =
-    31;
+  const SPORT_ICON_MIN_SIZE =
+    7;
+
+
+  /*
+    Icon uses no more than this proportion
+    of the polygon's smallest screen dimension.
+  */
+
+  const SPORT_ICON_POLYGON_RATIO =
+    0.48;
 
 
   // =========================================================
@@ -86,38 +98,40 @@ require([
   // =========================================================
 
   /*
-    Disability icons are intentionally NOT included.
+    Disability icons are intentionally excluded.
 
-    Each sport can have one or more standard icon files.
+    Multiple icons can be listed for the same sport.
+    The app rotates between them using OBJECTID.
 
-    If you later add male/female variants, simply add them
-    to the array, for example:
-
-    "Soccer": [
-      "soccer_male.png",
-      "soccer_female.png"
-    ]
-
-    The app will automatically rotate the variants between
-    facilities using the OBJECTID.
+    This gives us a consistent male/female visual mix
+    without implying the facility itself is gender-specific.
   */
 
   const sportIcons = {
 
     "Gaelic Games": [
-      "gaa.png"
+      "gaa.png",
+      "gaelic_f.png"
     ],
 
     "Soccer": [
-      "soccer.png"
-    ],
-
-    "Golf": [
-      "golf.png"
+      "soccer.png",
+      "soccer_f.png"
     ],
 
     "Rugby": [
-      "rugby.png"
+      "rugby.png",
+      "rugby_f.png"
+    ],
+
+    "Cycling": [
+      "cycling.png",
+      "cycling_f.png"
+    ],
+
+    "Running": [
+      "running.png",
+      "running_f.png"
     ],
 
     "Swimming Indoor": [
@@ -128,15 +142,23 @@ require([
       "swimming.png"
     ],
 
-    "Cycling": [
-      "cycling.png"
+    "Golf": [
+      "golf.png"
     ],
 
     "Boxing": [
       "combat_sports.png"
     ],
 
+    "Combat Sports": [
+      "combat_sports.png"
+    ],
+
     "Gym": [
+      "personal_exercise.png"
+    ],
+
+    "Personal Exercise": [
       "personal_exercise.png"
     ],
 
@@ -150,6 +172,19 @@ require([
 
     "Padel": [
       "racket_sports.png"
+    ],
+
+    "Racket Sports": [
+      "racket_sports.png"
+    ],
+
+    "Pilates": [
+      "pilates.png",
+      "pilates_f.png"
+    ],
+
+    "Dancing": [
+      "dancing.png"
     ]
 
   };
@@ -302,22 +337,22 @@ require([
 
   const breakdownColours = [
 
-    [0,132,150],
-    [235,132,30],
-    [85,115,185],
-    [170,85,165],
-    [55,155,125],
-    [210,85,70],
-    [125,145,75],
-    [105,105,145],
-    [225,165,45],
-    [75,145,175]
+    [0, 132, 150],
+    [235, 132, 30],
+    [85, 115, 185],
+    [170, 85, 165],
+    [55, 155, 125],
+    [210, 85, 70],
+    [125, 145, 75],
+    [105, 105, 145],
+    [225, 165, 45],
+    [75, 145, 175]
 
   ];
 
 
   // =========================================================
-  // RENDERER
+  // FACILITY RENDERER
   // =========================================================
 
   const rendererInfos =
@@ -391,7 +426,7 @@ require([
 
 
   // =========================================================
-  // GRAPHICS
+  // GRAPHICS LAYERS
   // =========================================================
 
   const coverageLayer =
@@ -402,7 +437,11 @@ require([
     new GraphicsLayer({
 
       title:
-        "Sport icons"
+        "Sport icons",
+
+
+      opacity:
+        0.5
 
     });
 
@@ -412,7 +451,12 @@ require([
 
 
   const selectionGraphicsLayer =
-    new GraphicsLayer();
+    new GraphicsLayer({
+
+      title:
+        "Selected facilities"
+
+    });
 
 
   // =========================================================
@@ -431,21 +475,37 @@ require([
 
 
       outFields: [
+
         "OBJECTID",
+
         "Sport",
+
         "Infrastructure_Type",
+
         "Surface",
+
         "Floodlights",
+
         "Owner",
+
         "Facility_Size",
+
         "Owner_Name",
+
         "Quality",
+
         "Local_Authority",
+
         "LEA",
+
         "Multi_Use",
+
         "Area_msq",
+
         "Pool_Length",
+
         "Pool_Breadth"
+
       ],
 
 
@@ -529,11 +589,17 @@ require([
 
 
       layers: [
+
         coverageLayer,
+
         facilitiesLayer,
+
         sportIconLayer,
+
         analysisLayer,
+
         selectionGraphicsLayer
+
       ]
 
     });
@@ -651,12 +717,12 @@ require([
     0;
 
 
-  let allSportValues =
-    [];
-
-
   let sportIconRequestId =
     0;
+
+
+  let allSportValues =
+    [];
 
 
   // =========================================================
@@ -2004,25 +2070,9 @@ require([
         ) {
 
           if (
-            !feature.geometry
+            !feature.geometry ||
+            !feature.geometry.extent
           ) {
-
-            return;
-
-          }
-
-
-          const sport =
-            feature.attributes.Sport;
-
-
-          const centre =
-            getGeometryCentre(
-              feature.geometry
-            );
-
-
-          if (!centre) {
 
             return;
 
@@ -2042,65 +2092,127 @@ require([
           }
 
 
-          /*
-           * WHITE HALO
-           */
-
-          graphics.push(
-
-            new Graphic({
-
-              geometry:
-                centre,
+          const centre =
+            getGeometryCentre(
+              feature.geometry
+            );
 
 
-              symbol: {
+          if (!centre) {
 
-                type:
-                  "simple-marker",
+            return;
 
-
-                style:
-                  "circle",
-
-
-                size:
-                  SPORT_ICON_HALO_SIZE,
-
-
-                color: [
-                  255,
-                  255,
-                  255,
-                  0.93
-                ],
-
-
-                outline: {
-
-                  color: [
-                    0,
-                    90,
-                    70,
-                    0.55
-                  ],
-
-
-                  width:
-                    1
-
-                }
-
-              }
-
-            })
-
-          );
+          }
 
 
           /*
-           * SPORT ICON
-           */
+            Convert polygon extent to screen pixels.
+          */
+
+          const extent =
+            feature.geometry.extent;
+
+
+          const topLeft =
+            view.toScreen(
+
+              new Point({
+
+                x:
+                  extent.xmin,
+
+                y:
+                  extent.ymax,
+
+                spatialReference:
+                  extent.spatialReference
+
+              })
+
+            );
+
+
+          const bottomRight =
+            view.toScreen(
+
+              new Point({
+
+                x:
+                  extent.xmax,
+
+                y:
+                  extent.ymin,
+
+                spatialReference:
+                  extent.spatialReference
+
+              })
+
+            );
+
+
+          if (
+            !topLeft ||
+            !bottomRight
+          ) {
+
+            return;
+
+          }
+
+
+          const polygonWidth =
+            Math.abs(
+              bottomRight.x -
+              topLeft.x
+            );
+
+
+          const polygonHeight =
+            Math.abs(
+              bottomRight.y -
+              topLeft.y
+            );
+
+
+          const smallestDimension =
+            Math.min(
+              polygonWidth,
+              polygonHeight
+            );
+
+
+          /*
+            Icon stays comfortably inside the polygon
+            bounding box.
+          */
+
+          const calculatedSize =
+            smallestDimension *
+            SPORT_ICON_POLYGON_RATIO;
+
+
+          const iconSize =
+            Math.min(
+              SPORT_ICON_MAX_SIZE,
+              calculatedSize
+            );
+
+
+          /*
+            If it would be too tiny, don't show it yet.
+            It appears automatically as the map zooms in.
+          */
+
+          if (
+            iconSize <
+            SPORT_ICON_MIN_SIZE
+          ) {
+
+            return;
+
+          }
+
 
           graphics.push(
 
@@ -2121,12 +2233,12 @@ require([
 
 
                 width:
-                  SPORT_ICON_SIZE +
+                  iconSize +
                   "px",
 
 
                 height:
-                  SPORT_ICON_SIZE +
+                  iconSize +
                   "px"
 
               }
@@ -2184,7 +2296,8 @@ require([
 
     if (
       !options ||
-      options.length === 0
+      options.length ===
+      0
     ) {
 
       return null;
@@ -2198,6 +2311,13 @@ require([
       ) ||
       0;
 
+
+    /*
+      Deterministic rotation.
+
+      If there are two images, facilities alternate
+      between them consistently.
+    */
 
     const index =
       Math.abs(
@@ -2836,7 +2956,8 @@ require([
 
 
     if (
-      overlapping.length > 0
+      overlapping.length >
+      0
     ) {
 
       overlapping.sort(
@@ -3161,6 +3282,7 @@ require([
     ) {
 
       console.error(
+        "CATCHMENT ERROR:",
         error
       );
 
@@ -3593,6 +3715,7 @@ require([
     ) {
 
       console.error(
+        "FOCUS SEARCH ERROR:",
         error
       );
 
@@ -4697,21 +4820,36 @@ require([
 
 
     const ids =
-      graphics.map(
-        function (
-          feature
-        ) {
+      graphics
+        .map(
+          function (
+            feature
+          ) {
 
-          return (
-            feature.getObjectId()
-          );
+            return (
+              feature.getObjectId()
+            );
 
-        }
-      );
+          }
+        )
+        .filter(
+          function (
+            id
+          ) {
+
+            return (
+              id !== undefined &&
+              id !== null
+            );
+
+          }
+        );
 
 
     if (
-      facilitiesLayerView
+      facilitiesLayerView &&
+      ids.length >
+      0
     ) {
 
       highlightHandle =
@@ -4887,7 +5025,7 @@ require([
 
 
   // =========================================================
-  // DETAILS
+  // FACILITY DETAILS
   // =========================================================
 
   function showFacilityDetails(
@@ -5107,7 +5245,7 @@ require([
 
 
   // =========================================================
-  // PANEL HELPERS
+  // PANELS
   // =========================================================
 
   function showNormalPanel() {
