@@ -77,11 +77,11 @@ require([
 
 
   const SPORT_ICON_MAX_SIZE =
-    28;
+    46;
 
 
   const SPORT_ICON_MIN_SIZE =
-    8;
+    10;
 
 
   /*
@@ -90,7 +90,7 @@ require([
   */
 
   const SPORT_ICON_POLYGON_RATIO =
-    0.60;
+    0.72;
 
 
   // =========================================================
